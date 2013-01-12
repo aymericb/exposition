@@ -12,13 +12,14 @@ class Photo extends Item
 		parent::__construct($path, $title);
 
 		// ### TODO
+		// Parse JSON config file
 	}
 
 	// Helper Method
 	static function isPhoto($obj) 
 	{
 		return (get_class($obj) === 'Barthe\Exposition\Photo');
-	}	
+	}
 	
 }
 

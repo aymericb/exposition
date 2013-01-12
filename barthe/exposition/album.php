@@ -23,18 +23,13 @@ class Album extends Item
 		// ### TODO: Parse JSON config file
 
 		// Iterate on $path. Fill $children
+		// ### TODO: Sort by filename
 		$this->children = array();
 		while (false !== ($entry = readdir($dir))) {
 			if ($entry === '.' || $entry === '..')
 				continue;
 			$filepath = $this->path . DIRECTORY_SEPARATOR . $entry;
-			$ext = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
-			$item = NULL;
-			if (is_dir($filepath)) {
-				$item = new Album($filepath);
-			} elseif (in_array($ext, Config::PHOTO_EXTENSIONS())) {
-				$item = new Photo($filepath);
-			}
+			$item = Item::createItem($filepath);
 			if ($item)
 				array_push($this->children, $item);
 		}

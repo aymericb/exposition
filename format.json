@@ -1,0 +1,13 @@
+/* JSON sent to get item information. This can be of either type 'album' or 'photo'  */
+{
+	/* Common properties */
+	"type": "album",	/* or "photo" */
+	"title": "title_of_item",  /* add localization later */
+	"path": "path/to/item",
+	/* Album properties only */
+	"children": [ 
+		/* Arrays of items, same description as this, except that album items
+		do NOT have a 'children' property. Children items are to be shown
+		in the same order as they appear in the array */
+	]
+}

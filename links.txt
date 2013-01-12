@@ -6,4 +6,5 @@ PHP coding standard
 Galleries (for inspiration)
 	http://demo.zinescripts.com/slickgallery-1.0/#?rand=3110
 	http://wowslider.com
+
 	
