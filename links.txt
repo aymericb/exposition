@@ -2,3 +2,8 @@ PHP coding standard
 	http://stackoverflow.com/questions/1820353/is-there-a-well-established-naming-convention-for-php-namespaces
 	https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
 	http://framework.zend.com/manual/1.12/en/coding-standard.naming-conventions.html
+
+Galleries (for inspiration)
+	http://demo.zinescripts.com/slickgallery-1.0/#?rand=3110
+	http://wowslider.com
+	
