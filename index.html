@@ -22,6 +22,14 @@
 			border-bottom-color: rgb(65, 65, 65);
 		}
 
+		#header p {
+			margin-top: 19px;
+			margin-left: 19px;			
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 22px;
+			color: rgb(240, 240, 240);			
+		}
+
 		#footer {
 			position: absolute;
 			bottom: 0px;
@@ -42,13 +50,80 @@
 			bottom: 62px;
 			background-color: rgb(32, 32, 32);
 			box-shadow: inset 5px 0px 5px -5px rgba(0, 0, 0, 1), inset -5px 0px 5px -5px rgba(0, 0, 0, 1), inset 0px 6px 5px -5px rgba(0, 0, 0, 1), inset 0px -6px 5px -5px rgba(0, 0, 0, 1);
+		}
 
+		.item {
+			position: absolute;			
+
+			/* Example */
+			left: 20px;
+			top: 20px;
+			width: 160px;
+			height: 138px; /*107+17+14px;*/
+
+			/* Debugging */
+			/*border-color: red;
+			border-style: solid;
+			border-width: 1px;*/
+		}
+
+		.item .thumbnail {
+			position: absolute;
+			top: 0px;
+			margin: 0px;
+
+			/* Example */
+			width: 160px;
+			height: 107px;
+
+
+			/* Debugging */
+			border-color: white;
+			border-style: solid;
+			border-width: 1px;
+		}
+
+		.item .title {
+			position: absolute;
+			color: rgb(220, 220, 220);			
+			text-align: center;
+			left: 16px;
+			right: 14px;
+			bottom: 0px;			
+			height: 17px;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 11px;
+			/*text-shadow: rgb(0, 0, 0) 0px 0px 1px;*/
+			padding-top: 4px;
+			padding-bottom: 0px;
+
+
+			background-clip: border-box;
+			background-color: 
+			rgb(60, 60, 60);
+			background-image: none;
+			background-origin: padding-box;
+			border-bottom-left-radius: 10px;
+			border-bottom-right-radius: 10px;
+			border-top-left-radius: 10px;
+			border-top-right-radius: 10px;
+			box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
+
+			/* Debugging */
+			/*border-color: green;
+			border-style: solid;
+			border-width: 1px;*/
 		}
 
 	</style>
 </head>
 <body>
-	<div id="header"></div>
-	<div id="main"></div>
+	<div id="header"><p>Salingkit Gallery<p></div>
+	<div id="main">
+		<div class="item">
+			<div class="thumbnail"></div>
+			<div class="title">Animals</div>
+		</div>
+	</div>
 	<div id="footer"></div>
 </body>
