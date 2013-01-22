@@ -8,6 +8,14 @@ function createItemData($item)
 {
 	$type = Photo::isPhoto($item) ? 'photo' : 'album';
 	$data = array('type' => $type, 'title' => $item->getTitle(), 'path' => $item->getPath());
+
+	if (Album::isAlbum($item)) {
+		$data['children'] = array();
+		foreach ($item->getChildren() as $subitem) {
+			array_push($data['children'], createItemData($subitem));
+		}
+	}
+	
 	return $data;
 }
 
@@ -22,12 +30,7 @@ try {
 	$path = Config::PHOTO_DIR . DIRECTORY_SEPARATOR . $path;
 	$item = Item::createItem($path);
 	$data = createItemData($item);
-	if (Album::isAlbum($item)) {
-		$data['children'] = array();
-		foreach ($item->getChildren() as $subitem) {
-			array_push($data['children'], createItemData($subitem));
-		}
-	}
+
 
 	// Send JSON
 	header('content-type: application/json; charset=utf-8');
