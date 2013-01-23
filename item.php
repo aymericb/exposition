@@ -7,7 +7,13 @@ require_once('barthe/exposition/photo.php');
 function createItemData($item) 
 {
 	$type = Photo::isPhoto($item) ? 'photo' : 'album';
-	$data = array('type' => $type, 'title' => $item->getTitle(), 'path' => $item->getPath());
+	
+	// ### FIXME: The class should use relative paths internally
+	$path = substr_replace($item->getPath(), '', 0, strlen(Config::PHOTO_DIR)+1);
+	if ($path === '') 
+		$path = '/';
+	
+	$data = array('type' => $type, 'title' => $item->getTitle(), 'path' => $path);
 
 	if (Album::isAlbum($item)) {
 		$data['children'] = array();
@@ -27,7 +33,7 @@ try {
 		throw new \Exception('Missing path parameter');
 
 	// Get item path
-	$path = Config::PHOTO_DIR . DIRECTORY_SEPARATOR . $path;
+	$path = Config::PHOTO_DIR . $path;
 	$item = Item::createItem($path);
 	$data = createItemData($item);
 

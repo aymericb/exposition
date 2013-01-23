@@ -6,13 +6,15 @@ require_once 'barthe/exposition/photo.php';
 require_once 'barthe/exposition/item.php';
 
 //$photo = new Photo('/nas/media3/Exposition/Albums/france_oct_2009/albi/IMG_7841.jpg');
-$album = new Album('/nas/media3/Exposition/Albums/france_oct_2009');
+//$album = new Album('/nas/media3/Exposition/Albums/france_oct_2009');
+$album = new Album('/nas/media3/Exposition/Albums');
 
 function printAlbum($album) 
 {
 	print('<ul>');
 	foreach ($album->getChildren() as $item) {
-		print('<li>'.$item->getTitle());
+		$path = substr_replace($item->getPath(), '', 0, strlen(Config::PHOTO_DIR));
+		print('<li>'.$item->getTitle().'  '.$path);
 		if (Album::isAlbum($item)) {
 			printAlbum($item);
 		}
