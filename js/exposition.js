@@ -21,21 +21,27 @@ ph.barthe.debug = true;
 ph.barthe.generateId = function(path, prefix) {
     return prefix+path.replace(/\//g, '-').replace(/[^A-Za-z0-9\-\.]/g, '_');
 };
+ph.barthe.constant = function(value) {
+    return (function() {return value;});
+};
 
 /**
  * Item class
  *
  * This is a frontend for the JSON Item format passed by the server. This class merely
  * provides validation of the JSON data, and read-only access. Each item can either be
- * an 'Album' with children (other Items) or a 'Photo'.
+ * an 'Album' with children (other Item objects) or a 'Photo'.
  *
  * @author Aymeric Barthe
  */
 
 ph.barthe.Item = function(json) {
-    // Private members
+    
+    // Redefinitions
     var self = this;
     var assert = ph.barthe.assert;
+
+    // Private members
     var m_children = [];
 
     // Public methods
@@ -102,13 +108,15 @@ ph.barthe.Item = function(json) {
 
 };
 
-// Global State
+// Application Singleton
 ph.barthe.Exposition = function(main_div) {
+    
     //
     // Redefinitions
     //
     var self = this;
     var assert = ph.barthe.assert;
+    var constant = ph.barthe.constant;
 
     //
     // Private members
@@ -121,12 +129,23 @@ ph.barthe.Exposition = function(main_div) {
     //
     // Constants
     //
-    var PAGE_ITEM = function() { return 'item.php'; };
-    var PAGE_IMAGE = function() { return 'image.php'; };
-    var THUMBNAIL_SIZE = function() { return 160; };
-        // ### FIXME: Should be retrieved dynamically / Missing retina support
-    var THUMBNAIL_HEIGHT = function() { return THUMBNAIL_SIZE()+/*See CSS*/17+14;};
-    var THUMBNAIL_WIDTH = function() { return THUMBNAIL_SIZE; };
+    var PAGE_ITEM = constant('item.php');
+    var PAGE_IMAGE = constant('image.php');
+    // ### FIXME: Use PHP config for all THUMBNAIL sizes
+    var THUMBNAIL_SIZE = constant(160);     // ### FIXME: Missing retina support
+    var THUMBNAIL_TITLE_MARGIN = constant(10);
+    var THUMBNAIL_TITLE_HEIGHT = constant( (function() {
+        // Compute dynamically by reading CSS property of div class '.item .title'
+        var item = $('<div>').addClass('item').hide();
+        var title = $('<div>').addClass('title');
+        item.append(title);
+        $(document.body).append(item);
+        var height = title.outerHeight();
+        item.remove();
+        return height;
+    })() );
+    var THUMBNAIL_HEIGHT = constant(THUMBNAIL_SIZE()+THUMBNAIL_TITLE_HEIGHT());
+    var THUMBNAIL_WIDTH = constant(THUMBNAIL_SIZE());
 
     //
     // Private Functions
@@ -141,6 +160,24 @@ ph.barthe.Exposition = function(main_div) {
         if (reason !== '')
             log += " Reason: " + reason;
         console.error(log);
+    };
+
+    /**
+     * Layout current album
+     * Requires m_item and m_path to be set to point to the current album.
+     * Throws on error.
+     */
+    var layoutAlbum = function() {
+        
+        // Preconditions
+        var loading_div = $('#album-loading');
+        assert(m_item.isAlbum());
+        assert(m_path);
+        assert(loading_div);
+
+        // Move the elemts
+        // ### TODO
+
     };
 
     /**
