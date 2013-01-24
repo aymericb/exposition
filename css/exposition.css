@@ -56,8 +56,8 @@ html, body {
 	/* Example */
 	left: 20px;
 	top: 20px;
-	width: 160px;
-	height: 191px; /*107+(17+4)+10px;*/
+	/*width: 160px;
+	height: 191px; *//*107+(17+4)+10px;*/
 	/*height:191px*/;
 
 	/* Debugging */
@@ -87,7 +87,7 @@ html, body {
 	position: absolute;
 	color: rgb(220, 220, 220);			
 	text-align: center;
-	left: 16px;
+	left: 14px;
 	right: 14px;
 	height: 17px;
 	font-family: Arial, Helvetica, sans-serif;

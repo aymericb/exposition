@@ -10,12 +10,14 @@ var ph = ph || {};
 ph.barthe = ph.barthe || {};
 
 // Debugging
+ph.barthe.debug = true;
 ph.barthe.assert = function(cond) {
-    if (! cond) {
-        throw { message: 'Assertion failed: '+cond };
+    if (ph.barthe.debug) {
+        if (! cond) {
+            throw { message: 'Assertion failed: '+cond };
+        }
     }
 };
-ph.barthe.debug = true;
 
 // Utilities
 ph.barthe.generateId = function(path, prefix) {
@@ -122,7 +124,7 @@ ph.barthe.AlbumViewCache = {
  *
  * @author Aymeric Barthe
  */
-ph.barthe.AlbumView = function(config, album_div, item) {
+ph.barthe.AlbumView = function(CONFIG, album_div, item) {
 
     //
     // Redefinitions
@@ -139,13 +141,6 @@ ph.barthe.AlbumView = function(config, album_div, item) {
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
     var m_loading_div;               // Hidden div used temporarily to load assets
-
-    //
-    // Constants (config subset)
-    //
-    var PAGE_IMAGE = config.PAGE_IMAGE;
-    var THUMBNAIL_SIZE = config.THUMBNAIL_SIZE;
-
 
     /**
      * Constructor
@@ -190,7 +185,7 @@ ph.barthe.AlbumView = function(config, album_div, item) {
      * Load album into view
      *
      * This method clears album_div, create and layout the photo thumbails for
-     * the current album.
+     * the current album. This method implictely calls updateLayout().
      *
      * Throws on error. However thumnail image loading errors are handled
      * interally as non critical errors, and display to the end-user.
@@ -227,13 +222,17 @@ ph.barthe.AlbumView = function(config, album_div, item) {
                 continue;
 
             // Read properties
-            var url = PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: THUMBNAIL_SIZE});
+            var url = CONFIG.PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: CONFIG.THUMBNAIL_SIZE});
             var id = m_children[i].id;
             var item = m_item.children()[i];
             assert(url && id && item);
 
             // Create elements
             var div_item = $('<div>').addClass('item').attr('id', id);
+            div_item.css( {
+                width: CONFIG.THUMBNAIL_SIZE+'px',
+                height: (CONFIG.THUMBNAIL_SIZE+CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT)+'px'
+            });
             var div_title = $('<div>').addClass('title').text( children[i].title() );
                 // ### FIXME: What if title too large
             var div_thumbnail = $('<div>').addClass('thumbnail');
@@ -241,11 +240,92 @@ ph.barthe.AlbumView = function(config, album_div, item) {
             div_item.append(div_thumbnail);
             div_item.append(div_title);
             m_loading_div.append(div_item);
-            console.log(url);
+            // ### DEBUG console.log(url);
         }
-        m_loading_div.show(); // ### DEBUG
+
+        // Update layout
+        self.updateLayout();
+        // m_loading_div.show(); // ### DEBUG
     };
 
+    /**
+     * Layout album into the view
+     *
+     * This methods should be called whenever the view size changes. It should be called
+     * only after the album was loaded with load(). This methods updates the layouts
+     * of the album items the items (and thumnails). It tries to display as many of them
+     * as possible, and create pagination if there are too many.
+     *
+     */
+    self.updateLayout = function() {
+
+        // Precondition
+        assert(m_main_div);
+        assert(m_loading_div);
+        assert( (function() {
+            for (var i=0; i<m_children.length; ++i) {
+                if (m_children[i] && $('#'+m_children[i].id).length === 0) {
+                    return false;   // div element does not exist for child!
+                }
+            }
+            return true;
+        })() );
+
+        // Compute sizes
+        var VIEW_WIDTH  = m_main_div.width();
+        var VIEW_HEIGHT = m_main_div.height();
+        var WIDTH       = CONFIG.THUMBNAIL_MARGIN + CONFIG.THUMBNAIL_SIZE;
+        var HEIGHT      = CONFIG.THUMBNAIL_MARGIN + CONFIG.THUMBNAIL_SIZE+CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT;
+        var COL_COUNT   = Math.floor( VIEW_WIDTH/WIDTH );
+        var ROW_COUNT   = Math.floor( VIEW_HEIGHT/HEIGHT );
+        var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + CONFIG.THUMBNAIL_MARGIN)/2 );
+        var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + CONFIG.THUMBNAIL_MARGIN)/2 );
+        if (ph.barthe.debug) {
+            console.log('Resizing album. COL_COUNT: '+COL_COUNT+'  ROW_COUNT: '+ROW_COUNT);
+        }
+
+        // Helper function
+        var getPageElement = function(index) {
+            var id = 'album-page-'+(index+1);
+            var el = $('#'+id);
+            if (el.length === 0) {
+                el = $('<div>').attr('id', id).hide();
+                m_main_div.append(el);
+            }
+            return el;
+        };
+
+        // Iterate on children
+        var pageIndex = 0;
+        var pageElement = getPageElement(pageIndex);
+        pageElement.show(); // ### DEBUG
+        var x = H_MARGIN;
+        var y = V_MARGIN;
+        for (var i=0; i<m_children.length; ++i) {
+            
+            // Skip empty
+            if (!m_children[i])
+                continue;
+
+            // Move item
+            var item = $('#'+m_children[i].id);
+            assert(item.length>0);
+            item.css( {left:x, top:y} );
+            pageElement.append(item);
+
+            // Increment position
+            x += WIDTH;
+            if (x+WIDTH > VIEW_WIDTH) {
+                x = H_MARGIN;
+                y += HEIGHT;
+                if (y+HEIGHT > VIEW_HEIGHT) {
+                    y = V_MARGIN;
+                    pageIndex += 1;
+                    pageElement = getPageElement(pageIndex);
+                }
+            }
+        }
+    };
 
 };
 
@@ -276,6 +356,7 @@ ph.barthe.Exposition = function(main_div) {
         
         // ### FIXME: Use PHP config for all THUMBNAIL sizes
         THUMBNAIL_SIZE:          160,     // ### FIXME: Missing retina support
+        THUMBNAIL_MARGIN:        20,
         THUMBNAIL_TITLE_MARGIN:  10,
         THUMBNAIL_TITLE_HEIGHT: (function() {
             // Compute dynamically by reading CSS property of div class '.item .title'
