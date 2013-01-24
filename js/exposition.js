@@ -79,31 +79,33 @@ ph.barthe.Item = function(json) {
     };
 
     // Constructor: validate data
-    var checkStringAttribute = function(name) {
-        if (! json[name]) {
-            throw { message: 'Missing '+name+' attribute in JSON.' };
+    (function() {
+        var checkStringAttribute = function(name) {
+            if (! json[name]) {
+                throw { message: 'Missing '+name+' attribute in JSON.' };
+            }
+            if (typeof json[name] !== 'string') {
+                 throw { message: 'Attribute '+name+' should be a String in JSON.' };
+            }
+        };
+        checkStringAttribute('type');
+        if (!self.isAlbum() && !self.isPhoto()) {
+            throw { message: 'Invalid type attribute in JSON.' };
         }
-        if (typeof json[name] !== 'string') {
-             throw { message: 'Attribute '+name+' should be a String in JSON.' };
+        checkStringAttribute('title');
+        checkStringAttribute('path');
+        if (self.isAlbum()) {
+            if (! json.children) {
+                throw { message: 'Missing children attribute in JSON.' };
+            }
+            if( Object.prototype.toString.call( json.children ) !== '[object Array]' ) {
+                throw { message: 'Attribute children should be an Array in JSON.' };
+            }
+            for (var i=0; i<json.children.length; ++i) {
+                m_children.push(new ph.barthe.Item(json.children[i]));
+            }
         }
-    };
-    checkStringAttribute('type');
-    if (!self.isAlbum() && !self.isPhoto()) {
-        throw { message: 'Invalid type attribute in JSON.' };
-    }
-    checkStringAttribute('title');
-    checkStringAttribute('path');
-    if (self.isAlbum()) {
-        if (! json.children) {
-            throw { message: 'Missing children attribute in JSON.' };
-        }
-        if( Object.prototype.toString.call( json.children ) !== '[object Array]' ) {
-            throw { message: 'Attribute children should be an Array in JSON.' };
-        }
-        for (var i=0; i<json.children.length; ++i) {
-            m_children.push(new ph.barthe.Item(json.children[i]));
-        }
-    }
+    })();
 
 };
 
@@ -438,7 +440,9 @@ ph.barthe.Exposition = function(main_div) {
     //
     // Constructor
     //
-    loadPath(m_path);
+    (function() {
+        loadPath(m_path);
+    })();
 
 };
 
