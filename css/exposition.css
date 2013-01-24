@@ -57,8 +57,8 @@ html, body {
 	left: 20px;
 	top: 20px;
 	width: 160px;
-	/*height: 138px;*/ /*107+17+14px;*/
-	height:191px;
+	height: 142px; /*107+(17+4)+10px;*/
+	/*height:191px*/;
 
 	/* Debugging */
 	border-color: red;
@@ -95,6 +95,7 @@ html, body {
 	/*text-shadow: rgb(0, 0, 0) 0px 0px 1px;*/
 	padding-top: 4px;
 	padding-bottom: 0px;
+	padding-top: 4px;	/* Used to center text, increase height by 4px */
 
 
 	background-clip: border-box;
