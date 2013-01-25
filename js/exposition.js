@@ -203,16 +203,43 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
         // Load image helper
         // See http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
         // and http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
-        var load_image = function(div_thumbnail, url) {
-            var img = $('<img>').attr('src', url).load(function() {
-                if (!this.complete || !this.naturalWidth) {
+        var load_image = function(url, v_margin, parent, div_title) {
+            var img = $('<img>').attr('src', url).load(function(response, status, xhr) {
+                if (status === 'error') {
+                    console.error('Download failed for image '+url+' '+xhr.status+' '+xhr.statusText);
                     // ### TODO: Show error in thumnail
-                    console.error('Could not receive: '+url);
+                } else if (!this.complete || !this.naturalWidth) {
+                    // ### TODO: Show error in thumnail
+                    console.error('Downloaded image is not valid: '+url);
                 } else {
                     // ### TODO: Ajust centering of the image in the div element
-                    div_thumbnail.css('background-image', 'url('+url+')');
+                    var ratio = this.naturalWidth/this.naturalHeight;
+                    var parent_height = parent.height()-v_margin;
+                    if (this.naturalWidth >= this.naturalHeight) {
+                        var h = Math.floor(parent.width()/ratio);
+                        var top = Math.floor( (parent_height-h)/2 );
+                        img.css({
+                            top: top,
+                            left: 0,
+                            width: parent.width(),
+                            height: h
+                        });
+                        div_title.css('top', top+h+v_margin-div_title.height());
+                    } else {
+                        var w = Math.floor(parent_height*ratio);
+                        img.css({
+                            top: 0,
+                            left: Math.floor( (parent.width()-w)/2 ),
+                            width: w,
+                            height: parent_height
+                        });
+                    }
+                    //div_thumbnail.parent().width();
+                    img.css('background-image', 'url('+url+')');
+                    parent.show();
                 }
             });
+            return img;
         };
 
         // Load thumbnails
@@ -230,16 +257,17 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
             assert(url && id && item);
 
             // Create elements
-            var div_item = $('<div>').addClass('item').attr('id', id);
+            var div_item = $('<div>').addClass('item').attr('id', id).hide();
             div_item.css( {
                 width: CONFIG.THUMBNAIL_SIZE+'px',
                 height: (CONFIG.THUMBNAIL_SIZE+CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT)+'px'
             });
             var div_title = $('<div>').addClass('title').text( children[i].title() );
                 // ### FIXME: What if title too large
-            var div_thumbnail = $('<div>').addClass('thumbnail');
-            load_image(div_thumbnail, url);
-            div_item.append(div_thumbnail);
+            //var div_thumbnail = $('<div>').addClass('thumbnail');
+            var img = load_image(url, CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
+            img.addClass('thumbnail');
+            div_item.append(img);
             div_item.append(div_title);
             m_loading_div.append(div_item);
             // ### DEBUG console.log(url);

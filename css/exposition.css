@@ -61,9 +61,9 @@ html, body {
 	/*height:191px*/;
 
 	/* Debugging */
-	border-color: red;
+	/*border-color: red;
 	border-style: solid;
-	border-width: 1px;
+	border-width: 1px;*/
 }
 
 .item .thumbnail {
@@ -78,9 +78,10 @@ html, body {
 
 
 	/* Debugging */
+	/*
 	border-color: white;
 	border-style: solid;
-	border-width: 1px;
+	border-width: 1px;*/
 }
 
 .item .title {
