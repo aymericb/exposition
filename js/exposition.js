@@ -466,11 +466,29 @@ ph.barthe.Exposition = function(main_div) {
             });
     };
 
+    /**
+     * Resize current view
+     * Calls onFatalError on errors.
+     */
+    var onResize = function() {
+        if (!m_view)
+            return;
+
+        try {
+            m_view.updateLayout();
+        } catch(e) {
+            onFatalError("Resized failed. Reason: "+e.message);
+            if (ph.barthe.debug)
+                throw e;
+        }
+    };
+
     //
     // Constructor
     //
     (function() {
         loadPath(m_path);
+        $(window).resize(onResize);
     })();
 
 };
