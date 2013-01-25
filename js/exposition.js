@@ -184,35 +184,32 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
     })();
 
     /**
-     * Load album into view
+     * Load thumnail image asynchronously and center it.
      *
-     * This method clears album_div, create and layout the photo thumbails for
-     * the current album. This method implictely calls updateLayout().
+     * This function create an IMG element for url.
+     * The image is centered using v_margin (extra height for title) within the parent jQuery element.
+     * The div_title is positionned directly under the thumnail image (v_maring accounts for its height).
      *
-     * Throws on error. However thumnail image loading errors are handled
-     * interally as non critical errors, and display to the end-user.
+     * Error handling. This function may throw or return an empty jQuery object. However the
+     * image loading callback does not throw. It captures errors and provide feedback to the
+     * user showing that the thumnail image could not be created.
      *
+     * Design losly inspired by
+     * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
+     * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
      */
-    self.load = function() {
-
-        // Clear divs
-        m_main_div.empty();
-        m_loading_div = $('<div>').attr('id', 'album-loading').hide();
-        m_main_div.append(m_loading_div);
-
-        // Load image helper
-        // See http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
-        // and http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
-        var load_image = function(url, v_margin, parent, div_title) {
-            var img = $('<img>').attr('src', url).load(function(response, status, xhr) {
-                if (status === 'error') {
-                    console.error('Download failed for image '+url+' '+xhr.status+' '+xhr.statusText);
-                    // ### TODO: Show error in thumnail
-                } else if (!this.complete || !this.naturalWidth) {
-                    // ### TODO: Show error in thumnail
-                    console.error('Downloaded image is not valid: '+url);
-                } else {
-                    // ### TODO: Ajust centering of the image in the div element
+    var loadThumnailImage = function(url, v_margin, parent, div_title) {
+        var img = $('<img>').attr('src', url).attr('alt', div_title.text());
+        img.load(function(response, status, xhr) {
+            var has_error = false;
+            if (status === 'error') {
+                console.error('Download failed for image '+url+' '+xhr.status+' '+xhr.statusText);
+                has_error = true;
+            } else if (!this.complete || !this.naturalWidth) {
+                console.error('Downloaded image is not valid: '+url);
+                has_error = true;
+            } else {
+                try {
                     var ratio = this.naturalWidth/this.naturalHeight;
                     var parent_height = parent.height()-v_margin;
                     var top, height;
@@ -238,10 +235,34 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
                     }
                     div_title.css('top', top+height+v_margin-div_title.outerHeight());
                     parent.show();
+                } catch (e) {
+                    console.error('Cannot center image '+url+' Reason: '+e.message);
+                    has_error = true;
                 }
-            });
-            return img;
-        };
+            }
+            if (has_error) {
+                // ### TODO Show to end user that the thumnail could not be loaded.
+            }
+        });
+        return img;
+    };
+
+    /**
+     * Load album into view
+     *
+     * This method clears album_div, create and layout the photo thumbails for
+     * the current album. This method implictely calls updateLayout().
+     *
+     * Throws on error. However thumnail image loading errors are handled
+     * interally as non critical errors, and display to the end-user.
+     *
+     */
+    self.load = function() {
+
+        // Clear divs
+        m_main_div.empty();
+        m_loading_div = $('<div>').attr('id', 'album-loading').hide();
+        m_main_div.append(m_loading_div);
 
         // Load thumbnails
         var children = m_item.children();
@@ -266,7 +287,7 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
             var div_title = $('<div>').addClass('title').text( children[i].title() );
                 // ### FIXME: What if title too large
             //var div_thumbnail = $('<div>').addClass('thumbnail');
-            var img = load_image(url, CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
+            var img = loadThumnailImage(url, CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
             img.addClass('thumbnail');
             div_item.append(img);
             div_item.append(div_title);
