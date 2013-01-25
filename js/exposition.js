@@ -215,18 +215,20 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
                     // ### TODO: Ajust centering of the image in the div element
                     var ratio = this.naturalWidth/this.naturalHeight;
                     var parent_height = parent.height()-v_margin;
+                    var top, height;
                     if (this.naturalWidth >= this.naturalHeight) {
-                        var h = Math.floor(parent.width()/ratio);
-                        var top = Math.floor( (parent_height-h)/2 );
+                        height = Math.floor(parent.width()/ratio);
+                        top = Math.floor( (parent_height-height)/2 );
                         img.css({
                             top: top,
                             left: 0,
                             width: parent.width(),
-                            height: h
+                            height: height
                         });
-                        div_title.css('top', top+h+v_margin-div_title.height());
                     } else {
                         var w = Math.floor(parent_height*ratio);
+                        top = 0;
+                        height = parent_height;
                         img.css({
                             top: 0,
                             left: Math.floor( (parent.width()-w)/2 ),
@@ -234,8 +236,7 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
                             height: parent_height
                         });
                     }
-                    //div_thumbnail.parent().width();
-                    img.css('background-image', 'url('+url+')');
+                    div_title.css('top', top+height+v_margin-div_title.outerHeight());
                     parent.show();
                 }
             });
