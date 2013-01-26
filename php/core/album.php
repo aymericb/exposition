@@ -1,6 +1,7 @@
 <?php 
 namespace Barthe\Exposition;
 
+require_once('../core/path.php');
 require_once('../core/item.php');
 
 class Album extends Item
@@ -15,8 +16,7 @@ class Album extends Item
 		parent::__construct($path);
 
 		// Open $path directory
-		$this->path = $path;
-		$dir = opendir($this->path);
+		$dir = opendir($this->realPath);
 		if (!$dir)
 			throw new \Exception("Cannot open directory \"$this->path\"");
 
@@ -28,8 +28,8 @@ class Album extends Item
 		while (false !== ($entry = readdir($dir))) {
 			if ($entry === '.' || $entry === '..')
 				continue;
-			$filepath = $this->path . DIRECTORY_SEPARATOR . $entry;
-			$item = Item::createItem($filepath);
+			$filepath = joinPath($this->realPath, $entry);
+			$item = Item::createItem(joinPath($this->path, $entry));
 			if ($item)
 				array_push($this->children, $item);
 		}

@@ -1,6 +1,7 @@
 <?php 
 namespace Barthe\Exposition;
 
+require_once('../core/path.php');
 require_once('../core/config.php');
 
 class Image 
@@ -12,7 +13,7 @@ class Image
 	public function __construct($path, $size) 
 	{
 		// Add implied root directory
-		$path = Config::PHOTO_DIR . DIRECTORY_SEPARATOR . $path;
+		$path = joinPath(Config::PHOTO_DIR, $path);
 
 		// Check if size is authorized
 		if (!in_array($size, Config::PHOTO_SIZES()) &&
@@ -30,7 +31,7 @@ class Image
 		// Computed cached image path
 		$this->cachePath = Config::CACHE_DIR . substr($path, strlen(Config::PHOTO_DIR));
 		$info = pathinfo($this->cachePath);
-		$this->cachePath = dirname($this->cachePath) . DIRECTORY_SEPARATOR . basename($this->cachePath, '.'.$info['extension']). "_" . $size . ".jpg";
+		$this->cachePath = joinPath(dirname($this->cachePath), basename($this->cachePath, '.'.$info['extension']). "_" . $size . ".jpg");
 		@mkdir(dirname($this->cachePath), 0700, true);
 
 		// Check if image is really cached

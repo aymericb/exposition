@@ -7,14 +7,13 @@ require_once '../core/photo.php';
 
 //$photo = new Photo('/nas/media3/Exposition/Albums/france_oct_2009/albi/IMG_7841.jpg');
 //$album = new Album('/nas/media3/Exposition/Albums/france_oct_2009');
-$album = new Album('/nas/media3/Exposition/Albums');
+$album = new Album('/france_oct_2009');
 
 function printAlbum($album) 
 {
 	print('<ul>');
 	foreach ($album->getChildren() as $item) {
-		$path = substr_replace($item->getPath(), '', 0, strlen(Config::PHOTO_DIR));
-		print('<li>'.$item->getTitle().'  '.$path);
+		print('<li>'.$item->getTitle().'  '.$item->getPath());
 		if (Album::isAlbum($item)) {
 			printAlbum($item);
 		}

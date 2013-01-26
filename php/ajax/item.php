@@ -6,13 +6,7 @@ require_once('../core/photo.php');
 function createItemData($item) 
 {
 	$type = Photo::isPhoto($item) ? 'photo' : 'album';
-	
-	// ### FIXME: The class should use relative paths internally
-	$path = substr_replace($item->getPath(), '', 0, strlen(Config::PHOTO_DIR)+1);
-	if ($path === '') 
-		$path = '/';
-	
-	$data = array('type' => $type, 'title' => $item->getTitle(), 'path' => $path);
+	$data = array('type' => $type, 'title' => $item->getTitle(), 'path' => $item->getPath());
 
 	if (Album::isAlbum($item)) {
 		$data['children'] = array();
@@ -32,10 +26,8 @@ try {
 		throw new \Exception('Missing path parameter');
 
 	// Get item path
-	$path = Config::PHOTO_DIR . $path;
 	$item = Item::createItem($path);
 	$data = createItemData($item);
-
 
 	// Send JSON
 	header('content-type: application/json; charset=utf-8');
