@@ -1,7 +1,7 @@
 <?php 
 namespace Barthe\Exposition;
 
-require_once('config.php');
+require_once('../core/config.php');
 
 class Image 
 {

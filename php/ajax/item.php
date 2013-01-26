@@ -1,8 +1,7 @@
 <?php 
 namespace Barthe\Exposition;
-require_once('barthe/exposition/item.php');
-require_once('barthe/exposition/album.php');
-require_once('barthe/exposition/photo.php');
+require_once('../core/album.php');
+require_once('../core/photo.php');
 
 function createItemData($item) 
 {

@@ -1,9 +1,9 @@
 <?php
 namespace Barthe\Exposition;
-require_once 'barthe/exposition/config.php';
-require_once 'barthe/exposition/album.php';
-require_once 'barthe/exposition/photo.php';
-require_once 'barthe/exposition/item.php';
+require_once '../core/config.php';
+require_once '../core/item.php';
+require_once '../core/album.php';
+require_once '../core/photo.php';
 
 //$photo = new Photo('/nas/media3/Exposition/Albums/france_oct_2009/albi/IMG_7841.jpg');
 //$album = new Album('/nas/media3/Exposition/Albums/france_oct_2009');

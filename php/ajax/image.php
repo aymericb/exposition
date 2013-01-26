@@ -1,6 +1,6 @@
 <?php 
 namespace Barthe\Exposition;
-require_once('barthe/exposition/image.php');
+require_once('../core/image.php');
 
 try {
 

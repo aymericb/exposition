@@ -1,7 +1,7 @@
 <?php 
 namespace Barthe\Exposition;
 
-require_once('item.php');
+require_once('../core/item.php');
 
 class Album extends Item
 {

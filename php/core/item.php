@@ -1,9 +1,9 @@
 <?php 
 namespace Barthe\Exposition;
 
-require_once('config.php');
-require_once('album.php');
-require_once('photo.php');
+require_once('../core/config.php');
+require_once('../core/album.php');		
+require_once('../core/photo.php');
 
 abstract class Item 
 {

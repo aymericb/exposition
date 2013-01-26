@@ -1,19 +1,19 @@
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
 
-// Use strict header
-(function() {
-"use strict";
-
 // Namespace declarations
 var ph = ph || {};
 ph.barthe = ph.barthe || {};
+
+// Use strict header
+(function() {
+"use strict";
 
 // Debugging
 ph.barthe.debug = true;
 ph.barthe.assert = function(cond) {
     if (ph.barthe.debug) {
-        if (! cond) {
+        if (! cond) {   // ### FIXME Need to find a better mechanism to stop executing functions/ code
             throw { message: 'Assertion failed: '+cond };
         }
     }
@@ -119,10 +119,11 @@ ph.barthe.AlbumViewCache = {
  *
  * The album view provides the mechanism for loading an album into the browser view.
  * It is reponsible for creating, loading and displaying the thumnails. It also
- * dynaically adjust the layout for fit in the view, and creates as many pages
+ * dynamically adjusts the layout to fit within the view, and creates as many pages
  * as necessary.
  *
- * Any methods (including constructor) may throw in case of error.
+ * Any methods (including constructor) may throw in case of error, unless otherwise
+ * specified.
  *
  * @author Aymeric Barthe
  */
@@ -194,7 +195,7 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
      * image loading callback does not throw. It captures errors and provide feedback to the
      * user showing that the thumnail image could not be created.
      *
-     * Design losly inspired by
+     * Design loosely inspired by
      * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
      * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
      */
@@ -403,8 +404,8 @@ ph.barthe.Exposition = function(main_div) {
     // Constants
     //
     var CONFIG = {
-        PAGE_ITEM:              'item.php',
-        PAGE_IMAGE:             'image.php',
+        PAGE_ITEM:              'php/ajax/item.php',
+        PAGE_IMAGE:             'php/ajax/image.php',
         
         // ### FIXME: Use PHP config for all THUMBNAIL sizes
         THUMBNAIL_SIZE:          160,     // ### FIXME: Missing retina support
