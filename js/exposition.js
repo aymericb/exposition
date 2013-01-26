@@ -25,7 +25,6 @@ ph.barthe.Exposition = function(main_div) {
     var m_item;                     // Current item (class Item)
     var m_view;                     // Current view
     var m_main_div = main_div;      // Main div used for rendering
-    var m_album_to_photo = {};      // Map album_path -> photo_path
 
     //
     // Constants
@@ -66,24 +65,6 @@ ph.barthe.Exposition = function(main_div) {
         if (reason !== '')
             log += " Reason: " + reason;
         console.error(log);
-    };
-
-    /**
-     * Layout current album
-     * Requires m_item and m_path to be set to point to the current album.
-     * Throws on error.
-     */
-    var layoutAlbum = function() {
-        
-        // Preconditions
-        var loading_div = $('#album-loading');
-        assert(m_item.isAlbum());
-        assert(m_path);
-        assert(loading_div);
-
-        // Move the elemts
-        // ### TODO
-
     };
 
     /**
