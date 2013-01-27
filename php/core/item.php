@@ -1,4 +1,8 @@
 <?php 
+//
+// Exposition. © 2013 Aymeric Barthe
+//
+
 namespace Barthe\Exposition;
 
 require_once('../core/path.php');

@@ -1,5 +1,10 @@
+//
+// Exposition. © 2013 Aymeric Barthe
+//
+
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
+
 
 // Namespace declarations
 var ph = ph || {};
@@ -25,7 +30,6 @@ ph.barthe.AlbumViewCache = {
  * Any methods (including constructor) may throw in case of error, unless otherwise
  * specified.
  *
- * @author Aymeric Barthe
  */
 ph.barthe.AlbumView = function(CONFIG, album_div, item) {
 

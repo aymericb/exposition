@@ -1,4 +1,8 @@
 <?php 
+//
+// Exposition. © 2013 Aymeric Barthe
+//
+
 namespace Barthe\Exposition;
 
 // ### FIXME: Use DIRECTORY_SEPARATOR for OS seprators

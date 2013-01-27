@@ -1,3 +1,7 @@
+//
+// Exposition. © 2013 Aymeric Barthe
+//
+
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 
 // Namespace declarations
@@ -11,7 +15,6 @@ ph.barthe = ph.barthe || {};
  * provides validation of the JSON data, and read-only access. Each item can either be
  * an 'Album' with children (other Item objects) or a 'Photo'.
  *
- * @author Aymeric Barthe
  */
 
 ph.barthe.Item = function(json) {

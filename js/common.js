@@ -1,3 +1,7 @@
+//
+// Exposition. © 2013 Aymeric Barthe
+//
+
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 
 // Namespace declarations
