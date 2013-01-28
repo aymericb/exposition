@@ -14,7 +14,7 @@ ph.barthe = ph.barthe || {};
 "use strict";
 
 // Application Singleton
-ph.barthe.Exposition = function(main_div) {
+ph.barthe.Exposition = function(config, main_div) {
     
     //
     // Redefinitions
@@ -29,32 +29,6 @@ ph.barthe.Exposition = function(main_div) {
     var m_item;                     // Current item (class Item)
     var m_view;                     // Current view
     var m_main_div = main_div;      // Main div used for rendering
-
-    //
-    // Constants
-    //
-    var CONFIG = {
-        PAGE_ITEM:              'php/ajax/item.php',
-        PAGE_IMAGE:             'php/ajax/image.php',
-        
-        // ### FIXME: Use PHP config for all THUMBNAIL sizes
-        THUMBNAIL_SIZE:          160,     // ### FIXME: Missing retina support
-        THUMBNAIL_MARGIN:        20,
-        THUMBNAIL_TITLE_MARGIN:  10,
-        THUMBNAIL_TITLE_HEIGHT: (function() {
-            // Compute dynamically by reading CSS property of div class '.item .title'
-            var item = $('<div>').addClass('item').hide();
-            var title = $('<div>').addClass('title');
-            item.append(title);
-            $(document.body).append(item);
-            var height = title.outerHeight();
-            item.remove();
-            return height;
-        })(),
-
-        THUMBNAIL_HEIGHT: this.THUMBNAIL_SIZE+this.THUMBNAIL_TITLE_HEIGHT,
-        THUMBNAIL_WIDTH:  this.THUMBNAIL_SIZE
-    };
 
     //
     // Private Functions
@@ -80,14 +54,14 @@ ph.barthe.Exposition = function(main_div) {
         var onError = function(error) {
             onFatalError("Cannot navigate to page "+path, error?error.message:'');
         };
-        $.ajax(CONFIG.PAGE_ITEM+'?'+$.param({path: path}))
+        $.ajax(config.pageItem()+'?'+$.param({path: path}))
             .fail( onError )
             .done( function(data) {
                 try {
                     m_item = new ph.barthe.Item(data);
                     m_path = path;
                     if (m_item.isAlbum()) {
-                        m_view = new ph.barthe.AlbumView(CONFIG, m_main_div, m_item);
+                        m_view = new ph.barthe.AlbumView(config, m_main_div, m_item);
                     } else {
                         // ### TODO: loadPhoto();
                     }
@@ -132,7 +106,7 @@ ph.barthe.Exposition = function(main_div) {
 $(document).ready(function() {
     var config = new ph.barthe.Config(function(){
         console.log(config.info());
-        var expo = new ph.barthe.Exposition($('#main'));
+        var expo = new ph.barthe.Exposition(config, $('#main'));
     }, function(err) {
         // ### FIXME: Improve error handling
         console.error('Failed '+err.message);

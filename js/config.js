@@ -69,6 +69,12 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     self.thumbnailTitleHeight = function() {
         return m_thumnbail_title_height;
     };
+    self.thumbnailHeight = function() {
+        return self.thumbnailSize() + self.thumbnailTitleHeight();
+    };
+    self.thumbnailWidth = function () {
+        return self.thumbnailSize();
+    };
 
     //
     // Constructor

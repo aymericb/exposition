@@ -31,7 +31,7 @@ ph.barthe.AlbumViewCache = {
  * specified.
  *
  */
-ph.barthe.AlbumView = function(CONFIG, album_div, item) {
+ph.barthe.AlbumView = function(config, album_div, item) {
 
     //
     // Redefinitions
@@ -48,6 +48,15 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
     var m_loading_div;               // Hidden div used temporarily to load assets
+
+    //
+    // Config Constants
+    //
+    var PAGE_IMAGE = config.pageImage();
+    var THUMBNAIL_MARGIN = config.thumbnailMargin();
+    var THUMBNAIL_SIZE = config.thumbnailSize();
+    var THUMBNAIL_TITLE_MARGIN = config.thumbnailTitleMargin();
+    var THUMBNAIL_TITLE_HEIGHT = config.thumbnailTitleHeight();
 
     /**
      * Constructor
@@ -178,7 +187,7 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
                 continue;
 
             // Read properties
-            var url = CONFIG.PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: CONFIG.THUMBNAIL_SIZE});
+            var url = PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: THUMBNAIL_SIZE});
             var id = m_children[i].id;
             var item = m_item.children()[i];
             assert(url && id && item);
@@ -186,13 +195,13 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
             // Create elements
             var div_item = $('<div>').addClass('item').attr('id', id).hide();
             div_item.css( {
-                width: CONFIG.THUMBNAIL_SIZE+'px',
-                height: (CONFIG.THUMBNAIL_SIZE+CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT)+'px'
+                width: THUMBNAIL_SIZE+'px',
+                height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
             });
             var div_title = $('<div>').addClass('title').text( children[i].title() );
                 // ### FIXME: What if title too large
             //var div_thumbnail = $('<div>').addClass('thumbnail');
-            var img = loadThumnailImage(url, CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
+            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
             img.addClass('thumbnail');
             div_item.append(img);
             div_item.append(div_title);
@@ -231,12 +240,12 @@ ph.barthe.AlbumView = function(CONFIG, album_div, item) {
         // Compute sizes
         var VIEW_WIDTH  = m_main_div.width();
         var VIEW_HEIGHT = m_main_div.height();
-        var WIDTH       = CONFIG.THUMBNAIL_MARGIN + CONFIG.THUMBNAIL_SIZE;
-        var HEIGHT      = CONFIG.THUMBNAIL_MARGIN + CONFIG.THUMBNAIL_SIZE+CONFIG.THUMBNAIL_TITLE_MARGIN+CONFIG.THUMBNAIL_TITLE_HEIGHT;
+        var WIDTH       = THUMBNAIL_MARGIN + THUMBNAIL_SIZE;
+        var HEIGHT      = THUMBNAIL_MARGIN + THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT;
         var COL_COUNT   = Math.floor( VIEW_WIDTH/WIDTH );
         var ROW_COUNT   = Math.floor( VIEW_HEIGHT/HEIGHT );
-        var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + CONFIG.THUMBNAIL_MARGIN)/2 );
-        var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + CONFIG.THUMBNAIL_MARGIN)/2 );
+        var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + THUMBNAIL_MARGIN)/2 );
+        var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + THUMBNAIL_MARGIN)/2 );
         if (ph.barthe.debug) {
             console.log('Resizing album. COL_COUNT: '+COL_COUNT+'  ROW_COUNT: '+ROW_COUNT);
         }
