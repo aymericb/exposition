@@ -7,7 +7,7 @@ namespace Barthe\Exposition;
 
 class Config 
 {
-	const INFO = 'Exposition. (c) 2013 Aymeric Barthe';
+	const INFO = 'Exposition. (c) 2013 Aymeric Barthe.';
 	const VERSION = 'alpha';
 
 	const PHOTO_DIR = '/nas/media3/Exposition/Albums';

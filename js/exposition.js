@@ -130,7 +130,14 @@ ph.barthe.Exposition = function(main_div) {
 
 // Main function
 $(document).ready(function() {
-    var expo = new ph.barthe.Exposition($('#main'));
+    var config = new ph.barthe.Config(function(){
+        console.log(config.info());
+        var expo = new ph.barthe.Exposition($('#main'));
+    }, function(err) {
+        // ### FIXME: Improve error handling
+        console.error('Failed '+err.message);
+
+    });
    
 });
 
