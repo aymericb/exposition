@@ -12,7 +12,7 @@ ph.barthe = ph.barthe || {};
  * Config class
  *
  * This class provides access to the configuration constants. Some values
- * are retrieved dynamically using the server. You need to pass a 
+ * are retrieved dynamically using the server. You need to pass a
  * 'ready' and 'error' callback to the constructor. You must wait until
  * 'ready' has been called. If you receive 'error' instead, you must abort.
  * The 'error' function takes a single and optional argument, that is
@@ -23,7 +23,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     // Redefinitions
     "use strict";
     var self = this;
-    var assert = ph.barthe.assert;    
+    var assert = ph.barthe.assert;
 
     //
     // Private members
@@ -114,7 +114,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
                     checkStringAttribute('version');
                     checkStringAttribute('info');
 
-                    // Check array of sizes                     
+                    // Check array of sizes
                     var checkSizeArray = function(name) {
                         var array = json[name];
                         if (! array) {

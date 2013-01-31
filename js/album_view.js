@@ -105,60 +105,52 @@ ph.barthe.AlbumView = function(config, album_div, item) {
      * The div_title is positionned directly under the thumnail image (v_maring accounts for its height).
      *
      * Error handling. This function may throw or return an empty jQuery object. However the
-     * image loading callback does not throw. It captures errors and provide feedback to the
-     * user showing that the thumnail image could not be created.
+     * image loading errors are handled internally.
      *
      * Design loosely inspired by
      * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
      * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
      */
     var loadThumnailImage = function(url, v_margin, parent, div_title) {
-        var img = $('<img>').attr('src', url).attr('alt', div_title.text());
-        img.load(function(response, status, xhr) {
-            var has_error = false;
-            if (status === 'error') {
-                console.error('Download failed for image '+url+' '+xhr.status+' '+xhr.statusText);
-                has_error = true;
-            } else if (!this.complete || !this.naturalWidth) {
-                console.error('Downloaded image is not valid: '+url);
-                has_error = true;
-            } else {
-                try {
-                    var ratio = this.naturalWidth/this.naturalHeight;
-                    var parent_height = parent.height()-v_margin;
-                    var top, height;
-                    if (this.naturalWidth >= this.naturalHeight) {
-                        height = Math.floor(parent.width()/ratio);
-                        top = Math.floor( (parent_height-height)/2 );
-                        img.css({
-                            top: top,
-                            left: 0,
-                            width: parent.width(),
-                            height: height
-                        });
-                    } else {
-                        var w = Math.floor(parent_height*ratio);
-                        top = 0;
-                        height = parent_height;
-                        img.css({
-                            top: 0,
-                            left: Math.floor( (parent.width()-w)/2 ),
-                            width: w,
-                            height: parent_height
-                        });
-                    }
-                    div_title.css('top', top+height+v_margin-div_title.outerHeight());
-                    parent.show();
-                } catch (e) {
-                    console.error('Cannot center image '+url+' Reason: '+e.message);
-                    has_error = true;
+        var on_fail = function() {
+            // ### TODO
+        };
+        var on_success = function(img) {
+            try
+            {
+                var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
+                var parent_height = parent.height()-v_margin;
+                var top, height;
+                if (img.get(0).naturalWidth >= img.get(0).naturalHeight) {
+                    height = Math.floor(parent.width()/ratio);
+                    top = Math.floor( (parent_height-height)/2 );
+                    img.css({
+                        top: top,
+                        left: 0,
+                        width: parent.width(),
+                        height: height
+                    });
+                } else {
+                    var w = Math.floor(parent_height*ratio);
+                    top = 0;
+                    height = parent_height;
+                    img.css({
+                        top: 0,
+                        left: Math.floor( (parent.width()-w)/2 ),
+                        width: w,
+                        height: parent_height
+                    });
                 }
+                div_title.css('top', top+height+v_margin-div_title.outerHeight());
+                parent.show();
+            } catch (err) {
+                if (err && err.message)
+                    console.error("Error: "+err.message);
+                on_fail(img);
             }
-            if (has_error) {
-                // ### TODO Show to end user that the thumnail could not be loaded.
-            }
-        });
-        return img;
+        };
+
+        return ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
     };
 
     /**

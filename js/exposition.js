@@ -102,18 +102,5 @@ ph.barthe.Exposition = function(config, main_div) {
 };
 
 
-// Main function
-$(document).ready(function() {
-    var config = new ph.barthe.Config(function(){
-        console.log(config.info());
-        var expo = new ph.barthe.Exposition(config, $('#main'));
-    }, function(err) {
-        // ### FIXME: Improve error handling
-        console.error('Failed '+err.message);
-
-    });
-   
-});
-
 // Use strict footer
 })();
