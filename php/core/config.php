@@ -11,7 +11,7 @@ class Config
 	const VERSION = 'alpha';
 
 	const PHOTO_DIR = '/nas/media3/Exposition/Albums';
-	const CACHE_DIR = '/nas/media3/Exposition/Cache';
+	const CACHE_DIR = '/nas/unsafe/ExpositionCache';
 	static public function PHOTO_EXTENSIONS() 
 	{
 		return array('jpg', 'jpeg');		// In lowercase.

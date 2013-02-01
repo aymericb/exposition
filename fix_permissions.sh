@@ -5,13 +5,17 @@
 
 WWW_DIR=/nas/unsafe/www
 DATA_DIR=/nas/media3/Exposition
+CACHE_DIR=/nas/unsafe/ExpositionCache
 
-chown -R www-data ${WWW_DIR} && \
-chgrp -R jackjeff ${WWW_DIR} && \
-chmod -R o+rwX,g+rwX,o+rX-w ${WWW_DIR} && \
-chown -R www-data ${DATA_DIR} && \
-chgrp -R jackjeff ${DATA_DIR} && \
-chmod -R o+rwX,g+rwX,o+rX-w ${DATA_DIR} 
+
+change_permissions () 
+{
+	chown -R www-data $1 && \
+	chgrp -R jackjeff $1 && \
+	chmod -R o+rwX,g+rwX,o+rX-w $1
+}
+
+change_permissions ${WWW_DIR} && change_permissions ${DATA_DIR} && change_permissions ${CACHE_DIR}
 
 if [ $? -ne 0 ]
 then
