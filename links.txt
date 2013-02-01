@@ -6,5 +6,10 @@ PHP coding standard
 Galleries (for inspiration)
 	http://demo.zinescripts.com/slickgallery-1.0/#?rand=3110
 	http://wowslider.com
+	http://www.juicebox.net
 
-	
+Interesting idea of how to use <a title="blah"><img/></a> instead of <divs>
+http://www.zurb.com/playground/css3-polaroids
+
+Hover effect
+http://www.cvwdesign.com/txp/article/395/css3-box-shadow-and-image-hover-effects

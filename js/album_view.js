@@ -118,6 +118,8 @@ ph.barthe.AlbumView = function(config, album_div, item) {
         var on_success = function(img) {
             try
             {
+                var h_padding = Math.floor((img.outerWidth()-img.width())/2);
+                var v_padding = img.outerHeight()-img.height();                
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
                 var parent_height = parent.height()-v_margin;
                 var top, height;
@@ -126,7 +128,7 @@ ph.barthe.AlbumView = function(config, album_div, item) {
                     top = Math.floor( (parent_height-height)/2 );
                     img.css({
                         top: top,
-                        left: 0,
+                        left: -h_padding,
                         width: parent.width(),
                         height: height
                     });
@@ -136,12 +138,12 @@ ph.barthe.AlbumView = function(config, album_div, item) {
                     height = parent_height;
                     img.css({
                         top: 0,
-                        left: Math.floor( (parent.width()-w)/2 ),
+                        left: Math.floor( (parent.width()-w)/2 )-h_padding,
                         width: w,
                         height: parent_height
                     });
                 }
-                div_title.css('top', top+height+v_margin-div_title.outerHeight());
+                div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
                 parent.show();
             } catch (err) {
                 if (err && err.message)

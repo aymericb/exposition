@@ -51,12 +51,12 @@ html, body {
 }
 
 .item {
-	position: absolute;			
+	position: absolute;
 
 	/* Example */
-	left: 20px;
+	/*left: 20px;
 	top: 20px;
-	/*width: 160px;
+	width: 160px;
 	height: 191px; *//*107+(17+4)+10px;*/
 	/*height:191px*/;
 
@@ -69,12 +69,16 @@ html, body {
 .item .thumbnail {
 	position: absolute;
 	margin: 0px;
+	background-color: rgb(240, 240, 240);			
+	padding: 4px;
+	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
+
 
 	/* Example */
-	top: 0px;
+	/*top: 0px;
 	left: 26px;
 	width: 106px;
-	height: 160px;
+	height: 160px;*/
 
 
 	/* Debugging */
@@ -83,6 +87,12 @@ html, body {
 	border-style: solid;
 	border-width: 1px;*/
 }
+
+.item .thumbnail:hover {
+	box-shadow: rgb(255, 255, 255) 0px 0px 10px 0px;
+	-webkit-filter: brightness(20%);
+}
+
 
 .item .title {
 	position: absolute;
