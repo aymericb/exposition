@@ -241,7 +241,7 @@ ph.barthe.AlbumView = function(config, album_div, item) {
         var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + THUMBNAIL_MARGIN)/2 );
         var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + THUMBNAIL_MARGIN)/2 );
         if (ph.barthe.debug) {
-            console.log('Resizing album. COL_COUNT: '+COL_COUNT+'  ROW_COUNT: '+ROW_COUNT);
+            console.log('Resizing album. Items: '+m_children.length+' COL_COUNT: '+COL_COUNT+' ROW_COUNT: '+ROW_COUNT);
         }
 
         // Helper function
