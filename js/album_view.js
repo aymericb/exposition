@@ -30,8 +30,17 @@ ph.barthe.AlbumViewCache = {
  * Any methods (including constructor) may throw in case of error, unless otherwise
  * specified.
  *
+ * Constructor parameters
+ * - config                     -> A ph.barthe.Config object
+ * - divs An object containing all the necesessary divs as properties
+ *      - main                  -> display area for the album
+ *      - page_handler          -> display area for page handling ui
+ *      - page_handler_left     -> previous page arrow
+ *      - page_handler_center   -> "page x/y" display
+ *      - page_handler_right    -> next page arrow
+ * - item                       -> A ph.barthe.Item object to display
  */
-ph.barthe.AlbumView = function(config, album_div, item) {
+ph.barthe.AlbumView = function(config, divs, item) {
 
     //
     // Redefinitions
@@ -43,11 +52,15 @@ ph.barthe.AlbumView = function(config, album_div, item) {
     // Private members
     //
     var m_album_to_photo = ph.barthe.AlbumViewCache.album_to_photo;
-    var m_main_div = album_div;     // Root view
+    var m_main_div = divs.main;     // Root view
+    var m_divs = divs;
     var m_item = item;              // Root item of the album
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
-    var m_loading_div;               // Hidden div used temporarily to load assets
+    var m_loading_div;              // Hidden div used temporarily to load assets
+    var m_page_count;
+    var m_current_page_index=0;
+    var m_current_page_div;
 
     //
     // Config Constants
@@ -65,6 +78,11 @@ ph.barthe.AlbumView = function(config, album_div, item) {
     (function() {
 
         // Preconditions
+        assert(m_divs);
+        assert(m_divs.page_handler);
+        assert(m_divs.page_handler_left);
+        assert(m_divs.page_handler_center);
+        assert(m_divs.page_handler_right);
         assert(m_main_div);
         assert(m_item);
         assert(m_item.isAlbum());
@@ -110,6 +128,8 @@ ph.barthe.AlbumView = function(config, album_div, item) {
      * Design loosely inspired by
      * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
      * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
+     *
+     * Calls setCurrentPage() internally.
      */
     var loadThumnailImage = function(url, v_margin, parent, div_title) {
         var on_fail = function() {
@@ -119,7 +139,7 @@ ph.barthe.AlbumView = function(config, album_div, item) {
             try
             {
                 var h_padding = Math.floor((img.outerWidth()-img.width())/2);
-                var v_padding = img.outerHeight()-img.height();                
+                var v_padding = img.outerHeight()-img.height();
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
                 var parent_height = parent.height()-v_margin;
                 var top, height;
@@ -154,6 +174,58 @@ ph.barthe.AlbumView = function(config, album_div, item) {
 
         return ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
     };
+
+    /**
+     * Set the current page of the album.
+     * Hides the current page and makes the page referenced by page_index visible.
+     * page_index is an integer that represent the page number. 0 <= page_index < m_page_count
+     * This method updates m_current_page_div and m_current_page_index when it succeeds.
+     */
+    var setCurrentPage = function(page_index)
+    {
+        // Preconditions
+        console.log("Showing page "+(page_index+1));
+        assert(page_index >= 0);
+        assert(page_index < m_page_count);
+        assert(m_divs);
+        assert(m_divs.page_handler);
+        assert(m_divs.page_handler_left);
+        assert(m_divs.page_handler_center);
+        assert(m_divs.page_handler_right);
+
+        // Hide current page
+        m_divs.page_handler.hide();
+        if (m_current_page_div)
+            m_current_page_div.hide();
+
+        // Get page div
+        var id = 'album-page-'+(page_index+1);
+        var div_page = $('#'+id);
+        assert(div_page.length !== 0);
+
+        // Update page handler status
+        m_divs.page_handler_center.text("Page "+(page_index+1)+"/"+m_page_count);
+        if (page_index>0)
+            m_divs.page_handler_left.show();
+        else
+            m_divs.page_handler_left.hide();
+        if (page_index+1 < m_page_count)
+            m_divs.page_handler_right.show();
+        else
+            m_divs.page_handler_right.hide();
+        m_current_page_index = page_index;
+        m_divs.page_handler.show();
+
+        // Make new page visible
+        m_current_page_index = page_index;
+        m_current_page_div = div_page;
+        m_current_page_div.show();
+        m_divs.page_handler.show();
+    };
+
+    //
+    // Public API
+    //    
 
     /**
      * Load album into view
@@ -258,9 +330,9 @@ ph.barthe.AlbumView = function(config, album_div, item) {
         // Iterate on children
         var pageIndex = 0;
         var pageElement = getPageElement(pageIndex);
-        pageElement.show(); // ### DEBUG
         var x = H_MARGIN;
         var y = V_MARGIN;
+        m_page_count = 1;
         for (var i=0; i<m_children.length; ++i) {
             
             // Skip empty
@@ -282,9 +354,29 @@ ph.barthe.AlbumView = function(config, album_div, item) {
                     y = V_MARGIN;
                     pageIndex += 1;
                     pageElement = getPageElement(pageIndex);
+                    m_page_count += 1;
                 }
             }
         }
+        
+        // Check if last page is empty
+        if (pageElement.children().length === 0)
+            m_page_count -= 1;
+
+        // Update page handler
+        if (m_current_page_index>=m_page_count)
+            m_current_page_index = m_page_count-1;
+        setCurrentPage(m_current_page_index);
+    };
+
+    /** Go to next page */
+    self.goToNext = function() {
+        setCurrentPage(m_current_page_index+1);
+    };
+
+    /** Go to previous page */
+    self.goToPrev = function() {
+        setCurrentPage(m_current_page_index-1);
     };
 };
 

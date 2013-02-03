@@ -93,7 +93,6 @@ html, body {
 	-webkit-filter: brightness(20%);
 }
 
-
 .item .title {
 	position: absolute;
 	color: rgb(220, 220, 220);			
@@ -123,3 +122,21 @@ html, body {
 	border-style: solid;
 	border-width: 1px;*/
 }
+
+#page-handler {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	top: 20px;
+	right: 0px;
+	margin-right: 20px;
+	position: absolute;
+}
+#page-handler div {
+	display: inline;
+}
+#page-handler-left:hover, #page-handler-right:hover {
+	color: rgb(100, 255, 255);
+	font-weight: bolder;
+	cursor: pointer;
+}
+

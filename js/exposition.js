@@ -14,7 +14,19 @@ ph.barthe = ph.barthe || {};
 "use strict";
 
 // Application Singleton
-ph.barthe.Exposition = function(config, main_div) {
+/**
+ * Application Singleton
+ * 
+ * Constructor parameters
+ * - config                     -> A ph.barthe.Config object
+ * - divs An object containing all the necesessary divs as properties
+ *      - main                  -> main display area
+ *      - page_handler          -> display area for page handling ui
+ *      - page_handler_left     -> previous page arrow
+ *      - page_handler_center   -> "page x/y" display
+ *      - page_handler_right    -> next page arrow 
+ */
+ph.barthe.Exposition = function(config, divs) {
     
     //
     // Redefinitions
@@ -28,7 +40,8 @@ ph.barthe.Exposition = function(config, main_div) {
     var m_path = '/';               // Current album or item path
     var m_item;                     // Current item (class Item)
     var m_view;                     // Current view
-    var m_main_div = main_div;      // Main div used for rendering
+    var m_divs = divs;              // Divs used for display
+    var m_main_div = divs.main;     // Main div used for rendering    
 
     //
     // Private Functions
@@ -61,7 +74,7 @@ ph.barthe.Exposition = function(config, main_div) {
                     m_item = new ph.barthe.Item(data);
                     m_path = path;
                     if (m_item.isAlbum()) {
-                        m_view = new ph.barthe.AlbumView(config, m_main_div, m_item);
+                        m_view = new ph.barthe.AlbumView(config, m_divs, m_item);
                     } else {
                         // ### TODO: loadPhoto();
                     }
@@ -91,10 +104,26 @@ ph.barthe.Exposition = function(config, main_div) {
         }
     };
 
+    /** Event handler for m_divs.page_handler_left */
+    var onGoToPrev = function() {
+        m_view.goToPrev();
+    };
+
+    var onGoToNext = function() {
+        m_view.goToNext();
+    };
+
     //
     // Constructor
     //
     (function() {
+        assert(m_divs.main);
+        assert(m_divs.page_handler);
+        assert(m_divs.page_handler_left);
+        assert(m_divs.page_handler_center);
+        assert(m_divs.page_handler_right);
+        m_divs.page_handler_left.click(onGoToPrev);
+        m_divs.page_handler_right.click(onGoToNext);
         loadPath(m_path);
         $(window).resize(onResize);
     })();
