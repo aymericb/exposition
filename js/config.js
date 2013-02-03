@@ -61,7 +61,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         return m_json.thumnail_sizes[0];
     };
     self.thumbnailMargin = function() {
-        return 20;
+        return 30;
     };
     self.thumbnailTitleMargin = function() {
         return 10;
