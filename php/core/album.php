@@ -37,6 +37,13 @@ class Album extends Item
 			if ($item)
 				array_push($this->children, $item);
 		}
+
+		// Sort array by name
+		usort($this->children, function($a, $b)
+			{
+				return strcmp($a->getPath(), $b->getPath());
+			}
+		);
 	}
 
 	// Helper Method
