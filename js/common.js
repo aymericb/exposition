@@ -48,19 +48,14 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
     ph.barthe.assert(on_success);
 
     // Create img element
-    var img = $('<img>').attr('src', url);
+    var img = $('<img>');
     if (alt_text)
         img.attr('alt', alt_text);
 
     // Async load
     img.load(function(response, status, xhr) {
         var msg;
-        if (status === 'error') {
-            msg = 'Download failed for image '+url+' '+xhr.status+' '+xhr.statusText;
-            console.error(msg);
-            if (on_fail)
-                on_fail(img, msg);
-        } else if (!this.complete || !this.naturalWidth) {
+        if (!this.complete || !this.naturalWidth) {
             msg = 'Downloaded image is not valid: '+url;
             console.error(msg);
             if (on_fail)
@@ -69,6 +64,14 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
             on_success(img, user_data);
         }
     });
+    img.error(function(error) {
+        // Apparently no way to get HTTP errors from IMG elements
+        // http://stackoverflow.com/questions/8108636/how-to-get-http-status-code-of-img-tags
+        // ### FIXME: As a workaround we could make an AJAX request on the URL and see what happens
+        if (on_fail)
+            on_fail(img, error.message, user_data);
+    });
+    img.attr('src', url);
 
     // Return jQuery IMG element
     return img;
