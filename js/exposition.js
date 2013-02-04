@@ -16,7 +16,7 @@ ph.barthe = ph.barthe || {};
 // Application Singleton
 /**
  * Application Singleton
- * 
+ *
  * Constructor parameters
  * - config                     -> A ph.barthe.Config object
  * - divs An object containing all the necesessary divs as properties
@@ -24,7 +24,7 @@ ph.barthe = ph.barthe || {};
  *      - page_handler          -> display area for page handling ui
  *      - page_handler_left     -> previous page arrow
  *      - page_handler_center   -> "page x/y" display
- *      - page_handler_right    -> next page arrow 
+ *      - page_handler_right    -> next page arrow
  */
 ph.barthe.Exposition = function(config, divs) {
     
@@ -41,7 +41,7 @@ ph.barthe.Exposition = function(config, divs) {
     var m_item;                     // Current item (class Item)
     var m_view;                     // Current view
     var m_divs = divs;              // Divs used for display
-    var m_main_div = divs.main;     // Main div used for rendering    
+    var m_main_div = divs.main;     // Main div used for rendering
 
     //
     // Private Functions

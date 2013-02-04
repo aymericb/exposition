@@ -49,13 +49,23 @@ ph.barthe.Item = function(json) {
         if (m_children.length === 0)
             return '';
         var photos = [];
+        var albums = [];
         for (var i=0; i<m_children.length; ++i) {
             if (m_children[i].isPhoto())
                 photos.push(m_children[i]);
+            else
+                albums.push(m_children[i]);
         }
         if (photos.length === 0) {
-            var r1 = Math.floor(Math.random() * m_children.length);
-            return m_children[r1].getRandomPhotoPath();
+            // Continue until we find an album with a photo
+            while (albums.length > 0) {
+                var r1 = Math.floor(Math.random() * albums.length);
+                var value = m_children[r1].getRandomPhotoPath();
+                if (value)
+                    return value;
+                albums.splice(r1, 1);
+            }
+            return '';
         } else {
             var r2 = Math.floor(Math.random() * photos.length);
             return photos[r2].path();
