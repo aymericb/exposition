@@ -42,7 +42,7 @@ ph.barthe.generateId = function(path, prefix) {
  * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
  * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
  */
-ph.barthe.loadImage = function(url, on_success, on_fail, alt_text) {
+ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
     // Precondition
     ph.barthe.assert(url);
     ph.barthe.assert(on_success);
@@ -64,9 +64,9 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text) {
             msg = 'Downloaded image is not valid: '+url;
             console.error(msg);
             if (on_fail)
-                on_fail(img, msg);
+                on_fail(img, msg, user_data);
         } else {
-            on_success(img);
+            on_success(img, user_data);
         }
     });
 

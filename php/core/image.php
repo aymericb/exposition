@@ -26,6 +26,13 @@ class Image
 			throw new \Exception("Invalid size for image: $size");
 		}
 
+		// Check if native size (magic value '0')
+		if ($size === 0)
+		{
+			$this->cachePath = $path;
+			return;
+		}
+
 		// Get original file timestamp
 		$originalTime = filemtime($path);
 		if (! $originalTime) {
@@ -57,7 +64,7 @@ class Image
 		// Read asset size
 		$image_size = getimagesize($path);
 		if (! $image_size)
-			throw new \Exception("Cannot get time for \"$path\"");
+			throw new \Exception("Cannot get size for \"$path\"");
 		list($width, $height, $type) = $image_size;
 
 		// Compute asset new size
@@ -69,6 +76,14 @@ class Image
 		} else {
 			$cacheHeight = $size;
 			$cacheWidth = $cacheHeight * $ratio;
+		}
+
+		// Check if original image is smaller than requested image
+		if ($cacheHeight*$cacheWidth > $width*$height) {
+			//if (! copy($path, $this->cachePath))
+			if (! symlink($path, $this->cachePath))
+				throw new \Exception("Cannot copy \"$path\" to cache");
+			return;
 		}
 
 		// Read original image

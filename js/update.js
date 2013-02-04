@@ -25,8 +25,11 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
     var m_el_errors = el_errors;
     var m_config;
     var m_item;
+    var m_sizes;
     var m_count = 0;
     var m_total = 0;
+    var m_download_queue = [];
+    var PARALLEL_DOWNLOAD = 6;
 
     // Private Methods
     var onConfigSuccess = function() {
@@ -36,6 +39,14 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
             })
             .done( function(data) {
                 try {
+                    // Store sizes
+                    m_sizes = m_config.allImageSizes();
+                    m_sizes = m_sizes.sort(function(a,b){return a-b;});
+                    if (m_sizes[0] === 0)
+                        m_sizes = m_sizes.splice(1, m_sizes.length-1);
+
+                    console.log('Sizes: '+m_sizes);
+
                     // Count photos
                     m_item = new ph.barthe.Item(data);
                     var countPhotos = function(item) {
@@ -51,10 +62,9 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
                             return 1;
                         }
                     };
-                    m_total = countPhotos(m_item);
-                    // ### FIXME: Compute number of images
-                    // image_count = photo_count * (thumnail_sizes.length+photo_sizes.length)
-                    console.log('Total: '+m_total+' photos');
+                    var photo_count = countPhotos(m_item);
+                    m_total = photo_count*m_sizes.length;
+                    console.log('Total: '+photo_count+' photos, '+m_total+' images.');
 
                     // Update progress bar
                     m_el_progress.progressbar( "option", {
@@ -64,6 +74,9 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
 
                     // Start caching
                     cacheItem(m_item);
+                    for (var k=0; k<PARALLEL_DOWNLOAD; ++k) {
+                        popDownload();
+                    }
 
                 } catch(e) {
                     onFailed(e);
@@ -84,6 +97,42 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
         }
     };
 
+    var updateDownloadProgress = function(download) {
+        m_count += 1;
+        m_el_progress.progressbar("option", "value", m_count);
+        if ( m_count === m_total ) {
+            m_el_progress_label.text("Done");
+        } else {
+            m_el_progress_label.text(download.title + '@' + download.size + 'px');
+        }
+    };
+
+    var popDownload = function() {
+        if (m_download_queue.length === 0)
+            return;
+        var download = m_download_queue.pop();
+        ph.barthe.loadImage(download.url, onDownloadSuccess, onDownloadFailed, download.title, download);
+    };
+
+    var onDownloadSuccess = function(img, download) {
+        updateDownloadProgress(download);
+        popDownload();
+    };
+
+    var onDownloadFailed = function(img, msg, download) {
+        updateDownloadProgress(download);
+
+        var html = m_el_errors.html();
+        if (msg)
+            html += msg;
+        else
+            html += '<p>' + "Failed " + download.url + " ";
+        html += '</p>';
+        m_el_errors.html(html);
+
+        popDownload();
+    };
+
     var cacheItem = function(item) {
         // Precondition
         assert(item);
@@ -100,36 +149,17 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
             return;
         }
 
-        // ### FIXME: The size is fixed but should be read from the config
-        var size = m_config.thumbnailSize();
-
         // Cache photo
         assert(item.isPhoto());
-        var update_progress = function() {
-            m_count += 1;
-            m_el_progress.progressbar("option", "value", m_count);
-            if ( m_count === m_total ) {
-                m_el_progress_label.text("Done");
-            } else {
-                m_el_progress_label.text(item.title());
-            }
-        };
-        var on_success = function() {
-            update_progress();
-        };
-        var on_fail = function(img, msg) {
-            m_count += 1;
-            m_el_progress.progressbar("option", "value", m_count);
-            m_el_progress_label.text(item.title());
-            var html = m_el_errors.html();
-            html += '<p>' + "Failed " + item.path() + '@' + size + 'px ';
-            if (msg)
-                html += msg;
-            html += '</p>';
-            m_el_errors.html(html);
-        };
-        var url = m_config.pageImage()+'?'+$.param({path:item.path(), size: size});
-        ph.barthe.loadImage(url, on_success, on_fail, item.title());
+        for (var j=0; j<m_sizes.length; ++j) {
+            var url = m_config.pageImage()+'?'+$.param({path:item.path(), size: m_sizes[j]});
+            m_download_queue.push(Object.freeze({
+                url: url,
+                size: m_sizes[j],
+                title: item.title()
+            }));
+        }
+
     };
 
     //

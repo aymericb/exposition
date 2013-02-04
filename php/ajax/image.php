@@ -10,11 +10,18 @@ try {
 
 	// Get parameters
 	$path = $_GET['path'];
-	if (!$path || empty($path))
+	if (!isset($path) || !$path || empty($path))
 		throw new \Exception('Missing path parameter');
 	$size = $_GET['size'];
-	if (!$size || empty($size))
+	if (!isset($size))
 		throw new \Exception('Missing size parameter');
+	if ($size === '0') {
+		$size = 0;
+	} else {
+		$size = intval($size);
+		if (!$size)
+			throw new \Exception('Invalid size parameter');
+	}
 
 	// Get cached image
 	$image = new Image($path, $size);

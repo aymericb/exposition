@@ -76,6 +76,22 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         return self.thumbnailSize();
     };
 
+    // Raw size info
+    self.allImageSizes = function() {
+        // http://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript
+        var arrayUnique = function(array) {
+            var a = array.concat();
+            for(var i=0; i<a.length; ++i) {
+                for(var j=i+1; j<a.length; ++j) {
+                    if(a[i] === a[j])
+                        a.splice(j--, 1);
+                }
+            }
+            return a;
+        };
+        return arrayUnique(m_json.photo_sizes.concat(m_json.thumnail_sizes));
+    };
+
     //
     // Constructor
     //
