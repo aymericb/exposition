@@ -24,9 +24,58 @@ ph.barthe.assert = function(cond) {
     }
 };
 
-// Utilities
+/** Generate a suitable HTML id out of a prefix and a UNIX style path */
 ph.barthe.generateId = function(path, prefix) {
-    return prefix+path.replace(/\//g, '-').replace(/[^A-Za-z0-9\-\.]/g, '_');
+    return prefix+path.replace(/\//g, '-').replace(/[^A-Za-z0-9\-]/g, '_');
+};
+
+/** Check if object is an array */
+ph.barthe.isArray = function(object) {
+    return Object.prototype.toString.call(object) === '[object Array]' ;
+};
+
+/**
+ * Helps implementing the design pattern Observer.
+ *
+ * Usage.
+ *
+ * The class that emits the signal creates the Signal object passing the emitter object
+ * to the constructor. A fireEvent function is added to the emitter object, that can be
+ * used to send the signal optionally with parameters. The Signal object should be
+ * left accessible as a public property. Listeners can be added or removed with the
+ * public 'on' and 'off' methods.
+ *
+ */
+ph.barthe.Signal = function(emitter) {
+    var self = this;
+    var assert = ph.barthe.assert;
+    var m_list = [];
+
+    /** Add listener */
+    self.on = function(listener) {
+        assert(m_list.indexOf(listener) === -1);
+        m_list.push(listener);
+    };
+
+    /** Remove listener */
+    self.off = function(listener) {
+        var index = m_list.indexOf(listener);
+        assert(index !== -1);
+        m_list.split(index, 1);
+    };
+
+    /**
+     * Fire the signal. It is possible to provide optional arguments to pass to the
+     * listener functions, using the Function.apply() syntax.
+     *   - params: an array containing the arguments of the function
+     *   - this_object: is the 'this' object passed to the function
+     */
+    emitter.fire = function(params, this_object) {
+        assert(params === undefined || ph.barthe.isArray(params));
+        for (var i=0; i<m_list.length; ++i) {
+            m_list[i].apply(this_object, params);
+        }
+    };
 };
 
 /**

@@ -92,7 +92,7 @@ ph.barthe.Item = function(json) {
             if (! json.children) {
                 throw { message: 'Missing children attribute in JSON.' };
             }
-            if( Object.prototype.toString.call( json.children ) !== '[object Array]' ) {
+            if( !ph.barthe.isArray(json.children) ) {
                 throw { message: 'Attribute children should be an Array in JSON.' };
             }
             for (var i=0; i<json.children.length; ++i) {

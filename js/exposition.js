@@ -63,6 +63,7 @@ ph.barthe.Exposition = function(config, divs) {
      * Calls onFatalError on errors.
      */
     var loadPath = function(path) {
+        console.log("Loading: "+path);
         m_main_div.empty();
         var onError = function(error) {
             onFatalError("Cannot navigate to page "+path, error?error.message:'');
@@ -75,6 +76,7 @@ ph.barthe.Exposition = function(config, divs) {
                     m_path = path;
                     if (m_item.isAlbum()) {
                         m_view = new ph.barthe.AlbumView(config, m_divs, m_item);
+                        m_view.onLoadPath.on(loadPath);
                     } else {
                         // ### TODO: loadPhoto();
                     }
@@ -109,6 +111,7 @@ ph.barthe.Exposition = function(config, divs) {
         m_view.goToPrev();
     };
 
+    /** Event handler for m_divs.page_handler_right */
     var onGoToNext = function() {
         m_view.goToNext();
     };

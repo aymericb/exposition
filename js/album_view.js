@@ -51,16 +51,25 @@ ph.barthe.AlbumView = function(config, divs, item) {
     //
     // Private members
     //
+
+    // Data Model
     var m_album_to_photo = ph.barthe.AlbumViewCache.album_to_photo;
+    var m_item = item;              // Root item of the album
+
+    // HTML
     var m_main_div = divs.main;     // Root view
     var m_divs = divs;
-    var m_item = item;              // Root item of the album
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
     var m_loading_div;              // Hidden div used temporarily to load assets
+
+    // Page Handling
     var m_page_count;
     var m_current_page_index=0;
     var m_current_page_div;
+
+    // Event handling
+    var m_on_load_path = {};
 
     //
     // Config Constants
@@ -225,7 +234,7 @@ ph.barthe.AlbumView = function(config, divs, item) {
 
     //
     // Public API
-    //    
+    //
 
     /**
      * Load album into view
@@ -244,6 +253,13 @@ ph.barthe.AlbumView = function(config, divs, item) {
         m_loading_div = $('<div>').attr('id', 'album-loading').hide();
         m_main_div.append(m_loading_div);
 
+        // Click handler
+        var on_click = function(item) {
+            return function() {
+                m_on_load_path.fire([item.path()]);
+            };
+        };
+
         // Load thumbnails
         var children = m_item.children();
         for (var i=0; i<m_children.length; ++i) {
@@ -260,6 +276,13 @@ ph.barthe.AlbumView = function(config, divs, item) {
 
             // Create elements
             var div_item = $('<div>').addClass('item').attr('id', id).hide();
+            if (item.isAlbum()) {
+                div_item.addClass('album');
+            } else {
+                assert(item.isPhoto());
+                div_item.addClass('photo');
+            }
+            div_item.click(on_click(item));
             div_item.css( {
                 width: THUMBNAIL_SIZE+'px',
                 height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
@@ -297,6 +320,8 @@ ph.barthe.AlbumView = function(config, divs, item) {
         assert( (function() {
             for (var i=0; i<m_children.length; ++i) {
                 if (m_children[i] && $('#'+m_children[i].id).length === 0) {
+                    $('#'+m_children[i].id).show();
+                    console.log("No div for "+m_children[i].id);
                     return false;   // div element does not exist for child!
                 }
             }
@@ -378,6 +403,12 @@ ph.barthe.AlbumView = function(config, divs, item) {
     self.goToPrev = function() {
         setCurrentPage(m_current_page_index-1);
     };
+
+    /** 
+     * Event callback handler(path)
+     * Path is a string pointing to the path to load.
+     */
+    self.onLoadPath = new ph.barthe.Signal(m_on_load_path);
 };
 
 // Use strict footer
