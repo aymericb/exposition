@@ -13,7 +13,6 @@ ph.barthe = ph.barthe || {};
 (function() {
 "use strict";
 
-// Application Singleton
 /**
  * Application Singleton
  *
@@ -42,6 +41,7 @@ ph.barthe.Exposition = function(config, divs) {
     var m_view;                     // Current view
     var m_divs = divs;              // Divs used for display
     var m_main_div = divs.main;     // Main div used for rendering
+    var m_page_handler;             // ph.barthe.PageHandler
 
     //
     // Private Functions
@@ -75,8 +75,16 @@ ph.barthe.Exposition = function(config, divs) {
                     m_item = new ph.barthe.Item(data);
                     m_path = path;
                     if (m_item.isAlbum()) {
-                        m_view = new ph.barthe.AlbumView(config, m_divs, m_item);
+                        m_view = new ph.barthe.AlbumView(config, m_main_div, m_item);
                         m_view.onLoadPath.on(loadPath);
+                        m_view.onPageUpdate.on(function(show, current_page, total_page) {
+                            if (!show) {
+                                m_page_handler.hide();
+                                return;
+                            }
+                            m_page_handler.show();
+                            m_page_handler.setPage("Page", current_page, total_page);
+                        });
                     } else {
                         // ### TODO: loadPhoto();
                     }
@@ -120,13 +128,20 @@ ph.barthe.Exposition = function(config, divs) {
     // Constructor
     //
     (function() {
+
+        // Preconditions
         assert(m_divs.main);
         assert(m_divs.page_handler);
         assert(m_divs.page_handler_left);
         assert(m_divs.page_handler_center);
         assert(m_divs.page_handler_right);
-        m_divs.page_handler_left.click(onGoToPrev);
-        m_divs.page_handler_right.click(onGoToNext);
+
+        // Initialize page handler
+        m_page_handler = new ph.barthe.PageHandler(m_divs);
+        m_page_handler.onGoToPrev.on(onGoToPrev);
+        m_page_handler.onGoToNext.on(onGoToNext);
+
+        // Initialize view
         loadPath(m_path);
         $(window).resize(onResize);
     })();

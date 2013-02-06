@@ -32,15 +32,9 @@ ph.barthe.AlbumViewCache = {
  *
  * Constructor parameters
  * - config                     -> A ph.barthe.Config object
- * - divs An object containing all the necesessary divs as properties
- *      - main                  -> display area for the album
- *      - page_handler          -> display area for page handling ui
- *      - page_handler_left     -> previous page arrow
- *      - page_handler_center   -> "page x/y" display
- *      - page_handler_right    -> next page arrow
- * - item                       -> A ph.barthe.Item object to display
+ * - main_div                   -> display area for the album
  */
-ph.barthe.AlbumView = function(config, divs, item) {
+ph.barthe.AlbumView = function(config, main_div, item) {
 
     //
     // Redefinitions
@@ -57,8 +51,7 @@ ph.barthe.AlbumView = function(config, divs, item) {
     var m_item = item;              // Root item of the album
 
     // HTML
-    var m_main_div = divs.main;     // Root view
-    var m_divs = divs;
+    var m_main_div = main_div;     // Root view
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
     var m_loading_div;              // Hidden div used temporarily to load assets
@@ -70,6 +63,7 @@ ph.barthe.AlbumView = function(config, divs, item) {
 
     // Event handling
     var m_on_load_path = {};
+    var m_on_page_update = {};    
 
     //
     // Config Constants
@@ -87,11 +81,7 @@ ph.barthe.AlbumView = function(config, divs, item) {
     (function() {
 
         // Preconditions
-        assert(m_divs);
-        assert(m_divs.page_handler);
-        assert(m_divs.page_handler_left);
-        assert(m_divs.page_handler_center);
-        assert(m_divs.page_handler_right);
+        assert(m_main_div);
         assert(m_main_div);
         assert(m_item);
         assert(m_item.isAlbum());
@@ -196,14 +186,9 @@ ph.barthe.AlbumView = function(config, divs, item) {
         console.log("Showing page "+(page_index+1));
         assert(page_index >= 0);
         assert(page_index < m_page_count);
-        assert(m_divs);
-        assert(m_divs.page_handler);
-        assert(m_divs.page_handler_left);
-        assert(m_divs.page_handler_center);
-        assert(m_divs.page_handler_right);
 
         // Hide current page
-        m_divs.page_handler.hide();
+        m_on_page_update.fire([false]);
         if (m_current_page_div)
             m_current_page_div.hide();
 
@@ -212,24 +197,11 @@ ph.barthe.AlbumView = function(config, divs, item) {
         var div_page = $('#'+id);
         assert(div_page.length !== 0);
 
-        // Update page handler status
-        m_divs.page_handler_center.text("Page "+(page_index+1)+"/"+m_page_count);
-        if (page_index>0)
-            m_divs.page_handler_left.show();
-        else
-            m_divs.page_handler_left.hide();
-        if (page_index+1 < m_page_count)
-            m_divs.page_handler_right.show();
-        else
-            m_divs.page_handler_right.hide();
-        m_current_page_index = page_index;
-        m_divs.page_handler.show();
-
         // Make new page visible
         m_current_page_index = page_index;
         m_current_page_div = div_page;
         m_current_page_div.show();
-        m_divs.page_handler.show();
+        m_on_page_update.fire([true, page_index, m_page_count]);
     };
 
     //
@@ -404,11 +376,16 @@ ph.barthe.AlbumView = function(config, divs, item) {
         setCurrentPage(m_current_page_index-1);
     };
 
-    /** 
-     * Event callback handler(path)
-     * Path is a string pointing to the path to load.
-     */
+    /** onLoadPath(path) -> path is a string pointing to the path to load. */
     self.onLoadPath = new ph.barthe.Signal(m_on_load_path);
+
+    /**
+     * onPageUpdate(show, current_page, total_page)
+     * show {bool}          -> if false, hide ignore other parameters
+     * current_page {int}   -> current page, index 0
+     * total_page {int}     -> number of pages in total >= 1
+     */
+    self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);
 };
 
 // Use strict footer
