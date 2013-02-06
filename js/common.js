@@ -61,7 +61,7 @@ ph.barthe.Signal = function(emitter) {
     self.off = function(listener) {
         var index = m_list.indexOf(listener);
         assert(index !== -1);
-        m_list.split(index, 1);
+        m_list.splice(index, 1);
     };
 
     /**
@@ -102,7 +102,7 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
         img.attr('alt', alt_text);
 
     // Async load
-    img.load(function(response, status, xhr) {
+    img.load(function() {
         var msg;
         if (!this.complete || !this.naturalWidth) {
             msg = 'Downloaded image is not valid: '+url;
