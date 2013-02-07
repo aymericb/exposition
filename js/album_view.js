@@ -5,7 +5,6 @@
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
 
-
 // Namespace declarations
 var ph = ph || {};
 ph.barthe = ph.barthe || {};
@@ -33,6 +32,7 @@ ph.barthe.AlbumViewCache = {
  * Constructor parameters
  * - config                     -> A ph.barthe.Config object
  * - main_div                   -> display area for the album
+ * - item                       -> A ph.barthe.Item representing the album to display
  */
 ph.barthe.AlbumView = function(config, main_div, item) {
 
@@ -51,7 +51,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     var m_item = item;              // Root item of the album
 
     // HTML
-    var m_main_div = main_div;     // Root view
+    var m_main_div = main_div;      // Root view
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
     var m_loading_div;              // Hidden div used temporarily to load assets
@@ -81,7 +81,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     (function() {
 
         // Preconditions
-        assert(m_main_div);
         assert(m_main_div);
         assert(m_item);
         assert(m_item.isAlbum());

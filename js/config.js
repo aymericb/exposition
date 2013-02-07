@@ -76,6 +76,11 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         return self.thumbnailSize();
     };
 
+    // Photo
+    self.photoSizes = function() {
+        return m_json.photo_sizes;
+    };
+
     // Raw size info
     self.allImageSizes = function() {
         // http://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript

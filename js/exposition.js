@@ -86,7 +86,8 @@ ph.barthe.Exposition = function(config, divs) {
                             m_page_handler.setPage("Page", current_page, total_page);
                         });
                     } else {
-                        // ### TODO: loadPhoto();
+                        assert(m_item.isPhoto());
+                        m_view = new ph.barthe.PhotoView(config, m_main_div, m_item);
                     }
                     m_view.load();
                 } catch(e) {
