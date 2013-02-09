@@ -1,5 +1,10 @@
 /* Exposition.css */
 
+/**
+ * Main page
+ * Adjust to 100% of visible area.
+ * header is on top, footer at the bottom
+ */
 html, body {
 	width: 100%;
 	height: 100%;
@@ -49,6 +54,22 @@ html, body {
 	background-color: rgb(32, 32, 32);
 	box-shadow: inset 5px 0px 5px -5px rgba(0, 0, 0, 1), inset -5px 0px 5px -5px rgba(0, 0, 0, 1), inset 0px 6px 5px -5px rgba(0, 0, 0, 1), inset 0px -6px 5px -5px rgba(0, 0, 0, 1);
 }
+
+/** Photo View */
+.photo {
+	margin: 20px;
+	background-color: rgb(240, 240, 240);			
+	padding: 4px;
+	position: absolute;
+}
+
+
+/** 
+ * 'item' is the enclosing DIV used in AlbumView
+ * It contains a 'thumnail' and 'title' div.
+ * 'thumnail' may also be of class 'photo-item' or 'album-item' depending
+ * whether the element is sub album or a photo
+ */
 
 .item {
 	position: absolute;
@@ -123,6 +144,10 @@ html, body {
 	border-width: 1px;*/
 }
 
+/**
+ * Page handler is used to show current, next and previous page control.
+ * Used in album and photo view.
+ */
 #page-handler {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 18px;

@@ -106,19 +106,26 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             var view_height = m_main_div.innerHeight();
             var view_ratio = view_width/view_height;
 
+            // Read margin from CSS
+            img.addClass('photo');
+            var h_margin = (img.outerWidth(true) - img.innerWidth())/2;
+            var v_margin = (img.outerHeight(true) - img.innerHeight())/2;
+
             // Adjust
             // ### FIXME. Use CSS style. Compute margins/padding/borders etc...
             if (view_ratio > img_ratio) {
                 // The view is wider. Maximize img height.
-                img.height(view_height);
-                img.width(img_ratio*img.height());
-                img.css({top:0, left:(view_width-img.width())/2, position:"absolute" });
+                img.height(Math.floor(view_height-2*v_margin));
+                img.width(Math.floor(img_ratio*img.height()));
             } else {
                 // The view is heigher. Maximize img width.
-                img.width(view_width);
-                img.height(img.width()/img_ratio);
-                img.css({top:(view_height-img.height())/2, left:0, position:"absolute"});
+                img.width(Math.floor(view_width-2*h_margin));
+                img.height(Math.floor(img.width()/img_ratio));
             }
+            img.css({
+                top:Math.floor((view_height-img.outerHeight(true))/2),
+                left:Math.floor((view_width-img.outerWidth(true))/2)
+            });
 
             // Show image
             img.show();

@@ -63,7 +63,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
     // Event handling
     var m_on_load_path = {};
-    var m_on_page_update = {};    
+    var m_on_page_update = {};
 
     //
     // Config Constants
@@ -248,10 +248,10 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             // Create elements
             var div_item = $('<div>').addClass('item').attr('id', id).hide();
             if (item.isAlbum()) {
-                div_item.addClass('album');
+                div_item.addClass('album-item');
             } else {
                 assert(item.isPhoto());
-                div_item.addClass('photo');
+                div_item.addClass('photo-item');
             }
             div_item.click(on_click(item));
             div_item.css( {
