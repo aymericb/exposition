@@ -43,7 +43,9 @@ ph.barthe.PhotoView = function(config, main_div, item) {
 
     // HTML
     var m_main_div = main_div;  // Root view
-    var m_img;                  // Image element
+    var m_current_img;          // Currently displayed IMG element
+    var m_loading_div;          // Contains IMG elements being loaded
+    var m_ready_div;            // Contains IMG elements ready to display
 
     // Constants
     var PAGE_IMAGE = config.pageImage();
@@ -60,9 +62,68 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         assert(m_item);
         assert(m_item.isPhoto());
 
+        // Create laoding and ready divs
+        m_loading_div = $('<div>').attr('id', 'photo-loading').hide();
+        m_ready_div = $('<div>').attr('id', 'photo-ready');
+        m_main_div.append(m_loading_div);
+        m_main_div.append(m_ready_div);
+
         // ### TODO. Load parent album
 
     })();
+
+    var generateId = function(path) {
+        assert(path);
+        return ph.barthe.generateId(path, 'photo');
+    };
+
+    /**
+     * Choose most appropriate size for image for the current view
+     * @param sizes {array} Integers sorted by increasing number
+     * @return the chosen size
+     */
+     var chooseSize = function(sizes) {
+        // Precondition
+        assert(ph.barthe.isArray(sizes) && sizes.length>0);
+
+        // Get the size one step larger than view_size
+        var view_size = Math.max(m_main_div.innerWidth(), m_main_div.innerHeight());
+        var i = 0;
+        while(i<sizes.length && sizes[i]<view_size)
+            i += 1;
+        if (i === sizes.length)
+            i -= 1;
+        var size = sizes[i];
+
+        // Special case for '0' which means native size
+        if (sizes[i]<view_size && sizes[0] === 0)
+            size = 0;
+
+        // Postcondition
+        assert(size !== undefined);
+        return size;
+    };
+
+    /**
+     * Load the image for path and size given
+     * @param path {string}    album path
+     * @param size {int}       value from IMAGE_SIZES
+     */
+    var loadImage = function(path, size) {
+        var url = PAGE_IMAGE+'?'+$.param({path:m_item.path(), size: size});
+        var on_fail = function() {
+            // ### TODO
+        };
+        var on_success = function(img) {
+            m_ready_div.append(img);
+            self.updateLayout();
+        };
+        var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
+        img.addClass(generateId(path));
+        img.attr('data-size', size);
+        img.hide();
+        m_loading_div.append(img);
+    };
 
     /**
      * Load photo into view
@@ -75,68 +136,102 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.load = function() {
 
-        // Clear div
-        m_main_div.empty();
+        // Clear main view
+        // ### m_main_div.empty();
 
-        // Choose most appropriate size
-        var view_size = Math.max(m_main_div.innerWidth(), m_main_div.innerHeight());
-        var i = 0;
-        while(i<IMAGE_SIZES.length && IMAGE_SIZES[i]<view_size)
-            i += 1;
-        var size = IMAGE_SIZES[i];
-        //console.log("All sizes: "+IMAGE_SIZES);
-        //console.log("View size: "+view_size);
-        if (IMAGE_SIZES[i]<view_size && IMAGE_SIZES[0] === 0)
-            size = 0;   // 0 means 'native size'
-        //console.log("Chose size: "+size);
+        // Load best size
+        var size = chooseSize(IMAGE_SIZES);
+        loadImage(m_item.path(), size);
+    };
 
-        // Load image
-        var url = PAGE_IMAGE+'?'+$.param({path:m_item.path(), size: size});
-        var on_fail = function() {
-            // ### TODO
+    /**
+     * Update layout of photo in the view
+     *
+     * This methods should be called whenever the view size changes. It should be called
+     * only after the view was loaded with load(). This methods recenter the photo and
+     * optionally triggers the download of a larger size photo.
+     *
+     */
+    self.updateLayout = function() {
+
+        // Helper function
+        var get_size = function(img) {
+            var size = img.attr('data-size');
+            assert(size);
+            size = parseInt(size, 10);
+            assert(!isNaN(size));
+            return size;
         };
-        var on_success = function(img) {
-            // ###  TODO
 
-            // Get sizes
-            var img_width = img[0].naturalWidth;
-            var img_height = img[0].naturalHeight;
-            var img_ratio = img_width/img_height;
-            var view_width = m_main_div.innerWidth();
-            var view_height = m_main_div.innerHeight();
-            var view_ratio = view_width/view_height;
+        // Find the best loaded image for the current size of the view
+        var sizes = [];         // size array
+        var ready_imgs = {};    // Map: size => jQuery element
+        m_ready_div.find('.'+generateId(m_item.path())).each(function() {
+            var size = get_size( $(this) );
+            ready_imgs[size] = $(this);
+            sizes.push(size);
+        });
+        var size, img;
+        if (sizes.length !== 0)
+        {
+            size = chooseSize(sizes);
+            img = ready_imgs[size];
+            //console.log('sizes: '+ sizes + '  size: '+size+'  ready_imgs: '+ready_imgs);
+            assert(img && img.length > 0);
+        }
 
-            // Read margin from CSS
-            img.addClass('photo');
-            var h_margin = (img.outerWidth(true) - img.innerWidth())/2;
-            var v_margin = (img.outerHeight(true) - img.innerHeight())/2;
-
-            // Adjust
-            // ### FIXME. Use CSS style. Compute margins/padding/borders etc...
-            if (view_ratio > img_ratio) {
-                // The view is wider. Maximize img height.
-                img.height(Math.floor(view_height-2*v_margin));
-                img.width(Math.floor(img_ratio*img.height()));
-            } else {
-                // The view is heigher. Maximize img width.
-                img.width(Math.floor(view_width-2*h_margin));
-                img.height(Math.floor(img.width()/img_ratio));
-            }
-            img.css({
-                top:Math.floor((view_height-img.outerHeight(true))/2),
-                left:Math.floor((view_width-img.outerWidth(true))/2)
+        // Request a better image if necessary
+        var best_size = chooseSize(IMAGE_SIZES);
+        if (size === undefined || (best_size !== 0 && best_size > size) ||
+                                  (size !== 0 && best_size === 0)) {
+            var already_loading = false;
+            m_loading_div.find('.'+generateId(m_item.path())).each(function() {
+                if (get_size($(this)) === best_size)
+                    already_loading = true;
             });
+            if (!already_loading) {
+                //console.log('load '+best_size);
+                loadImage(m_item.path(), best_size);
+            }
+        }
+        if (!img)
+            return;
 
-            // Show image
-            img.show();
-        };
-        var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
-        img.hide();
-        m_main_div.append(img);
+        // Update current image
+        if (m_current_img)
+            m_current_img.hide();
+        m_current_img = img;
 
-        // m_loading_div = $('<div>').attr('id', 'album-loading').hide();
-        // m_main_div.append(m_loading_div);
+        // Get sizes
+        var img_width = img[0].naturalWidth;
+        var img_height = img[0].naturalHeight;
+        var img_ratio = img_width/img_height;
+        var view_width = m_main_div.innerWidth();
+        var view_height = m_main_div.innerHeight();
+        var view_ratio = view_width/view_height;
 
+        // Read margin from CSS
+        img.addClass('photo');
+        var h_margin = (img.outerWidth(true) - img.innerWidth())/2;
+        var v_margin = (img.outerHeight(true) - img.innerHeight())/2;
+
+        // Adjust
+        if (view_ratio > img_ratio) {
+            // The view is wider. Maximize img height.
+            img.height(Math.floor(view_height-2*v_margin));
+            img.width(Math.floor(img_ratio*img.height()));
+        } else {
+            // The view is heigher. Maximize img width.
+            img.width(Math.floor(view_width-2*h_margin));
+            img.height(Math.floor(img.width()/img_ratio));
+        }
+        img.css({
+            top:Math.floor((view_height-img.outerHeight(true))/2),
+            left:Math.floor((view_width-img.outerWidth(true))/2)
+        });
+
+        // Make visible
+        img.show();
     };
 
 };
