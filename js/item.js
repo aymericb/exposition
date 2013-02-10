@@ -102,3 +102,44 @@ ph.barthe.Item = function(json) {
     })();
 
 };
+
+/** 
+ * Load a ph.barthe.Item item from a URL, or return cached version.
+ *
+ * Usage.
+ * Call ph.barthe.Item.Load() with the following parameters.
+ * @param url {string} URL where to load data from
+ * @param path {string} Exposition path
+ * @param on_success {function(ph.barthe.Item)} success callback, this CANNOT be immediate!
+ * @param on_fail {function(jqXHR, textStatus, errorThrown)} error callback
+ */
+ph.barthe.Item.Load = (function() {
+    var assert = ph.barthe.assert;  // Redifinitions
+    var cache = {};                 // Cache to avoid re-loading. Map: path => ph.barthe.Item
+
+    // Real body of function
+    return function(url, path, on_success, on_fail) {
+
+        // Check cache
+        if (cache[path]) {
+            setTimeout(function() { on_success(cache[path]); }, 0);
+            return;
+        }
+
+        // Download item
+        $.ajax(url+'?'+$.param({path: path}))
+            .fail( on_fail )
+            .done( function(data) {
+                try {
+                    var item = new ph.barthe.Item(data);
+                    cache[path] = item;
+                    on_success(item);
+                } catch(e) {
+                    on_fail(undefined, undefined, e);
+                    if (ph.barthe.debug)
+                        throw e;
+                }
+            });
+    };
+})();
+

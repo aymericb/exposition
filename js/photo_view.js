@@ -40,12 +40,17 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     // Data Model
 	var m_item = item;			// Photo item to display
 	var m_album;				// Parent item
+    var m_item_index;           // Current child index for m_item within m_album
 
     // HTML
     var m_main_div = main_div;  // Root view
     var m_current_img;          // Currently displayed IMG element
     var m_loading_div;          // Contains IMG elements being loaded
     var m_ready_div;            // Contains IMG elements ready to display
+
+    // Signal emitters
+    var m_on_page_update = {};
+    var m_on_load_path = {};
 
     // Constants
     var PAGE_IMAGE = config.pageImage();
@@ -68,8 +73,38 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         m_main_div.append(m_loading_div);
         m_main_div.append(m_ready_div);
 
-        // ### TODO. Load parent album
+        // Load parent album (for photo navigation prev/next)
+        var album_path = m_item.path().substring(0, m_item.path().lastIndexOf('/'));
+        if (album_path === '')
+            album_path = '/';
+        var on_album_error = function(jqXHR, textStatus, error) {
+            var msg = 'Cannot load parent album "'+album_path+'"';
+            if (textStatus)
+                msg += '  '+textStatus;
+            if (error && error.message)
+                msg += '  '+error.message;
+            console.error(msg);            
+        }
+        var on_album_success  = function(item) {
+            // Precondition
+            m_album = item;
+            assert(m_album);
+            assert(m_album.children().length > 0);
 
+            // Determine index of m_item within album
+            var children = m_album.children();
+            for (var i=0; i<children.length; ++i) {
+                if (children[i].path() === m_item.path()) {
+                    m_item_index = i;
+                    break;
+                }
+            }
+            m_on_page_update.fire([m_item_index, children.length]);
+
+            // Postcondition
+            assert(m_item_index !== undefined);
+        }
+        ph.barthe.Item.Load(config.pageItem(), album_path, on_album_success, on_album_error);        
     })();
 
     var generateId = function(path) {
@@ -210,12 +245,12 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         var view_height = m_main_div.innerHeight();
         var view_ratio = view_width/view_height;
 
-        // Read margin from CSS
+        // Read margins from CSS
         img.addClass('photo');
         var h_margin = (img.outerWidth(true) - img.innerWidth())/2;
         var v_margin = (img.outerHeight(true) - img.innerHeight())/2;
 
-        // Adjust
+        // Adjust IMG to center of view
         if (view_ratio > img_ratio) {
             // The view is wider. Maximize img height.
             img.height(Math.floor(view_height-2*v_margin));
@@ -233,6 +268,31 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         // Make visible
         img.show();
     };
+
+    // ### FIXME. Currently we force a re-loading of the next photo
+    // This is stupid. We should keep the current AlbumView and update
+    // the status of Exposition. Additionally, we can modify AlbumView to
+    // prefetch previous/next images.
+
+    /** Go to next page */
+    self.goToNext = function() {
+        m_on_load_path.fire([m_album.children()[m_item_index+1].path()]);
+    };
+
+    /** Go to previous page */
+    self.goToPrev = function() {
+        m_on_load_path.fire([m_album.children()[m_item_index-1].path()]);
+    };
+
+    /** onLoadPath(path) -> path is a string pointing to the path to load. */
+    self.onLoadPath = new ph.barthe.Signal(m_on_load_path);
+
+    /**
+     * onPageUpdate(show, current_page, total_page)
+     * current_page {int}   -> current page, index 0
+     * total_page {int}     -> number of pages in total >= 1
+     */
+    self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);   
 
 };
 

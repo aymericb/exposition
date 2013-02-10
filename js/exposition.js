@@ -65,37 +65,43 @@ ph.barthe.Exposition = function(config, divs) {
     var loadPath = function(path) {
         console.log("Loading: "+path);
         m_main_div.empty();
-        var onError = function(error) {
+
+        var on_error = function(jqXHR, textStatus, error) {
             onFatalError("Cannot navigate to page "+path, error?error.message:'');
         };
-        $.ajax(config.pageItem()+'?'+$.param({path: path}))
-            .fail( onError )
-            .done( function(data) {
-                try {
-                    m_item = new ph.barthe.Item(data);
-                    m_path = path;
-                    if (m_item.isAlbum()) {
-                        m_view = new ph.barthe.AlbumView(config, m_main_div, m_item);
-                        m_view.onLoadPath.on(loadPath);
-                        m_view.onPageUpdate.on(function(show, current_page, total_page) {
-                            if (!show) {
-                                m_page_handler.hide();
-                                return;
-                            }
-                            m_page_handler.show();
-                            m_page_handler.setPage("Page", current_page, total_page);
-                        });
-                    } else {
-                        assert(m_item.isPhoto());
-                        m_view = new ph.barthe.PhotoView(config, m_main_div, m_item);
-                    }
-                    m_view.load();
-                } catch(e) {
-                    onError(e);
-                    if (ph.barthe.debug)
-                        throw e;
+        var on_success = function(item) {
+            try {
+                m_item = item;
+                m_path = path;
+                if (m_item.isAlbum()) {
+                    m_view = new ph.barthe.AlbumView(config, m_main_div, m_item);
+                    m_view.onLoadPath.on(loadPath);
+                    m_view.onPageUpdate.on(function(show, current_page, total_page) {
+                        if (!show) {
+                            m_page_handler.hide();
+                            return;
+                        }
+                        m_page_handler.show();
+                        m_page_handler.setPage("Page", current_page, total_page);
+                    });
+                } else {
+                    assert(m_item.isPhoto());
+                    m_page_handler.hide();
+                    m_view = new ph.barthe.PhotoView(config, m_main_div, m_item);
+                    m_view.onLoadPath.on(loadPath); // ### FIXME. See goToNext/goToPrev in PhotoView
+                    m_view.onPageUpdate.on(function(current_photo, total_photo) {
+                        m_page_handler.show();
+                        m_page_handler.setPage("Photo", current_photo, total_photo);
+                    });
                 }
-            });
+                m_view.load();
+            } catch(e) {
+                on_error(e);
+                if (ph.barthe.debug)
+                    throw e;
+            }
+        };
+        ph.barthe.Item.Load(config.pageItem(), path, on_success, on_error);
     };
 
     /**
