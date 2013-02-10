@@ -13,6 +13,7 @@
     <script src="js/exposition.js"></script>
     <script src="js/page_handler.js"></script>
     <script src="js/photo_view.js"></script>
+    <script src="js/breadcrumb_handler.js"></script>
     <script>
         // Main function
         $(document).ready(function() {
@@ -20,6 +21,7 @@
                 console.log(config.info());
                 var divs = {
                     main: $('#main'),
+                    breadcrumb: $('#breadcrumb'),
                     page_handler: $('#page-handler'),
                     page_handler_center: $('#page-handler-center'),
                     page_handler_left: $('#page-handler-left'),
@@ -36,7 +38,9 @@
     </script>
 </head>
 <body>
-    <div id="header"><p>Salingkit Gallery</p></div>
+    <div id="header">
+        <div id="breadcrumb"></div>
+    </div>
     <div id="main">
     </div>
     <div id="footer">

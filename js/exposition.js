@@ -20,6 +20,7 @@ ph.barthe = ph.barthe || {};
  * - config                     -> A ph.barthe.Config object
  * - divs An object containing all the necesessary divs as properties
  *      - main                  -> main display area
+ *      - breadcrumb            -> breadcrumb section
  *      - page_handler          -> display area for page handling ui
  *      - page_handler_left     -> previous page arrow
  *      - page_handler_center   -> "page x/y" display
@@ -42,6 +43,7 @@ ph.barthe.Exposition = function(config, divs) {
     var m_divs = divs;              // Divs used for display
     var m_main_div = divs.main;     // Main div used for rendering
     var m_page_handler;             // ph.barthe.PageHandler
+    var m_breadcrumb_handler;       // ph.barthe.BreadcrumbHandler
 
     //
     // Private Functions
@@ -65,6 +67,8 @@ ph.barthe.Exposition = function(config, divs) {
     var loadPath = function(path) {
         console.log("Loading: "+path);
         m_main_div.empty();
+        m_page_handler.hide();
+        m_breadcrumb_handler.setPath(path);
 
         var on_error = function(jqXHR, textStatus, error) {
             onFatalError("Cannot navigate to page "+path, error?error.message:'');
@@ -137,16 +141,21 @@ ph.barthe.Exposition = function(config, divs) {
     (function() {
 
         // Preconditions
-        assert(m_divs.main);
-        assert(m_divs.page_handler);
-        assert(m_divs.page_handler_left);
-        assert(m_divs.page_handler_center);
-        assert(m_divs.page_handler_right);
+        assert(m_divs.main && m_divs.main.length>0);
+        assert(m_divs.breadcrumb && m_divs.breadcrumb.length>0);
+        assert(m_divs.page_handler && m_divs.page_handler.length>0);
+        assert(m_divs.page_handler_left && m_divs.page_handler_left.length>0);
+        assert(m_divs.page_handler_center && m_divs.page_handler_center.length>0);
+        assert(m_divs.page_handler_right && m_divs.page_handler_right.length>0);
 
         // Initialize page handler
         m_page_handler = new ph.barthe.PageHandler(m_divs);
         m_page_handler.onGoToPrev.on(onGoToPrev);
         m_page_handler.onGoToNext.on(onGoToNext);
+
+        // Initialize breadcrumb handler
+        m_breadcrumb_handler = new ph.barthe.BreadcrumbHandler(m_divs.breadcrumb);
+        m_breadcrumb_handler.onLoadPath.on(loadPath);
 
         // Initialize view
         loadPath(m_path);

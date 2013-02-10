@@ -30,7 +30,7 @@ html, body {
 	margin-left: 19px;			
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 22px;
-	color: rgb(240, 240, 240);			
+	color: rgb(240, 240, 240);
 }
 
 #footer {
@@ -98,6 +98,7 @@ html, body {
 .item .thumbnail:hover {
 	box-shadow: rgb(255, 255, 255) 0px 0px 10px 0px;
 	-webkit-filter: brightness(20%);
+	cursor: pointer;	
 }
 
 .item .title {
@@ -151,3 +152,39 @@ html, body {
 	cursor: pointer;
 }
 
+/**
+ * Breaccrumb section. 
+ * Contained within #header.
+ */
+
+#breadcrumb {
+	margin: 21px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	color: rgb(240, 240, 240);
+	display: block;
+}
+
+#breadcrumb .title {
+	font-size: 22px;
+	margin-top: -2px;
+}
+
+#breadcrumb .subpath {
+	display: inline-block;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+#breadcrumb .subpath:hover {
+	display: inline-block;
+	color: rgb(100, 255, 255);
+	cursor: pointer;	
+}
+#breadcrumb .separator {
+	display: inline-block;
+}
+#breadcrumb .separator:before {
+	display: inline-block;
+	content: "/";
+	color: rgb(180, 180, 180);	
+}
