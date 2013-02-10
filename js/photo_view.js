@@ -83,8 +83,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
                 msg += '  '+textStatus;
             if (error && error.message)
                 msg += '  '+error.message;
-            console.error(msg);            
-        }
+            console.error(msg);
+        };
         var on_album_success  = function(item) {
             // Precondition
             m_album = item;
@@ -103,8 +103,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
 
             // Postcondition
             assert(m_item_index !== undefined);
-        }
-        ph.barthe.Item.Load(config.pageItem(), album_path, on_album_success, on_album_error);        
+        };
+        ph.barthe.Item.Load(config.pageItem(), album_path, on_album_success, on_album_error);
     })();
 
     var generateId = function(path) {
@@ -292,7 +292,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      * current_page {int}   -> current page, index 0
      * total_page {int}     -> number of pages in total >= 1
      */
-    self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);   
+    self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);
 
 };
 
