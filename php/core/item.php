@@ -25,9 +25,20 @@ abstract class Item
 		$this->title = $title;
 		if (! $this->title) {
 			$this->title = basename($this->path);
+
+			// Special title for root album
 			if ($this->title === '') {
-				$this->title = '/';		// Special title for root album
+				$this->title = '/';
 			}
+
+			// Remove trailing extension
+			$dot = $last_dot = strrpos($this->title, '.');
+			while ($dot !== FALSE && $dot < strlen($this->title)) {
+				$last_dot = $dot;
+				$dot = strrpos($this->title, '.', $last_dot+1);
+			}
+			if ($last_dot)
+				$this->title = substr($this->title, 0, $last_dot);
 		}
 	}
 
