@@ -76,7 +76,7 @@ ph.barthe.PageHandler = function(divs) {
         assert(current_page<total_page);
 
         // Update status
-        m_divs.page_handler_center.text(text+(current_page+1)+"/"+total_page);
+        m_divs.page_handler_center.text(text+' '+(current_page+1)+"/"+total_page);
         if (current_page>0)
             m_divs.page_handler_left.show();
         else
