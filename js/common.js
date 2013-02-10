@@ -17,10 +17,8 @@ ph.barthe = ph.barthe || {};
 ph.barthe.debug = true;
 // ### FIXME: Improve this (eval, stack etc...)
 ph.barthe.assert = function(cond) {
-    if (ph.barthe.debug) {
-        if (! cond) {   // ### FIXME Need to find a better mechanism to stop executing functions/ code
-            throw { message: 'Assertion failed: '+cond };
-        }
+    if (! cond) {   // ### FIXME Need to find a better mechanism to stop executing functions/ code
+        throw { message: 'Assertion failed: '+cond };
     }
 };
 

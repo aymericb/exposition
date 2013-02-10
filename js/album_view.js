@@ -54,6 +54,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     var m_main_div = main_div;      // Root view
     var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
+    var m_children_count = 0;       // Real number of children (excluding holes)
     var m_loading_div;              // Hidden div used temporarily to load assets
 
     // Page Handling
@@ -182,7 +183,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     var setCurrentPage = function(page_index)
     {
         // Preconditions
-        console.log("Showing page "+(page_index+1));
+        if (ph.barthe.debug)
+            console.log("Showing page "+(page_index+1));
         assert(page_index >= 0);
         assert(page_index < m_page_count);
 
@@ -238,6 +240,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             // Skip empty albums
             if (!m_children[i])
                 continue;
+            m_children_count += 1;
 
             // Read properties
             var url = PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: THUMBNAIL_SIZE});
@@ -304,10 +307,14 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         var VIEW_HEIGHT = m_main_div.height();
         var WIDTH       = THUMBNAIL_MARGIN + THUMBNAIL_SIZE;
         var HEIGHT      = THUMBNAIL_MARGIN + THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT;
-        var COL_COUNT   = Math.floor( VIEW_WIDTH/WIDTH );
-        var ROW_COUNT   = Math.floor( VIEW_HEIGHT/HEIGHT );
+        var COL_COUNT   = Math.floor( (VIEW_WIDTH-2*THUMBNAIL_MARGIN)/WIDTH );
+        var ROW_COUNT   = Math.floor( (VIEW_HEIGHT-2*THUMBNAIL_MARGIN)/HEIGHT );
         var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + THUMBNAIL_MARGIN)/2 );
         var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + THUMBNAIL_MARGIN)/2 );
+        if (COL_COUNT*ROW_COUNT > m_children_count)
+            V_MARGIN = THUMBNAIL_MARGIN;
+        if (COL_COUNT >= m_children_count)
+            H_MARGIN = THUMBNAIL_MARGIN;
         if (ph.barthe.debug) {
             console.log('Resizing album. Items: '+m_children.length+' COL_COUNT: '+COL_COUNT+' ROW_COUNT: '+ROW_COUNT);
         }

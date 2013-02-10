@@ -75,13 +75,6 @@ html, body {
 .item {
 	position: absolute;
 
-	/* Example */
-	/*left: 20px;
-	top: 20px;
-	width: 160px;
-	height: 191px; *//*107+(17+4)+10px;*/
-	/*height:191px*/;
-
 	/* Debugging */
 	/*border-color: red;
 	border-style: solid;
@@ -94,14 +87,6 @@ html, body {
 	background-color: rgb(240, 240, 240);			
 	padding: 4px;
 	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
-
-
-	/* Example */
-	/*top: 0px;
-	left: 26px;
-	width: 106px;
-	height: 160px;*/
-
 
 	/* Debugging */
 	/*
