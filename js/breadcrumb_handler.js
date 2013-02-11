@@ -3,6 +3,7 @@
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
+/*global console:false*/
 
 // Namespace declarations
 var ph = ph || {};
@@ -29,6 +30,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
     var assert = ph.barthe.assert;
 
     // Private members
+    var PAGE_ITEM = config.pageItem();
     var TITLE = "Salingkit Gallery";    // ### FIXME. Use config
     var m_div = div;
     var m_on_load_path = {};
@@ -64,6 +66,21 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
                 m_on_load_path.fire([clicked_path]);
             };
         };
+        var on_title_failed = function(path) {
+            return function(jqXHR, textStatus, error) {
+                var msg = 'Cannot determine title for "'+path+'"';
+                if (textStatus)
+                    msg += '  '+textStatus;
+                if (error && error.message)
+                    msg += '  '+error.message;
+                console.error(msg);
+            };
+        };
+        var on_title_success = function(el) {
+            return function(item) {
+                el.text(item.title());
+            };
+        };
 
         // Iterate on subpaths
         // ### FIXME: Use titles instead of path components for display
@@ -74,11 +91,14 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
         for (var i=0; i<components.length; ++i) {
             var el_separator = $('<div>').addClass('separator');
             current_path += '/' + components[i];
-            var el_component = $('<div>').addClass('subpath').text(/* FIXME */components[i]);
+            var el_component = $('<div>').addClass('subpath'); //.text(components[i]);
             el_component.click(click_handler(current_path));
+            ph.barthe.Item.Load(config.pageItem(), current_path, 
+                on_title_success(el_component), on_title_failed(current_path));
             m_div.append(el_separator);
             m_div.append(el_component);
         }
+
 
     };
 

@@ -154,7 +154,7 @@ ph.barthe.Exposition = function(config, divs) {
         m_page_handler.onGoToNext.on(onGoToNext);
 
         // Initialize breadcrumb handler
-        m_breadcrumb_handler = new ph.barthe.BreadcrumbHandler(m_divs.breadcrumb);
+        m_breadcrumb_handler = new ph.barthe.BreadcrumbHandler(m_divs.breadcrumb, config);
         m_breadcrumb_handler.onLoadPath.on(loadPath);
 
         // Initialize view
