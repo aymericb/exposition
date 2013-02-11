@@ -16,6 +16,7 @@ ph.barthe = ph.barthe || {};
 // Debugging
 ph.barthe.debug = true;
 // ### FIXME: Improve this (eval, stack etc...)
+// ### FIXME: Use native console assert http://developer.apple.com/library/safari/#documentation/appleapplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html    
 ph.barthe.assert = function(cond) {
     if (! cond) {   // ### FIXME Need to find a better mechanism to stop executing functions/ code
         throw { message: 'Assertion failed: '+cond };
@@ -31,6 +32,14 @@ ph.barthe.generateId = function(path, prefix) {
 /** Check if object is an array */
 ph.barthe.isArray = function(object) {
     return Object.prototype.toString.call(object) === '[object Array]' ;
+};
+
+/** Define console for IE compatibility */
+console = window.console || {
+    log: function() {},
+    error: function() {},
+    warn: function() {},
+    info: function() {}
 };
 
 /**
