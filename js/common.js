@@ -2,7 +2,7 @@
 // Exposition. © 2013 Aymeric Barthe
 //
 
-/*jshint eqeqeq:true, browser:true, jquery:true*/
+/*jshint eqeqeq:true, browser:true, jquery:true, debug:true*/
 /*global console:false*/
 
 // Namespace declarations
@@ -15,11 +15,36 @@ ph.barthe = ph.barthe || {};
 
 // Debugging
 ph.barthe.debug = true;
-// ### FIXME: Improve this (eval, stack etc...)
-// ### FIXME: Use native console assert http://developer.apple.com/library/safari/#documentation/appleapplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html    
-ph.barthe.assert = function(cond) {
-    if (! cond) {   // ### FIXME Need to find a better mechanism to stop executing functions/ code
-        throw { message: 'Assertion failed: '+cond };
+
+/**
+ * Assert that throws.
+ *
+ * @param cond boolean expression. Throws if false. Trigger debugger if ph.barthe.debug is true,
+ * @message optional. A string, or exception object. Used for logging. Otherwise 'assertion failed'.
+ *
+ * Remark. There is a console.assert() but it does not throw, it just log errors.
+ */
+ph.barthe.assert = function(cond, message) {
+    if (! cond) {
+        // Log error
+        var str_msg = '';
+        if (typeof message === 'string')
+            str_msg = message;
+        else if (message === undefined || typeof message !== 'object')
+            str_msg = 'Assertion Failed';
+        else /*typeof message === 'object' */
+            str_msg = message.error || message; // default to toString()
+        console.error(str_msg);
+
+        // Trigger debugger
+        if (ph.barthe.debug)
+            debugger;
+
+        // Throw Error
+        if (typeof message === 'object')
+            throw message;
+        else
+            throw new Error(str_msg);
     }
 };
 
@@ -30,12 +55,13 @@ ph.barthe.generateId = function(path, prefix) {
 };
 
 /** Check if object is an array */
+// ### FIXME: Use Array.isArray() instead!
 ph.barthe.isArray = function(object) {
     return Object.prototype.toString.call(object) === '[object Array]' ;
 };
 
 /** Define console for IE compatibility */
-console = window.console || {
+var console = window.console || {
     log: function() {},
     error: function() {},
     warn: function() {},
