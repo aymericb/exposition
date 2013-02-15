@@ -74,13 +74,14 @@ var console = window.console || {
  * Usage.
  *
  * The class that emits the signal creates the Signal object passing the emitter object
- * to the constructor. A fireEvent function is added to the emitter object, that can be
- * used to send the signal optionally with parameters. The Signal object should be
+ * to the constructor. A fire function is added to the emitter object, that can be
+ * used to send the signal optionally with parameters. TThe Signal object should be
  * left accessible as a public property. Listeners can be added or removed with the
  * public 'on' and 'off' methods.
  *
  */
 ph.barthe.Signal = function(emitter) {
+    // Private
     var self = this;
     var assert = ph.barthe.assert;
     var m_list = [];
@@ -88,11 +89,13 @@ ph.barthe.Signal = function(emitter) {
     /** Add listener */
     self.on = function(listener) {
         assert(m_list.indexOf(listener) === -1);
+        assert(typeof listener === 'function');
         m_list.push(listener);
     };
 
     /** Remove listener */
     self.off = function(listener) {
+        assert(typeof listener === 'function');
         var index = m_list.indexOf(listener);
         assert(index !== -1);
         m_list.splice(index, 1);
@@ -100,14 +103,12 @@ ph.barthe.Signal = function(emitter) {
 
     /**
      * Fire the signal. It is possible to provide optional arguments to pass to the
-     * listener functions, using the Function.apply() syntax.
-     *   - params: an array containing the arguments of the function
-     *   - this_object: is the 'this' object passed to the function
+     * listener functions, using the regular function syntax.
      */
-    emitter.fire = function(params, this_object) {
-        assert(params === undefined || ph.barthe.isArray(params));
+    emitter.fire = function() {
         for (var i=0; i<m_list.length; ++i) {
-            m_list[i].apply(this_object, params);
+            assert(arguments.length<=m_list[i].length);
+            m_list[i].apply(/*this object*/null , arguments);
         }
     };
 };

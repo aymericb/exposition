@@ -99,7 +99,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
                     break;
                 }
             }
-            m_on_page_update.fire([m_item_index, children.length]);
+            m_on_page_update.fire(m_item_index, children.length);
 
             // Postcondition
             assert(m_item_index !== undefined);
@@ -276,12 +276,12 @@ ph.barthe.PhotoView = function(config, main_div, item) {
 
     /** Go to next page */
     self.goToNext = function() {
-        m_on_load_path.fire([m_album.children()[m_item_index+1].path()]);
+        m_on_load_path.fire(m_album.children()[m_item_index+1].path());
     };
 
     /** Go to previous page */
     self.goToPrev = function() {
-        m_on_load_path.fire([m_album.children()[m_item_index-1].path()]);
+        m_on_load_path.fire(m_album.children()[m_item_index-1].path());
     };
 
     /** onLoadPath(path) -> path is a string pointing to the path to load. */

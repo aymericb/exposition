@@ -57,13 +57,13 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
         // Create root element
         m_div.empty();
         var root_el = $('<div>').addClass('title').addClass('subpath').text(TITLE);
-        root_el.click(function() { m_on_load_path.fire(['/']); });
+        root_el.click(function() { m_on_load_path.fire('/'); });
         m_div.append(root_el);
 
         // Helper (do not create functions in loop)
         var click_handler = function(clicked_path) {
             return function() {
-                m_on_load_path.fire([clicked_path]);
+                m_on_load_path.fire(clicked_path);
             };
         };
         var on_title_failed = function(path) {

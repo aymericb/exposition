@@ -189,7 +189,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         assert(page_index < m_page_count);
 
         // Hide current page
-        m_on_page_update.fire([false]);
+        m_on_page_update.fire(false);
         if (m_current_page_div)
             m_current_page_div.hide();
 
@@ -202,7 +202,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         m_current_page_index = page_index;
         m_current_page_div = div_page;
         m_current_page_div.show();
-        m_on_page_update.fire([true, page_index, m_page_count]);
+        m_on_page_update.fire(true, page_index, m_page_count);
     };
 
     //
@@ -229,7 +229,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         // Click handler
         var on_click = function(item) {
             return function() {
-                m_on_load_path.fire([item.path()]);
+                m_on_load_path.fire(item.path());
             };
         };
 
