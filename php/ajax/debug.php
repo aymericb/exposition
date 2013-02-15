@@ -8,9 +8,12 @@ require_once '../core/config.php';
 require_once '../core/item.php';
 require_once '../core/album.php';
 require_once '../core/photo.php';
+require_once '../core/album_config.php';
 
 //$photo = new Photo('/nas/media3/Exposition/Albums/france_oct_2009/albi/IMG_7841.jpg');
 //$album = new Album('/nas/media3/Exposition/Albums/france_oct_2009');
+
+/*
 $album = new Album('/france_oct_2009');
 
 function printAlbum($album) 
@@ -25,11 +28,18 @@ function printAlbum($album)
 	}	
 	print('</ul>');
 }
+*/
+
+//$config = new AlbumConfig('/2009/france_oct_2009');
+$config = new AlbumConfig('/');
+
 
 ?>
 
 <html>
 <body>
+
+	<!-- 
 <h2>Config</h2>
 <ul>
 	<li><b>PhotoDir:</b> <?= Config::PHOTO_DIR ?></li>
@@ -44,6 +54,6 @@ function printAlbum($album)
 	<?php
 		printAlbum($album);
 	?>
-</ul>
+</ul> -->
 </body>
 </html>

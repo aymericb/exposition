@@ -11,3 +11,20 @@
 		in the same order as they appear in the array */
 	]
 }
+
+/* JSON in album.json to customize default scanning behavior.
+   The album.json file may be present in a directory to modify the titles, 
+   and order of the children */
+{
+	"version": 1,		/* Mandatory. Integer. Must be 1 */
+	"children": 		/* Mandatory. Children of the album will be shown
+		in the same order as appear in this array. Files which are not listed
+		will not be displayed, but could still be accessed with a direct
+		link (hidden album) */
+	[	
+		{				/* Item config */
+			"filename": "filename",		/* Mandatory. File or directory name within the album */
+			"tille": "custom_title"		/* Optional. Use this title instead of basename */
+		}
+	]
+}
