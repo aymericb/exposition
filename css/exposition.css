@@ -1,0 +1,190 @@
+/* Exposition.css */
+
+/**
+ * Main page
+ * Adjust to 100% of visible area.
+ * header is on top, footer at the bottom
+ */
+html, body {
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	margin: 0px;
+	color: white;
+}
+
+#header {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	height: 60px;
+	background-color: rgb(55, 55, 55);
+	/*box-shadow: inset 0px -5px 5px -5px rgba(0, 0, 0, 0.8);*/
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: rgb(65, 65, 65);
+}
+
+#header p {
+	margin-top: 19px;
+	margin-left: 19px;			
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 22px;
+	color: rgb(240, 240, 240);
+}
+
+#footer {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: 60px;
+	background-color: rgb(55, 55, 55);
+	/*box-shadow: inset 0px 5px 5px -5px rgba(0, 0, 0, 0.8);	*/
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: rgb(65, 65, 65);			
+}
+
+#main {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 62px;
+	bottom: 62px;
+	background-color: rgb(32, 32, 32);
+	box-shadow: inset 5px 0px 5px -5px rgba(0, 0, 0, 1), inset -5px 0px 5px -5px rgba(0, 0, 0, 1), inset 0px 6px 5px -5px rgba(0, 0, 0, 1), inset 0px -6px 5px -5px rgba(0, 0, 0, 1);
+}
+
+/** Photo View */
+.photo {
+	margin: 20px;
+	background-color: rgb(240, 240, 240);			
+	padding: 4px;
+	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;	
+	position: absolute;
+}
+
+
+/** 
+ * 'item' is the enclosing DIV used in AlbumView
+ * It contains a 'thumnail' and 'title' div.
+ * 'thumnail' may also be of class 'photo-item' or 'album-item' depending
+ * whether the element is sub album or a photo
+ */
+
+.item {
+	position: absolute;
+
+	/* Debugging */
+	/*border-color: red;
+	border-style: solid;
+	border-width: 1px;*/
+}
+
+.item .thumbnail {
+	position: absolute;
+	margin: 0px;
+	background-color: rgb(240, 240, 240);			
+	padding: 4px;
+	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
+
+	/* Debugging */
+	/*
+	border-color: white;
+	border-style: solid;
+	border-width: 1px;*/
+}
+
+.item .thumbnail:hover {
+	box-shadow: rgb(255, 255, 255) 0px 0px 10px 0px;
+	-webkit-filter: brightness(20%);
+	cursor: pointer;	
+}
+
+.item .title {
+	position: absolute;
+	color: rgb(220, 220, 220);			
+	text-align: center;
+	left: 14px;
+	right: 14px;
+	height: 17px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	/*text-shadow: rgb(0, 0, 0) 0px 0px 1px;*/
+	padding-top: 4px;
+	padding-bottom: 0px;
+	padding-top: 4px;	/* Used to center text, increase height by 4px */
+	background-clip: border-box;
+	background-color: 
+	rgb(60, 60, 60);
+	background-image: none;
+	background-origin: padding-box;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
+
+	/* Debugging */
+	/*border-color: green;
+	border-style: solid;
+	border-width: 1px;*/
+}
+
+/**
+ * Page handler is used to show current, next and previous page control.
+ * Used in album and photo view.
+ */
+#page-handler {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	top: 20px;
+	right: 0px;
+	margin-right: 20px;
+	position: absolute;
+}
+#page-handler div {
+	display: inline;
+}
+#page-handler-left:hover, #page-handler-right:hover {
+	color: rgb(100, 255, 255);
+	font-weight: bolder;
+	cursor: pointer;
+}
+
+/**
+ * Breaccrumb section. 
+ * Contained within #header.
+ */
+
+#breadcrumb {
+	margin: 21px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	color: rgb(240, 240, 240);
+	display: block;
+}
+
+#breadcrumb .title {
+	font-size: 22px;
+	margin-top: -2px;
+}
+
+#breadcrumb .subpath {
+	display: inline-block;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+#breadcrumb .subpath:hover {
+	display: inline-block;
+	color: rgb(100, 255, 255);
+	cursor: pointer;	
+}
+#breadcrumb .separator {
+	display: inline-block;
+}
+#breadcrumb .separator:before {
+	display: inline-block;
+	content: "/";
+	color: rgb(180, 180, 180);	
+}
