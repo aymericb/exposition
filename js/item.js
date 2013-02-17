@@ -115,24 +115,24 @@ ph.barthe.Item = function(json) {
  */
 ph.barthe.Item.Load = (function() {
     var assert = ph.barthe.assert;  // Redifinitions
-    var cache = {};                 // Cache to avoid re-loading. Map: path => ph.barthe.Item
+    var cache = {};                 // Cache to avoid re-loading. Map: url => ph.barthe.Item
 
     // Real body of function
-    return function(url, path, on_success, on_fail) {
+    return function(url, on_success, on_fail) {
 
         // Check cache
-        if (cache[path]) {
-            setTimeout(function() { on_success(cache[path]); }, 0);
+        if (cache[url]) {
+            setTimeout(function() { on_success(cache[url]); }, 0);
             return;
         }
 
         // Download item
-        $.ajax(url+'?'+$.param({path: path}))
+        $.ajax(url)
             .fail( on_fail )
             .done( function(data) {
                 try {
                     var item = new ph.barthe.Item(data);
-                    cache[path] = item;
+                    cache[url] = item;
                     on_success(item);
                 } catch(e) {
                     on_fail(undefined, undefined, e);

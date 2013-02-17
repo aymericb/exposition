@@ -33,7 +33,7 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
 
     // Private Methods
     var onConfigSuccess = function() {
-        $.ajax(m_config.pageItem()+'?'+$.param({path: '/'}))
+        $.ajax(m_config.makeItemUrl('/'))
             .fail( function() {
                 onFailed({message: 'Failed to load root album'});
             })
@@ -152,7 +152,7 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
         // Cache photo
         assert(item.isPhoto());
         for (var j=0; j<m_sizes.length; ++j) {
-            var url = m_config.pageImage()+'?'+$.param({path:item.path(), size: m_sizes[j]});
+            var url = m_config.makeImageUrl(m_sizes[j], item.path());
             m_download_queue.push(Object.freeze({
                 url: url,
                 size: m_sizes[j],

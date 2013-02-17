@@ -31,19 +31,24 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     var m_json;                             // Ajax values
     var m_thumnbail_title_height;           // Computed from CSS
 
+    // REST API
+    var PAGE_CONFIG = 'config';
+    var PAGE_ITEM = 'item';
+    var PAGE_IMAGE = 'image';
+
     //
     // Public members
     //
 
     // PHP Ajax Pages
-    self.pageConfig = function() {
-        return 'php/ajax/config.php';
+    self.makeItemUrl = function(path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        return PAGE_ITEM+path;
     };
-    self.pageItem = function() {
-        return 'php/ajax/item.php';
-    };
-    self.pageImage = function() {
-        return 'php/ajax/image.php';
+    self.makeImageUrl = function(size, path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        assert(typeof size === 'number' && size>=0);
+        return PAGE_IMAGE+'/'+size+path;
     };
 
     // Server info
@@ -119,7 +124,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         })();
 
         // Load ajax configuration
-        $.ajax(self.pageConfig())
+        $.ajax(PAGE_CONFIG)
             .fail( error_callback )
             .done( function(json) {
                 try {

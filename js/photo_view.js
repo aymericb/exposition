@@ -53,7 +53,6 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     var m_on_load_path = {};
 
     // Constants
-    var PAGE_IMAGE = config.pageImage();
     var IMAGE_SIZES = config.photoSizes().sort(function(a,b){return a-b;});
 
     /**
@@ -104,7 +103,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             // Postcondition
             assert(m_item_index !== undefined);
         };
-        ph.barthe.Item.Load(config.pageItem(), album_path, on_album_success, on_album_error);
+        ph.barthe.Item.Load(config.makeItemUrl(album_path), on_album_success, on_album_error);
     })();
 
     var generateId = function(path) {
@@ -145,7 +144,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      * @param size {int}       value from IMAGE_SIZES
      */
     var loadImage = function(path, size) {
-        var url = PAGE_IMAGE+'?'+$.param({path:m_item.path(), size: size});
+        var url = config.makeImageUrl(size, m_item.path());
         var on_fail = function() {
             // ### TODO
         };

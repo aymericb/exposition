@@ -1,0 +1,4 @@
+RewriteEngine on  
+RewriteRule ^item/(.*)$ php/ajax/item.php?path=/$1
+RewriteRule ^image/([0-9]+)/(.*)$ php/ajax/image.php?size=$1&path=/$2
+RewriteRule ^config$ php/ajax/config.php

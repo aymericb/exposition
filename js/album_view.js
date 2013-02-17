@@ -69,7 +69,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     //
     // Config Constants
     //
-    var PAGE_IMAGE = config.pageImage();
     var THUMBNAIL_MARGIN = config.thumbnailMargin();
     var THUMBNAIL_SIZE = config.thumbnailSize();
     var THUMBNAIL_TITLE_MARGIN = config.thumbnailTitleMargin();
@@ -243,7 +242,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             m_children_count += 1;
 
             // Read properties
-            var url = PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: THUMBNAIL_SIZE});
+            var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[i].photo_path);
             var id = m_children[i].id;
             var item = m_item.children()[i];
             assert(url && id && item);
