@@ -125,12 +125,8 @@ class Image
 	}
 
 	public function writeImage() {
-		$image = imagecreatefromjpeg($this->getPath());
-		if (! $image)
-			throw new \Exception("Cannot create image for \"" . $this->getPath() . "\"");
-		header('Content-Type: image/jpeg');
-		imagejpeg($image);
-		@imagedestroy($image);
+		if (! @readfile($this->getPath()))
+			throw new \Exception("Cannot read image file \"" . $this->getPath() . "\"");
 	}
 }
 
