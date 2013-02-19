@@ -124,9 +124,34 @@ class Image
 		return $this->cachePath;
 	}
 
-	public function writeImage() {
-		if (! @readfile($this->getPath()))
-			throw new \Exception("Cannot read image file \"" . $this->getPath() . "\"");
+	public function writeImage() {	
+
+		// Set common header to all requests
+		// We keep on setting Last-Modified, Expires, etc... because some browsers are
+		// supposed to be dump. http://stackoverflow.com/questions/1587667/should-http-304-not-modified-responses-contain-cache-control-headers	
+		$filepath = $this->getPath();		
+	    header("Cache-Control: max-age=".Config::PHOTO_CACHE_DURATION, true);
+	    	// 'must-revalidate' is broken as of Safari 6.0.2 (8536.26.17)
+	    	// If it is added, the browser will *always* request for the image
+	    	// even if max-age has not been reached, if Safari was restarted.
+	    	// This is claimed fixed https://bugs.webkit.org/show_bug.cgi?id=13128 
+	    	// but seems to work only as long as Safari is running... Similarly 
+	        // Safari will *always* reload any images after restart, rather than issue
+	        // a 'if-modified-since'...
+	    $last_modified = filemtime($filepath);
+	    header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified)." GMT", true);
+	    header('Expires: ' . gmdate('D, d M Y H:i:s', time()+Config::PHOTO_CACHE_DURATION) . ' GMT',  true);
+
+	    // Handle 'if-modified-since'	
+		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $last_modified) {
+			header('HTTP/1.0 304 Not Modified', true);
+		} else {
+		// Send data normally
+			header('Content-Type: image/jpeg', true);
+			header("Content-Length: " . filesize($filepath), true);
+			if (! @readfile($this->getPath()))
+				throw new \Exception("Cannot read image file \"" . $filepath . "\"");
+		}
 	}
 }
 

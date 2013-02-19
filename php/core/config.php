@@ -7,6 +7,8 @@ namespace Barthe\Exposition;
 
 class Config 
 {
+	const PHOTO_CACHE_DURATION = 3600;	// Cache-control max-age for images (seconds)
+
 	const VERSION = '0.2 alpha';
 	const INFO = 'Exposition 0.2 alpha. (c) 2013 Aymeric Barthe.';
 
