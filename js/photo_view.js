@@ -103,7 +103,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             // Postcondition
             assert(m_item_index !== undefined);
         };
-        ph.barthe.Item.Load(config.makeItemUrl(album_path), on_album_success, on_album_error);
+        ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
     })();
 
     var generateId = function(path) {

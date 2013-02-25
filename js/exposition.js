@@ -105,7 +105,7 @@ ph.barthe.Exposition = function(config, divs) {
                     throw e;
             }
         };
-        ph.barthe.Item.Load(config.makeItemUrl(path), on_success, on_error);
+        ph.barthe.Item.Load(config, path, on_success, on_error);
     };
 
     /**

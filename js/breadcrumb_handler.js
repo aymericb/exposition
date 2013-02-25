@@ -92,7 +92,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
             current_path += '/' + components[i];
             var el_component = $('<div>').addClass('subpath'); //.text(components[i]);
             el_component.click(click_handler(current_path));
-            ph.barthe.Item.Load(config.makeItemUrl(current_path),
+            ph.barthe.Item.Load(config, current_path,
                 on_title_success(el_component), on_title_failed(current_path));
             m_div.append(el_separator);
             m_div.append(el_component);
