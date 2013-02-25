@@ -12,6 +12,7 @@ try {
 	$path = $_GET['path'];
 	if (!isset($path) || !$path || empty($path))
 		throw new \Exception('Missing path parameter');
+	
 	$size = $_GET['size'];
 	if (!isset($size))
 		throw new \Exception('Missing size parameter');

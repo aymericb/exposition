@@ -40,9 +40,11 @@ class Image
 		}
 
 		// Computed cached image path
-		$this->cachePath = Config::CACHE_DIR . substr($path, strlen(Config::PHOTO_DIR));
-		$info = pathinfo($this->cachePath);
-		$this->cachePath = joinPath(dirname($this->cachePath), basename($this->cachePath, '.'.$info['extension']). "_" . $size . ".jpg");
+		$this->cachePath = joinPath(Config::CACHE_DIR, $size);
+		$this->cachePath = joinPath($this->cachePath, substr($path, strlen(Config::PHOTO_DIR)));
+		//$info = pathinfo($this->cachePath);
+		$this->cachePath = joinPath(dirname($this->cachePath), basename($this->cachePath) );
+		//$this->cachePath = joinPath(dirname($this->cachePath), basename($this->cachePath, '.'.$info['extension']). "_" . $size . ".jpg");
 		@mkdir(dirname($this->cachePath), 0700, true);
 
 		// Check if image is really cached
