@@ -24,7 +24,7 @@
 	[	
 		{				/* Item config */
 			"filename": "filename",		/* Mandatory. File or directory name within the album */
-			"tille": "custom_title"		/* Optional. Use this title instead of basename */
+			"title": "custom_title"		/* Optional. Use this title instead of basename */
 		}
 	]
 }
