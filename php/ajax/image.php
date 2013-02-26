@@ -9,10 +9,12 @@ require_once('../core/image.php');
 try {
 
 	// Get parameters
+	$cacheOnly = isset($_GET['cache']);
+
 	$path = $_GET['path'];
 	if (!isset($path) || !$path || empty($path))
 		throw new \Exception('Missing path parameter');
-	
+
 	$size = $_GET['size'];
 	if (!isset($size))
 		throw new \Exception('Missing size parameter');
@@ -26,9 +28,9 @@ try {
 
 	// Get cached image
 	$image = new Image($path, $size);
-	$image->writeImage();
+	if (!$cacheOnly)
+		$image->writeImage();
 
-	//print("Path: $path");	
 } catch (\Exception $e) {
 	header('HTTP/1.1 500 Internal Server Error', true);
 	echo('<br><br><b>ERROR: '.$e->getMessage().'</b');

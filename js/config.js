@@ -35,6 +35,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     var PAGE_CONFIG = 'config';
     var PAGE_ITEM = 'item';
     var PAGE_IMAGE = 'image';
+    var PAGE_CACHE = 'cache';
 
     //
     // Public members
@@ -49,6 +50,11 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
         assert(typeof size === 'number' && size>=0);
         return PAGE_IMAGE+'/'+size+path;
+    };
+    self.makeCacheUrl = function(size, path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        assert(typeof size === 'number' && size>=0);
+        return PAGE_CACHE+'/'+size+path;
     };
 
     // Server info
