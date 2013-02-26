@@ -122,13 +122,18 @@ ph.barthe.Item.Load = (function() {
         // Precondition
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
 
+        // Avoid making functions in loops
+        var immediate_success = function(item) {
+            setTimeout(function() { on_success(item); }, 0);
+        };
+
         // Check cache for same item
         if (cache[path]) {
-            setTimeout(function() { on_success(cache[path]); }, 0);
-            return cache[path];
+            immediate_success(cache[path]);
+            return;
         }
 
-        // Check cache for parent item. 
+        // Check cache for parent item.
         // If item is a photo in parent item, no need to contact the server.
         if (path.length>1) {
             var album_path  = path.substring(0, path.lastIndexOf('/'));
@@ -139,8 +144,8 @@ ph.barthe.Item.Load = (function() {
                     var child_item = children[i];
                     if (child_item.path() === path) {
                         if (child_item.isPhoto()) {
-                            setTimeout(function() { on_success(child_item); }, 0);
-                            return child_item;                     
+                            immediate_success(child_item);
+                            return;
                         } else {
                             break;  // The found item is an Album, so we need to load it
                                     // from the server, to get its children
