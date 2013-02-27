@@ -4,13 +4,20 @@ RewriteEngine on
 # to be an order of magnitude slower than regular apache files (and X-SendFile 
 # is not available). This code bypasses PHP through redirections. However if images
 # are changed they are not updated. The image-cache must be publically accessible
-#RewriteRule ^image/([0-9]+)/(.*)$ image-cache/$1/$2 [DPI]
+#RewriteRule ^api/image/([0-9]+)/(.*)$ image-cache/$1/$2 [DPI]
 #RewriteCond %{REQUEST_FILENAME} !-f
 #RewriteRule ^image-cache/([0-9]+)\/(.*)$ php/ajax/image.php?size=$1&path=/$2 [L]
 # END
 
-# Normal rewrite rules for RESTFul API
-RewriteRule ^item/(.*)$ php/ajax/item.php?path=/$1
-RewriteRule ^config$ php/ajax/config.php
-RewriteRule ^image/([0-9]+)/(.*)$ php/ajax/image.php?size=$1&path=/$2
-RewriteRule ^cache/([0-9]+)/(.*)$ php/ajax/image.php?cache&size=$1&path=/$2
+# Rewrite rules for RESTFul API for PHP server
+RewriteRule ^api/item/(.*)$ php/ajax/item.php?path=/$1 [L]
+RewriteRule ^api/config$ php/ajax/config.php [L]
+RewriteRule ^api/image/([0-9]+)/(.*)$ php/ajax/image.php?size=$1&path=/$2 [L]
+RewriteRule ^api/cache/([0-9]+)/(.*)$ php/ajax/image.php?cache&size=$1&path=/$2 [L]
+
+# Rewrites for accessing albums via HTML5 rewrites.
+# All paths which do not exist, are redirected to index.html, and passed as a query string
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/?$ ?path=/$1 [L,R]

@@ -68,6 +68,8 @@ var console = window.console || {
     info: function() {}
 };
 
+// ### TODO: Define HTML5 History API for backward compatibility?
+
 /**
  * Helps implementing the design pattern Observer.
  *

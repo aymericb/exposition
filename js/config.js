@@ -30,12 +30,13 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     //
     var m_json;                             // Ajax values
     var m_thumnbail_title_height;           // Computed from CSS
+    var m_base_url;                         // The base URL is rewritten with HTML history
 
     // REST API
-    var PAGE_CONFIG = 'config';
-    var PAGE_ITEM = 'item';
-    var PAGE_IMAGE = 'image';
-    var PAGE_CACHE = 'cache';
+    var PAGE_CONFIG = 'api/config';
+    var PAGE_ITEM = 'api/item';
+    var PAGE_IMAGE = 'api/image';
+    var PAGE_CACHE = 'api/cache';
 
     //
     // Public members
@@ -44,17 +45,17 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     // PHP Ajax Pages
     self.makeItemUrl = function(path) {
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
-        return PAGE_ITEM+path;
+        return m_base_url+PAGE_ITEM+path;
     };
     self.makeImageUrl = function(size, path) {
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
         assert(typeof size === 'number' && size>=0);
-        return PAGE_IMAGE+'/'+size+path;
+        return m_base_url+PAGE_IMAGE+'/'+size+path;
     };
     self.makeCacheUrl = function(size, path) {
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
         assert(typeof size === 'number' && size>=0);
-        return PAGE_CACHE+'/'+size+path;
+        return m_base_url+PAGE_CACHE+'/'+size+path;
     };
 
     // Server info
@@ -116,6 +117,13 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         // Preconditions
         assert(ready_callback);
         assert(error_callback);
+
+        // Compute base URL
+        m_base_url = document.URL;
+        var query_index = m_base_url.lastIndexOf('?');
+        if (query_index>0)
+            m_base_url = m_base_url.substr(0, query_index);
+        m_base_url = m_base_url.substr(0, m_base_url.lastIndexOf('/')+1);
 
         // Compute m_thumnbail_title_height
         m_thumnbail_title_height = (function() {
