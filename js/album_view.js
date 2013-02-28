@@ -336,7 +336,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         var y = V_MARGIN;
         m_page_count = 1;
         for (var i=0; i<m_children.length; ++i) {
-            
+
             // Skip empty
             if (!m_children[i])
                 continue;
@@ -360,7 +360,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 }
             }
         }
-        
+
         // Check if last page is empty
         if (pageElement.children().length === 0)
             m_page_count -= 1;
