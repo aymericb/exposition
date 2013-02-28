@@ -3,7 +3,7 @@
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true, debug:true*/
-/*global console:false*/
+/*global console:true, history:true*/
 
 // Namespace declarations
 var ph = ph || {};
@@ -58,14 +58,6 @@ ph.barthe.generateId = function(path, prefix) {
 // ### FIXME: Use Array.isArray() instead!
 ph.barthe.isArray = function(object) {
     return Object.prototype.toString.call(object) === '[object Array]' ;
-};
-
-/** Define console for IE compatibility */
-var console = window.console || {
-    log: function() {},
-    error: function() {},
-    warn: function() {},
-    info: function() {}
 };
 
 // ### TODO: Define HTML5 History API for backward compatibility?
@@ -162,6 +154,26 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
     // Return jQuery IMG element
     return img;
 };
+
+//
+// Internet Explorer compatibility 
+//
+
+console = window.console || {
+    log: function() {},
+    error: function() {},
+    warn: function() {},
+    info: function() {}
+};
+
+history = window.history || {
+    replaceState: function() {},
+    pushState: function() {}
+};
+if (! ('replaceState' in history))
+    history.replaceState = function() {};
+if (! ('pushState' in history))
+    history.pushState = function() {};
 
 // Use strict footer
 })();
