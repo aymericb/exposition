@@ -216,8 +216,9 @@ ph.barthe.PhotoView = function(config, main_div, item) {
 
         // Request a better image if necessary
         var best_size = chooseSize(IMAGE_SIZES);
-        if (size === undefined || (best_size !== 0 && best_size > size) ||
-                                  (size !== 0 && best_size === 0)) {
+        var is_best_size = !(size === undefined ||
+            (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
+        if (! is_best_size) {
             var already_loading = false;
             m_loading_div.find('.'+generateId(m_item.path())).each(function() {
                 if (get_size($(this)) === best_size)
@@ -259,6 +260,16 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             img.width(Math.floor(view_width-2*h_margin));
             img.height(Math.floor(img.width()/img_ratio));
         }
+
+        // Make sure the image is not scaled up ... 
+        // ... unless a larger is being downloaded.
+        if (is_best_size) {
+            if (img.width()>img[0].naturalWidth)
+                img.width(img[0].naturalWidth);
+            if (img.height()>img[0].naturalHeight)
+                img.height(img[0].naturalHeight);
+        }
+
         img.css({
             top:Math.floor((view_height-img.outerHeight(true))/2),
             left:Math.floor((view_width-img.outerWidth(true))/2)
