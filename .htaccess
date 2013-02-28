@@ -19,5 +19,4 @@ RewriteRule ^api/cache/([0-9]+)/(.*)$ php/ajax/image.php?cache&size=$1&path=/$2 
 # All paths which do not exist, are redirected to index.html, and passed as a query string
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.+)/?$ ?path=/$1 [L,R]
