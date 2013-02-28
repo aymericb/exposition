@@ -76,24 +76,24 @@ ph.barthe.Item = function(json) {
     (function() {
         var checkStringAttribute = function(name) {
             if (! json[name]) {
-                throw { message: 'Missing '+name+' attribute in JSON.' };
+                throw new Error('Missing '+name+' attribute in JSON.');
             }
             if (typeof json[name] !== 'string') {
-                 throw { message: 'Attribute '+name+' should be a String in JSON.' };
+                 throw new Error('Attribute '+name+' should be a String in JSON.');
             }
         };
         checkStringAttribute('type');
         if (!self.isAlbum() && !self.isPhoto()) {
-            throw { message: 'Invalid type attribute in JSON.' };
+            throw new Error('Invalid type attribute in JSON.');
         }
         checkStringAttribute('title');
         checkStringAttribute('path');
         if (self.isAlbum()) {
             if (! json.children) {
-                throw { message: 'Missing children attribute in JSON.' };
+                throw new Error('Missing children attribute in JSON.');
             }
             if( !ph.barthe.isArray(json.children) ) {
-                throw { message: 'Attribute children should be an Array in JSON.' };
+                throw new Error('Attribute children should be an Array in JSON.');
             }
             for (var i=0; i<json.children.length; ++i) {
                 m_children.push(new ph.barthe.Item(json.children[i]));

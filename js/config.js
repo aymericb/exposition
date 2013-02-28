@@ -147,10 +147,10 @@ ph.barthe.Config = function(ready_callback, error_callback) {
                     // Check string parameters
                     var checkStringAttribute = function(name) {
                         if (! json[name]) {
-                            throw { message: 'Missing '+name+' attribute in JSON.' };
+                            throw new Error('Missing '+name+' attribute in JSON.');
                         }
                         if (typeof json[name] !== 'string') {
-                             throw { message: 'Attribute '+name+' should be a String in JSON.' };
+                             throw new Error('Attribute '+name+' should be a String in JSON.');
                         }
                     };
                     checkStringAttribute('version');
@@ -161,17 +161,17 @@ ph.barthe.Config = function(ready_callback, error_callback) {
                     var checkSizeArray = function(name) {
                         var array = json[name];
                         if (! array) {
-                            throw { message: 'Missing '+name+' attribute in JSON.' };
+                            throw new Error('Missing '+name+' attribute in JSON.');
                         }
                         if( Object.prototype.toString.call( array ) !== '[object Array]' ) {
-                            throw { message: 'Attribute '+name+' should be an Array in JSON.' };
+                            throw new Error('Attribute '+name+' should be an Array in JSON.');
                         }
                         if ( array.length === 0) {
-                            throw { message: 'Attribute '+name+' should be not be an empty Array.' };
+                            throw new Error('Attribute '+name+' should be not be an empty Array.');
                         }
                         for (var i=0; i<array.length; ++i) {
                             if (typeof array[i] !== 'number' || array[i] % 1 !== 0) {
-                                throw { message: 'Attribute '+name+' should be integers.' };
+                                throw new Error('Attribute '+name+' should be integers.');
                             }
                         }
                     };

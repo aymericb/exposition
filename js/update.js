@@ -35,7 +35,7 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
     var onConfigSuccess = function() {
         $.ajax(m_config.makeItemUrl('/'))
             .fail( function() {
-                onFailed({message: 'Failed to load root album'});
+                onFailed(new Error('Failed to load root album'));
             })
             .done( function(data) {
                 try {
