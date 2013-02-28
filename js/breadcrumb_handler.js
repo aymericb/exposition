@@ -30,7 +30,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
     var assert = ph.barthe.assert;
 
     // Private members
-    var TITLE = "Salingkit Gallery";    // ### FIXME. Use config
+    var TITLE = config.galleryName();
     var m_div = div;
     var m_on_load_path = {};
 
@@ -48,7 +48,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
 
     /** Update the breadcrumb with current path */
     self.setPath = function(path) {
-        
+
         // Preconditions
         assert(path);
         assert(path.charAt(0) === '/');

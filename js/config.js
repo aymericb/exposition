@@ -62,9 +62,11 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     self.info = function() {
         return m_json.info;
     };
-
     self.version = function() {
         return m_json.version;
+    };
+    self.galleryName = function() {
+        return m_json.gallery_name;
     };
 
     // Thumnails
@@ -153,6 +155,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
                     };
                     checkStringAttribute('version');
                     checkStringAttribute('info');
+                    checkStringAttribute('gallery_name');
 
                     // Check array of sizes
                     var checkSizeArray = function(name) {
