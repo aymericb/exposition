@@ -82,7 +82,6 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
         };
 
         // Iterate on subpaths
-        // ### FIXME: Use titles instead of path components for display
         if (path === '/')
             return;
         var components = path.substr(1).split('/');
