@@ -80,8 +80,6 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
 
                 } catch(e) {
                     onFailed(e);
-                    if (ph.barthe.debug)
-                        throw e;
                 }
             });
     };

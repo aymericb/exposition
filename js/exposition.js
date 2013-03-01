@@ -50,14 +50,17 @@ ph.barthe.Exposition = function(config, divs) {
     // Private Functions
     //
 
-    // Notify the user of a global failure
-    var onFatalError = function(_description, _reason) {
+    /**
+     * Notify the user of a global failure
+     * @param _friendly_message {string}  Message shown to the end user
+     * @param error {Error}               Exception object
+     */
+    var onFatalError = function(_friendly_message, error) {
         // ### TODO: Add HTML element to page
-        var description = _description || 'An error has occurred';
-        var reason = _reason || '';
-        var log = description;
-        if (reason !== '')
-            log += " Reason: " + reason;
+        var friendly_message = friendly_message || 'An error has occurred';
+        var log = friendly_message;
+        if (error && ('message' in error))
+            log += " Reason: " + error.message;
         console.error(log);
     };
 
@@ -75,7 +78,7 @@ ph.barthe.Exposition = function(config, divs) {
         m_breadcrumb_handler.setPath(path);
 
         var on_error = function(jqXHR, textStatus, error) {
-            onFatalError("Cannot navigate to page "+path, error?error.message:'');
+            onFatalError("Cannot navigate to page "+path, error);
         };
         var on_success = function(item) {
             try {
@@ -113,8 +116,6 @@ ph.barthe.Exposition = function(config, divs) {
                 m_view.load();
             } catch(e) {
                 on_error(e);
-                if (ph.barthe.debug)
-                    throw e;
             }
         };
         ph.barthe.Item.Load(config, path, on_success, on_error);
@@ -131,9 +132,7 @@ ph.barthe.Exposition = function(config, divs) {
         try {
             m_view.updateLayout();
         } catch(e) {
-            onFatalError("Resized failed. Reason: "+e.message);
-            if (ph.barthe.debug)
-                throw e;
+            onFatalError("Resized failed.", e);
         }
     };
 
@@ -146,6 +145,8 @@ ph.barthe.Exposition = function(config, divs) {
     var onGoToNext = function() {
         m_view.goToNext();
     };
+
+    /** Configuration loaded */
 
     //
     // Constructor

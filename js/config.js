@@ -184,8 +184,6 @@ ph.barthe.Config = function(ready_callback, error_callback) {
 
                 } catch(e) {
                     error_callback(e);
-                    if (ph.barthe.debug)
-                        throw e;
                 }
             });
 

@@ -165,8 +165,6 @@ ph.barthe.Item.Load = (function() {
                     on_success(item);
                 } catch(e) {
                     on_fail(undefined, undefined, e);
-                    if (ph.barthe.debug)
-                        throw e;
                 }
             });
     };
