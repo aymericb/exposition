@@ -149,7 +149,13 @@ ph.barthe.Exposition = function(divs) {
             var loading_title = $('<p>').text('Loading...');
             loading_div.append(loading_title);
             m_main_div.append(loading_div);
-            m_loading_spinner = new ph.barthe.Spinner({color:'#fff'}).spin($('#loading .spinner')[0]);
+            m_loading_spinner = new ph.barthe.Spinner({
+                color:'#fff',
+                length: 4,
+                width: 3,
+                radius: 9
+            });
+            m_loading_spinner.spin($('#loading .spinner')[0]);
         };
         m_loading_timer = setTimeout(show_loading_hox, 500);
 
