@@ -10,7 +10,7 @@ class Config
 	const VERSION = '0.2 alpha';
 	const INFO = 'Exposition 0.2 alpha. (c) 2013 Aymeric Barthe.';
 
-	const GALLERY_NAME = 'Exposition Gallery';
+	const GALLERY_NAME = 'Exposition';
 
 	const PHOTO_CACHE_DURATION = 3600;	// Cache-control max-age for images (seconds)
 
