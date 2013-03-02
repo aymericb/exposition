@@ -13,6 +13,41 @@ html, body {
 	color: white;
 }
 
+#loading
+{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 120px;
+    width: 200px;
+    margin-top: -60px;
+    margin-left: -100px;
+	background-color: rgb(55, 55, 55);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.2);
+
+}
+#loading p {
+    position: absolute;
+    text-align: center;
+    left: 0px;
+    right: 0px;
+    margin: 0px;
+    bottom: 30px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 18px;
+	color: rgb(240, 240, 240);    
+}
+
+#loading .spinner {
+    left: 0px;
+    right: 0px;
+    margin: 0px;
+    bottom: 39px; /*30+18/2*/
+}
+
 #header {
 	position: absolute;
 	top: 0px;
@@ -28,7 +63,7 @@ html, body {
 #header p {
 	margin-top: 19px;
 	margin-left: 19px;			
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	font-size: 22px;
 	color: rgb(240, 240, 240);
 }
@@ -108,7 +143,7 @@ html, body {
 	left: 14px;
 	right: 14px;
 	height: 17px;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	font-size: 11px;
 	/*text-shadow: rgb(0, 0, 0) 0px 0px 1px;*/
 	padding-top: 4px;
@@ -136,7 +171,7 @@ html, body {
  * Used in album and photo view.
  */
 #page-handler {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	font-size: 18px;
 	top: 20px;
 	right: 0px;
@@ -159,7 +194,7 @@ html, body {
 
 #breadcrumb {
 	margin: 21px;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	font-size: 18px;
 	color: rgb(240, 240, 240);
 	display: block;

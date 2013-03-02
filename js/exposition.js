@@ -38,11 +38,13 @@ ph.barthe.Exposition = function(divs) {
     //
     var m_config;                   // ph.barthe.Config object
 
-    var m_divs = divs;              // Divs used for display
-    var m_main_div = divs.main;     // Main div used for rendering
-
     var m_path;                     // Current album or item path
     var m_item;                     // Current item (class Item)
+    var m_loading_timer;            // Timer use to delay showing the loading box
+    var m_loading_spinner;          // ph.barthe.Spinner object
+
+    var m_divs = divs;              // Divs used for display
+    var m_main_div = divs.main;     // Main div used for rendering
 
     var m_view;                     // Current view
     var m_page_handler;             // ph.barthe.PageHandler
@@ -65,6 +67,9 @@ ph.barthe.Exposition = function(divs) {
         if (error && ('message' in error))
             log += " Reason: " + error.message;
         console.error(log);
+
+        // Show GUI
+        hideLoading();
     };
 
     /**
@@ -122,6 +127,43 @@ ph.barthe.Exposition = function(divs) {
             }
         };
         ph.barthe.Item.Load(m_config, path, on_success, on_error);
+    };
+
+    /** 
+     * Show loading box in main view.
+     * The loading box is not shown right away, this after some delay, and should
+     * be visible on slowo connections only
+     */
+    var showDelayedLoading = function() {
+        // Preconditions
+        assert(!m_loading_timer);
+
+        // Create delayed loading
+        var show_loading_hox = function() {
+            assert($('#loading').length === 0);
+            var loading_div = $('<div>').attr('id', 'loading');
+            var spinner_div = $('<div>').addClass('spinner');
+            loading_div.append(spinner_div);
+            var loading_title = $('<p>').text('Loading...');
+            loading_div.append(loading_title);
+            m_main_div.append(loading_div);
+            m_loading_spinner = new ph.barthe.Spinner({color:'#fff'}).spin($('#loading .spinner')[0]);
+        };
+        m_loading_timer = setTimeout(show_loading_hox, 500);
+
+        // Postcondition
+        assert(m_loading_timer);
+    };
+
+    /** Hide the loading box, or make sure it will not show (if it has not shown yet) */
+    var hideLoading = function() {
+        if (m_loading_spinner)
+            m_loading_spinner.stop();
+        $('#loading').remove();
+        if (m_loading_timer) {
+            clearTimeout(m_loading_timer);
+            m_loading_timer = null;
+        }
     };
 
     /**
@@ -196,12 +238,17 @@ ph.barthe.Exposition = function(divs) {
         assert(m_divs.page_handler_center && m_divs.page_handler_center.length>0);
         assert(m_divs.page_handler_right && m_divs.page_handler_right.length>0);
 
+        // Loading box
+        showDelayedLoading();
+
         // Load configuration
         var config;
         var on_fail = function(err) {
+            hideLoading();
             onFatalError('Cannot load configuration.', err);
         };
         var on_success = function() {
+            hideLoading();
             m_config = config;      // Make sure m_config is undefined, unless fully loaded
             init();
         };
