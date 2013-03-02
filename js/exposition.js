@@ -84,6 +84,8 @@ ph.barthe.Exposition = function(divs) {
         m_main_div.empty();
         m_page_handler.hide();
         m_breadcrumb_handler.setPath(path);
+        hideLoading();
+        showDelayedLoading();
 
         var on_error = function(jqXHR, textStatus, error) {
             onFatalError("Cannot navigate to page "+path, error);
@@ -102,7 +104,6 @@ ph.barthe.Exposition = function(divs) {
                 }
                 if (m_item.isAlbum()) {
                     m_view = new ph.barthe.AlbumView(m_config, m_main_div, m_item);
-                    m_view.onLoadPath.on(loadPath);
                     m_view.onPageUpdate.on(function(show, current_page, total_page) {
                         if (!show) {
                             m_page_handler.hide();
@@ -115,12 +116,13 @@ ph.barthe.Exposition = function(divs) {
                     assert(m_item.isPhoto());
                     m_page_handler.hide();
                     m_view = new ph.barthe.PhotoView(m_config, m_main_div, m_item);
-                    m_view.onLoadPath.on(loadPath); // ### FIXME. See goToNext/goToPrev in PhotoView
                     m_view.onPageUpdate.on(function(current_photo, total_photo) {
                         m_page_handler.show();
                         m_page_handler.setPage("Photo", current_photo, total_photo);
                     });
                 }
+                m_view.onLoadPath.on(loadPath); // ### FIXME. See goToNext/goToPrev in PhotoView
+                m_view.onReady.on(hideLoading);
                 m_view.load();
             } catch(e) {
                 on_error(e);

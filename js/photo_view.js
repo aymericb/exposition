@@ -38,6 +38,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     //
 
     // Data Model
+    var m_is_loaded;            // Flag to remember is first image was loaded (m_on_ready)
 	var m_item = item;			// Photo item to display
 	var m_album;				// Parent item
     var m_item_index;           // Current child index for m_item within m_album
@@ -51,6 +52,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     // Signal emitters
     var m_on_page_update = {};
     var m_on_load_path = {};
+    var m_on_ready = {};
 
     // Constants
     var IMAGE_SIZES = config.photoSizes().sort(function(a,b){return a-b;});
@@ -151,6 +153,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         var on_success = function(img) {
             m_ready_div.append(img);
             self.updateLayout();
+            if (!m_is_loaded) {
+                m_is_loaded = true;
+                m_on_ready.fire();
+            }
         };
         var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
         img.addClass(generateId(path));
@@ -170,8 +176,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.load = function() {
 
-        // Clear main view
-        // ### m_main_div.empty();
+        m_is_loaded = false;
 
         // Load best size
         var size = chooseSize(IMAGE_SIZES);
@@ -304,6 +309,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);
 
+    /** onReady()            -> View is ready to show. */
+    self.onReady = new ph.barthe.Signal(m_on_ready);
 };
 
 // Use strict footer

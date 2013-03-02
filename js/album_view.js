@@ -65,6 +65,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     // Event handling
     var m_on_load_path = {};
     var m_on_page_update = {};
+    var m_on_ready = {};
 
     //
     // Config Constants
@@ -273,7 +274,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
         // Update layout
         self.updateLayout();
-        // m_loading_div.show(); // ### DEBUG
+
+        // ### FIXME:
+        m_on_ready.fire();
     };
 
     /**
@@ -391,6 +394,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
      * total_page {int}     -> number of pages in total >= 1
      */
     self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);
+
+    /** onReady()            -> View is ready to show. */
+    self.onReady = new ph.barthe.Signal(m_on_ready);
 };
 
 // Use strict footer
