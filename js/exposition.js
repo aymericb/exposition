@@ -125,7 +125,7 @@ ph.barthe.Exposition = function(divs) {
                 m_view.onReady.on(hideLoading);
                 m_view.load();
             } catch(e) {
-                on_error(e);
+                on_error(null, null, e);
             }
         };
         ph.barthe.Item.Load(m_config, path, on_success, on_error);
