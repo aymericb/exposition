@@ -131,12 +131,38 @@ ph.barthe.AlbumView = function(config, main_div, item) {
      * Calls setCurrentPage() internally.
      */
     var loadThumnailImage = function(url, v_margin, parent, div_title) {
+        // Preconditions
+        assert(url && typeof url === 'string');
+        assert(typeof v_margin === 'number');
+        assert(parent.length === 1);
+        assert(div_title.length === 1);
+
+        var spin_timer;
+        var spinner = new ph.barthe.Spinner({
+            color:  '#fff',
+            lines:  11,
+            length: 3,
+            width: 3,
+            radius: 6,
+            speed: 1.5
+        });
         var on_fail = function() {
             // ### TODO
         };
         var on_success = function(img) {
             try
             {
+                // Reset spinner
+                if (spin_timer) {
+                    clearTimeout(spin_timer);
+                    spin_timer = null;
+                }
+                spinner.stop();
+                parent.hide();
+                img.show();
+                div_title.show();
+
+                // Position image
                 var h_padding = Math.floor((img.outerWidth()-img.width())/2);
                 var v_padding = img.outerHeight()-img.height();
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
@@ -170,7 +196,12 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 on_fail(img);
             }
         };
-
+        var start_spinner = function() {
+            parent.show();
+            div_title.show();
+            spinner.spin(parent[0]);
+        };
+        spin_timer = setTimeout(start_spinner, 500);
         return ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
     };
 
@@ -261,10 +292,10 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 width: THUMBNAIL_SIZE+'px',
                 height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
             });
-            var div_title = $('<div>').addClass('title').text( children[i].title() );
+            var div_title = $('<div>').addClass('title').text( children[i].title() ).hide();
                 // ### FIXME: What if title too large
             //var div_thumbnail = $('<div>').addClass('thumbnail');
-            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
+            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title).hide();
             img.addClass('thumbnail');
             div_item.append(img);
             div_item.append(div_title);

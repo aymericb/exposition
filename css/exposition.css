@@ -143,6 +143,7 @@ html, body {
 	left: 14px;
 	right: 14px;
 	height: 17px;
+	bottom: 20px;	/* Used only when no image is shown (spinner, error, etc... ) */
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 11px;
 	/*text-shadow: rgb(0, 0, 0) 0px 0px 1px;*/
