@@ -17,23 +17,15 @@
     <script>
         // Main function
         $(document).ready(function() {
-            var on_success = function() {
-                console.log(config.info());
-                var divs = {
-                    main: $('#main'),
-                    breadcrumb: $('#breadcrumb'),
-                    page_handler: $('#page-handler'),
-                    page_handler_center: $('#page-handler-center'),
-                    page_handler_left: $('#page-handler-left'),
-                    page_handler_right: $('#page-handler-right')
-                };
-                var expo = new ph.barthe.Exposition(config, divs);                
-            }
-            var on_fail = function(err) {
-                // ### FIXME: Improve error handling
-                console.error('Failed '+err.message);                
-            }
-            var config = new ph.barthe.Config(on_success, on_fail);
+            var divs = {
+                main: $('#main'),
+                breadcrumb: $('#breadcrumb'),
+                page_handler: $('#page-handler'),
+                page_handler_center: $('#page-handler-center'),
+                page_handler_left: $('#page-handler-left'),
+                page_handler_right: $('#page-handler-right')
+            };
+            var expo = new ph.barthe.Exposition(divs);                
         });
     </script>
 </head>
