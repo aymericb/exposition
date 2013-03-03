@@ -13,6 +13,26 @@ html, body {
 	color: white;
 }
 
+#error
+{
+    z-index: 999;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 100px;
+    width: 280px;
+    margin-top: -60px;
+    margin-left: -150px;
+    background-color: rgb(180, 30, 30);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.2);
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    text-align: center;
+}
+
 #loading
 {
     position: absolute;
