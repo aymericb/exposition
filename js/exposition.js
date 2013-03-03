@@ -61,8 +61,8 @@ ph.barthe.Exposition = function(divs) {
      * @param error {Error}               Exception object
      */
     var onFatalError = function(_friendly_message, error) {
-        // ### TODO: Add HTML element to page
-        var friendly_message = friendly_message || 'An error has occurred';
+        // Extract error information
+        var friendly_message = friendly_message || 'An unexpected error has occurred';
         var log = friendly_message;
         if (error && ('message' in error))
             log += " Reason: " + error.message;
@@ -70,6 +70,13 @@ ph.barthe.Exposition = function(divs) {
 
         // Show GUI
         hideLoading();
+        var error_div = $('#error');
+        if (error_div.length === 0) {
+            error_div = $('<div>');
+            error_div.attr('id', 'error');
+            m_main_div.append(error_div);
+        }
+        error_div.html('<p>Error</p><p>'+_friendly_message+'</p>');
     };
 
     /**
@@ -238,29 +245,33 @@ ph.barthe.Exposition = function(divs) {
     //
     (function() {
 
-        // Preconditions
-        assert(m_divs.main && m_divs.main.length>0);
-        assert(m_divs.breadcrumb && m_divs.breadcrumb.length>0);
-        assert(m_divs.page_handler && m_divs.page_handler.length>0);
-        assert(m_divs.page_handler_left && m_divs.page_handler_left.length>0);
-        assert(m_divs.page_handler_center && m_divs.page_handler_center.length>0);
-        assert(m_divs.page_handler_right && m_divs.page_handler_right.length>0);
+        try {
+            // Preconditions
+            assert(m_divs.main && m_divs.main.length>0);
+            assert(m_divs.breadcrumb && m_divs.breadcrumb.length>0);
+            assert(m_divs.page_handler && m_divs.page_handler.length>0);
+            assert(m_divs.page_handler_left && m_divs.page_handler_left.length>0);
+            assert(m_divs.page_handler_center && m_divs.page_handler_center.length>0);
+            assert(m_divs.page_handler_right && m_divs.page_handler_right.length>0);
 
-        // Loading box
-        showDelayedLoading();
+            // Loading box
+            showDelayedLoading();
 
-        // Load configuration
-        var config;
-        var on_fail = function(err) {
-            hideLoading();
-            onFatalError('Cannot load configuration.', err);
-        };
-        var on_success = function() {
-            hideLoading();
-            m_config = config;      // Make sure m_config is undefined, unless fully loaded
-            init();
-        };
-        config = new ph.barthe.Config(on_success, on_fail);
+            // Load configuration
+            var config;
+            var on_fail = function(err) {
+                hideLoading();
+                onFatalError('Cannot load configuration.', err);
+            };
+            var on_success = function() {
+                hideLoading();
+                m_config = config;      // Make sure m_config is undefined, unless fully loaded
+                init();
+            };
+            config = new ph.barthe.Config(on_success, on_fail);
+        } catch (err) {
+            onFatalError('Failed to initialize gallery', err);
+        }
     })();
 
 };
