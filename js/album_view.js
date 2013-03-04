@@ -379,7 +379,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
             // Move item
             var item = $('#'+m_children[i].id);
-            assert(item.length>0);
+            assert(item.length === 1);
             item.css( {left:x, top:y} );
             pageElement.append(item);
 

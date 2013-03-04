@@ -247,12 +247,12 @@ ph.barthe.Exposition = function(divs) {
 
         try {
             // Preconditions
-            assert(m_divs.main && m_divs.main.length>0);
-            assert(m_divs.breadcrumb && m_divs.breadcrumb.length>0);
-            assert(m_divs.page_handler && m_divs.page_handler.length>0);
-            assert(m_divs.page_handler_left && m_divs.page_handler_left.length>0);
-            assert(m_divs.page_handler_center && m_divs.page_handler_center.length>0);
-            assert(m_divs.page_handler_right && m_divs.page_handler_right.length>0);
+            assert(m_divs.main && m_divs.main.length===1);
+            assert(m_divs.breadcrumb && m_divs.breadcrumb.length===1);
+            assert(m_divs.page_handler && m_divs.page_handler.length===1);
+            assert(m_divs.page_handler_left && m_divs.page_handler_left.length===1);
+            assert(m_divs.page_handler_center && m_divs.page_handler_center.length===1);
+            assert(m_divs.page_handler_right && m_divs.page_handler_right.length===1);
 
             // Loading box
             showDelayedLoading();

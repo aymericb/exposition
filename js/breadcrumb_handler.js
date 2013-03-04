@@ -38,7 +38,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
     (function() {
 
 		// Preconditions
-        assert(m_div && m_div.length>0);
+        assert(m_div && m_div.length===1);
 
     })();
 

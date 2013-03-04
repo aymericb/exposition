@@ -216,7 +216,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             size = chooseSize(sizes);
             img = ready_imgs[size];
             //console.log('sizes: '+ sizes + '  size: '+size+'  ready_imgs: '+ready_imgs);
-            assert(img && img.length > 0);
+            assert(img && img.length === 1);
         }
 
         // Request a better image if necessary
