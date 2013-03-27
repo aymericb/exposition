@@ -146,49 +146,68 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             radius: 6,
             speed: 1.5
         });
-        var on_fail = function() {
-            // ### TODO
+        var stop_spinner = function() {
+            if (spin_timer) {
+                clearTimeout(spin_timer);
+                spin_timer = null;
+            }
+            spinner.stop();
+            parent.hide();
+            div_title.show();
+        };
+        var center_element = function(el, ratio, natural_width, natural_height) {
+            var h_padding = Math.floor((el.outerWidth()-el.width())/2);
+            var v_padding = el.outerHeight()-el.height();
+            var parent_height = parent.height()-v_margin;
+            /*var height = Math.floor(parent.width()/ratio);
+            var top = Math.floor( (parent_height-height)/2 );*/
+            var top, height;
+            if (natural_width === undefined || natural_width >= natural_height) {
+                height = Math.floor(parent.width()/ratio);
+                top = Math.floor( (parent_height-height)/2 );
+                el.css({
+                    top: top,
+                    left: -h_padding,
+                    width: parent.width(),
+                    height: height
+                });
+            } else {
+                var w = Math.floor(parent_height*ratio);
+                top = 0;
+                height = parent_height;
+                el.css({
+                    top: 0,
+                    left: Math.floor( (parent.width()-w)/2 )-h_padding,
+                    width: w,
+                    height: parent_height
+                });
+            }
+            div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
+        };
+        var on_fail = function(img) {
+            // Reset spinner
+            stop_spinner();
+            if (img)
+                img.hide();
+
+            // Add error placeholder
+            var div_error = $('<div>');
+            div_error.addClass('item thumbnail error');
+            parent.append(div_error);
+            center_element(div_error, 1.5);
+            parent.show();
         };
         var on_success = function(img) {
             try
             {
                 // Reset spinner
-                if (spin_timer) {
-                    clearTimeout(spin_timer);
-                    spin_timer = null;
-                }
-                spinner.stop();
-                parent.hide();
+                stop_spinner();
                 img.show();
-                div_title.show();
 
                 // Position image
-                var h_padding = Math.floor((img.outerWidth()-img.width())/2);
-                var v_padding = img.outerHeight()-img.height();
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
-                var parent_height = parent.height()-v_margin;
-                var top, height;
-                if (img.get(0).naturalWidth >= img.get(0).naturalHeight) {
-                    height = Math.floor(parent.width()/ratio);
-                    top = Math.floor( (parent_height-height)/2 );
-                    img.css({
-                        top: top,
-                        left: -h_padding,
-                        width: parent.width(),
-                        height: height
-                    });
-                } else {
-                    var w = Math.floor(parent_height*ratio);
-                    top = 0;
-                    height = parent_height;
-                    img.css({
-                        top: 0,
-                        left: Math.floor( (parent.width()-w)/2 )-h_padding,
-                        width: w,
-                        height: parent_height
-                    });
-                }
-                div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
+                center_element(img, ratio, img.get(0).naturalWidth, img.get(0).naturalHeight);
+
                 parent.show();
             } catch (err) {
                 if (err && err.message)
