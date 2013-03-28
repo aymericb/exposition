@@ -57,6 +57,9 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         assert(typeof size === 'number' && size>=0);
         return m_base_url+PAGE_CACHE+'/'+size+path;
     };
+    self.getCautionImageUrl = function() {
+        return m_base_url+'/css/caution.png';
+    };
 
     // Server info
     self.info = function() {

@@ -159,8 +159,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             var h_padding = Math.floor((el.outerWidth()-el.width())/2);
             var v_padding = el.outerHeight()-el.height();
             var parent_height = parent.height()-v_margin;
-            /*var height = Math.floor(parent.width()/ratio);
-            var top = Math.floor( (parent_height-height)/2 );*/
             var top, height;
             if (natural_width === undefined || natural_width >= natural_height) {
                 height = Math.floor(parent.width()/ratio);
@@ -196,6 +194,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             parent.append(div_error);
             center_element(div_error, 1.5);
             parent.show();
+            console.error('Failed to download thumbnail: '+url);
         };
         var on_success = function(img) {
             try

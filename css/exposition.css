@@ -119,6 +119,12 @@ html, body {
 	position: absolute;
 }
 
+.photo.error {
+	/*content: url('caution.png');*/
+	background-color: rgb(55, 55, 55);
+	padding: 2%;
+	border-radius: 10px;
+}
 
 /** 
  * 'item' is the enclosing DIV used in AlbumView

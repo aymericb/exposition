@@ -148,7 +148,30 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     var loadImage = function(path, size) {
         var url = config.makeImageUrl(size, m_item.path());
         var on_fail = function() {
-            // ### TODO
+            console.error('Failed to load image: '+url);
+            img.remove();
+
+            // ### TODO. This is a very hacky way to provide
+            // feedback by showing the caution icon instead of the image.
+            // A better alternative would be to put this setting in a CSS and
+            // make sure all CSS assets are pre-loaded at startup.
+            // We should also display a regular div with text, rather than an image.
+            img = $('<img>');
+            img.addClass(generateId(path));
+            img.addClass('error');
+            img.attr('src', config.getCautionImageUrl());
+            img.attr('data-size', size);
+            img.hide();
+            var show_error = function() {
+                m_ready_div.append(img);
+                self.updateLayout();
+                if (!m_is_loaded) {
+                    m_is_loaded = true;
+                    m_on_ready.fire();
+                }
+            };
+            img.load(show_error);
+            img.error(show_error);
         };
         var on_success = function(img) {
             m_ready_div.append(img);
