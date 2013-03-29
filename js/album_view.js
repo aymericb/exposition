@@ -305,7 +305,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 assert(item.isPhoto());
                 div_item.addClass('photo-item');
             }
-            div_item.click(on_click(item));
             div_item.css( {
                 width: THUMBNAIL_SIZE+'px',
                 height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
@@ -315,6 +314,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             //var div_thumbnail = $('<div>').addClass('thumbnail');
             var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title).hide();
             img.addClass('thumbnail');
+            img.click(on_click(item));
             div_item.append(img);
             div_item.append(div_title);
             m_loading_div.append(div_item);

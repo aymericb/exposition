@@ -13,6 +13,10 @@ html, body {
 	color: white;
 }
 
+* {
+	-webkit-user-select: none;
+}
+
 #error
 {
     z-index: 999;
@@ -167,9 +171,19 @@ html, body {
 }
 
 .item .thumbnail:hover {
-	box-shadow: rgb(255, 255, 255) 0px 0px 10px 0px;
-	-webkit-filter: brightness(20%);
-	cursor: pointer;	
+	background-color: rgb(180, 240, 240);
+	/*box-shadow: rgb(240, 240, 240) 0px 0px 10px 0px;*/
+	box-shadow: rgb(180, 255, 255) 0px 0px 10px 0px;
+	/*opacity: 0.6;*/
+	cursor: pointer;
+}
+
+.item .thumbnail:hover ~ .title {
+	background-color: rgb(70, 90, 90);
+	color: white;
+}
+
+.item:hover {
 }
 
 .item .title {
@@ -187,8 +201,7 @@ html, body {
 	padding-bottom: 0px;
 	padding-top: 4px;	/* Used to center text, increase height by 4px */
 	background-clip: border-box;
-	background-color: 
-	rgb(60, 60, 60);
+	background-color: rgb(60, 60, 60);
 	background-image: none;
 	background-origin: padding-box;
 	border-bottom-left-radius: 10px;
