@@ -22,7 +22,7 @@ ph.barthe = ph.barthe || {};
  *
  * Constructor
  * - config                     -> A ph.barthe.Config object
- * - main_div                   -> display area for the photo
+ * - main_div                   -> The display area for the photo
  * - item                       -> A ph.barthe.Item representing the item to display
  */
 ph.barthe.PhotoView = function(config, main_div, item) {
@@ -39,8 +39,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
 
     // Data Model
     var m_is_loaded;            // Flag to remember is first image was loaded (m_on_ready)
-	var m_item = item;			// Photo item to display
-	var m_album;				// Parent item
+    var m_item = item;          // Photo item to display
+    var m_album;                // Parent item
     var m_item_index;           // Current child index for m_item within m_album
 
     // HTML
@@ -68,7 +68,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         assert(m_item);
         assert(m_item.isPhoto());
 
-        // Create laoding and ready divs
+        // Create loading and ready divs
         m_loading_div = $('<div>').attr('id', 'photo-loading').hide();
         m_ready_div = $('<div>').attr('id', 'photo-ready');
         m_main_div.append(m_loading_div);
