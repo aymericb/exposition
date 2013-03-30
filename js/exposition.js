@@ -127,6 +127,13 @@ ph.barthe.Exposition = function(divs) {
                         m_page_handler.show();
                         m_page_handler.setPage("Photo", current_photo, total_photo);
                     });
+                    m_view.onPathChanged.on(function(path) {
+                        m_path = path;
+                        hideLoading();
+                        showDelayedLoading();
+                        m_breadcrumb_handler.setPath(m_path);
+                        history.pushState(m_path, m_item.title(), m_path);
+                    });
                 }
                 m_view.onLoadPath.on(loadPath); // ### FIXME. See goToNext/goToPrev in PhotoView
                 m_view.onReady.on(hideLoading);

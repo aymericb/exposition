@@ -50,6 +50,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     var m_images_loading = {};  // Map path->size(str)->IMG element. Images being loaded.
 
     // Signal emitters
+    var m_on_path_changed = {};
     var m_on_page_update = {};
     var m_on_load_path = {};
     var m_on_ready = {};
@@ -310,23 +311,56 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         img.show();
     };
 
-    // ### FIXME. Currently we force a re-loading of the next photo
-    // This is stupid. We should keep the current AlbumView and update
-    // the status of Exposition. Additionally, we can modify AlbumView to
-    // prefetch previous/next images.
+    /** 
+     * Go to next or previous page. The PhotoView handles the internal navigation instead
+     * of emitting a onLoadPath signal. This is an optimization that makes it possible
+     * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
+     * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
+     * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
+     */
+    var gotoPage = function(offset) {
+        // Preconditions
+        assert(offset === 1 || offset === -1);
+
+        // Change current state
+        var children = m_album.children();
+        m_item_index = m_item_index+offset;
+        m_item = children[m_item_index];
+        if (m_current_img)
+            m_current_img.hide();
+        m_current_img = null;
+
+        // Notify application
+        var path = m_item.path();
+        m_on_page_update.fire(m_item_index, children.length);
+        m_on_path_changed.fire(path);
+        m_is_loaded = false;
+
+        // Load best size
+        var size = chooseSize(IMAGE_SIZES);
+        if (m_images_ready[path] && m_images_ready[path][size]) {
+            m_on_ready.fire();
+            self.updateLayout();
+        } else {
+            loadImage(path, size);
+        }
+    };
 
     /** Go to next page */
     self.goToNext = function() {
-        m_on_load_path.fire(m_album.children()[m_item_index+1].path());
+        gotoPage(+1);
     };
 
     /** Go to previous page */
     self.goToPrev = function() {
-        m_on_load_path.fire(m_album.children()[m_item_index-1].path());
+        gotoPage(-1);
     };
 
     /** onLoadPath(path) -> path is a string pointing to the path to load. */
     self.onLoadPath = new ph.barthe.Signal(m_on_load_path);
+
+    /** onPathChanged(path) -> path changed within the view. */
+    self.onPathChanged = new ph.barthe.Signal(m_on_path_changed);
 
     /**
      * onPageUpdate(show, current_page, total_page)
