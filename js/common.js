@@ -1,9 +1,13 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true, debug:true*/
-/*global console:false*/
+/*global console:true, history:true*/
 
 // Namespace declarations
 var ph = ph || {};
@@ -60,13 +64,7 @@ ph.barthe.isArray = function(object) {
     return Object.prototype.toString.call(object) === '[object Array]' ;
 };
 
-/** Define console for IE compatibility */
-var console = window.console || {
-    log: function() {},
-    error: function() {},
-    warn: function() {},
-    info: function() {}
-};
+// ### TODO: Define HTML5 History API for backward compatibility?
 
 /**
  * Helps implementing the design pattern Observer.
@@ -160,6 +158,26 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
     // Return jQuery IMG element
     return img;
 };
+
+//
+// Internet Explorer compatibility 
+//
+
+console = window.console || {
+    log: function() {},
+    error: function() {},
+    warn: function() {},
+    info: function() {}
+};
+
+history = window.history || {
+    replaceState: function() {},
+    pushState: function() {}
+};
+if (! ('replaceState' in history))
+    history.replaceState = function() {};
+if (! ('pushState' in history))
+    history.pushState = function() {};
 
 // Use strict footer
 })();

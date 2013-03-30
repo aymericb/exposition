@@ -1,5 +1,9 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -30,8 +34,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
     var assert = ph.barthe.assert;
 
     // Private members
-    var PAGE_ITEM = config.pageItem();
-    var TITLE = "Salingkit Gallery";    // ### FIXME. Use config
+    var TITLE = config.galleryName();
     var m_div = div;
     var m_on_load_path = {};
 
@@ -39,7 +42,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
     (function() {
 
 		// Preconditions
-        assert(m_div && m_div.length>0);
+        assert(m_div && m_div.length===1);
 
     })();
 
@@ -49,7 +52,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
 
     /** Update the breadcrumb with current path */
     self.setPath = function(path) {
-        
+
         // Preconditions
         assert(path);
         assert(path.charAt(0) === '/');
@@ -83,7 +86,6 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
         };
 
         // Iterate on subpaths
-        // ### FIXME: Use titles instead of path components for display
         if (path === '/')
             return;
         var components = path.substr(1).split('/');
@@ -93,7 +95,7 @@ ph.barthe.BreadcrumbHandler = function(div, config) {
             current_path += '/' + components[i];
             var el_component = $('<div>').addClass('subpath'); //.text(components[i]);
             el_component.click(click_handler(current_path));
-            ph.barthe.Item.Load(config.pageItem(), current_path, 
+            ph.barthe.Item.Load(config, current_path,
                 on_title_success(el_component), on_title_failed(current_path));
             m_div.append(el_separator);
             m_div.append(el_component);

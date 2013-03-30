@@ -1,5 +1,9 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -76,24 +80,24 @@ ph.barthe.Item = function(json) {
     (function() {
         var checkStringAttribute = function(name) {
             if (! json[name]) {
-                throw { message: 'Missing '+name+' attribute in JSON.' };
+                throw new Error('Missing '+name+' attribute in JSON.');
             }
             if (typeof json[name] !== 'string') {
-                 throw { message: 'Attribute '+name+' should be a String in JSON.' };
+                 throw new Error('Attribute '+name+' should be a String in JSON.');
             }
         };
         checkStringAttribute('type');
         if (!self.isAlbum() && !self.isPhoto()) {
-            throw { message: 'Invalid type attribute in JSON.' };
+            throw new Error('Invalid type attribute in JSON.');
         }
         checkStringAttribute('title');
         checkStringAttribute('path');
         if (self.isAlbum()) {
             if (! json.children) {
-                throw { message: 'Missing children attribute in JSON.' };
+                throw new Error('Missing children attribute in JSON.');
             }
             if( !ph.barthe.isArray(json.children) ) {
-                throw { message: 'Attribute children should be an Array in JSON.' };
+                throw new Error('Attribute children should be an Array in JSON.');
             }
             for (var i=0; i<json.children.length; ++i) {
                 m_children.push(new ph.barthe.Item(json.children[i]));
@@ -103,31 +107,60 @@ ph.barthe.Item = function(json) {
 
 };
 
-/** 
- * Load a ph.barthe.Item item from a URL, or return cached version.
+/**
+ * Load a ph.barthe.Item item from a path, or return cached version.
  *
  * Usage.
  * Call ph.barthe.Item.Load() with the following parameters.
- * @param url {string} URL where to load data from
+ * @param config {string} ph.barthe.Config instance
  * @param path {string} Exposition path
  * @param on_success {function(ph.barthe.Item)} success callback, this CANNOT be immediate!
  * @param on_fail {function(jqXHR, textStatus, errorThrown)} error callback
  */
 ph.barthe.Item.Load = (function() {
-    var assert = ph.barthe.assert;  // Redifinitions
-    var cache = {};                 // Cache to avoid re-loading. Map: path => ph.barthe.Item
+    var assert = ph.barthe.assert;  // Redefinitions
+    var cache = {};                 // Cache to avoid re-loading. Map: url => ph.barthe.Item
 
     // Real body of function
-    return function(url, path, on_success, on_fail) {
+    return function(config, path, on_success, on_fail) {
+        // Precondition
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
 
-        // Check cache
+        // Avoid making functions in loops
+        var immediate_success = function(item) {
+            setTimeout(function() { on_success(item); }, 0);
+        };
+
+        // Check cache for same item
         if (cache[path]) {
-            setTimeout(function() { on_success(cache[path]); }, 0);
+            immediate_success(cache[path]);
             return;
         }
 
+        // Check cache for parent item.
+        // If item is a photo in parent item, no need to contact the server.
+        if (path.length>1) {
+            var album_path  = path.substring(0, path.lastIndexOf('/'));
+            var album_item = cache[album_path];
+            if (album_item) {
+                var children = album_item.children();
+                for (var i=0; i<children.length; ++i) {
+                    var child_item = children[i];
+                    if (child_item.path() === path) {
+                        if (child_item.isPhoto()) {
+                            immediate_success(child_item);
+                            return;
+                        } else {
+                            break;  // The found item is an Album, so we need to load it
+                                    // from the server, to get its children
+                        }
+                    }
+                }
+            }
+        }
+
         // Download item
-        $.ajax(url+'?'+$.param({path: path}))
+        $.ajax(config.makeItemUrl(path))
             .fail( on_fail )
             .done( function(data) {
                 try {
@@ -136,8 +169,6 @@ ph.barthe.Item.Load = (function() {
                     on_success(item);
                 } catch(e) {
                     on_fail(undefined, undefined, e);
-                    if (ph.barthe.debug)
-                        throw e;
                 }
             });
     };

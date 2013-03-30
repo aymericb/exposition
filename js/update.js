@@ -1,5 +1,9 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -33,9 +37,9 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
 
     // Private Methods
     var onConfigSuccess = function() {
-        $.ajax(m_config.pageItem()+'?'+$.param({path: '/'}))
+        $.ajax(m_config.makeItemUrl('/'))
             .fail( function() {
-                onFailed({message: 'Failed to load root album'});
+                onFailed(new Error('Failed to load root album'));
             })
             .done( function(data) {
                 try {
@@ -80,8 +84,6 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
 
                 } catch(e) {
                     onFailed(e);
-                    if (ph.barthe.debug)
-                        throw e;
                 }
             });
     };
@@ -111,25 +113,25 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
         if (m_download_queue.length === 0)
             return;
         var download = m_download_queue.pop();
-        ph.barthe.loadImage(download.url, onDownloadSuccess, onDownloadFailed, download.title, download);
+        $.ajax(download.url)
+            .fail( function(jqXHR, textStatus, errorThrown) {
+                onDownloadFailed(errorThrown?('HTTP '+jqXHR.status+' '+errorThrown):textStatus, download);
+            })
+            .done( function() {
+                onDownloadSuccess(download);
+            });
     };
 
-    var onDownloadSuccess = function(img, download) {
+    var onDownloadSuccess = function(download) {
         updateDownloadProgress(download);
         popDownload();
     };
 
-    var onDownloadFailed = function(img, msg, download) {
+    var onDownloadFailed = function(msg, download) {
         updateDownloadProgress(download);
-
         var html = m_el_errors.html();
-        if (msg)
-            html += msg;
-        else
-            html += '<p>' + "Failed " + download.url + " ";
-        html += '</p>';
+        html += '<p>' + 'Failed ' + download.url + ' ' + msg + '</p>';
         m_el_errors.html(html);
-
         popDownload();
     };
 
@@ -152,7 +154,7 @@ ph.barthe.UpdateCache = function(el_progress, el_progress_label, el_errors) {
         // Cache photo
         assert(item.isPhoto());
         for (var j=0; j<m_sizes.length; ++j) {
-            var url = m_config.pageImage()+'?'+$.param({path:item.path(), size: m_sizes[j]});
+            var url = m_config.makeCacheUrl(m_sizes[j], item.path());
             m_download_queue.push(Object.freeze({
                 url: url,
                 size: m_sizes[j],

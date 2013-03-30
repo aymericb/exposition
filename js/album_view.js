@@ -1,5 +1,9 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -65,11 +69,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     // Event handling
     var m_on_load_path = {};
     var m_on_page_update = {};
+    var m_on_ready = {};
 
     //
     // Config Constants
     //
-    var PAGE_IMAGE = config.pageImage();
     var THUMBNAIL_MARGIN = config.thumbnailMargin();
     var THUMBNAIL_SIZE = config.thumbnailSize();
     var THUMBNAIL_TITLE_MARGIN = config.thumbnailTitleMargin();
@@ -131,38 +135,82 @@ ph.barthe.AlbumView = function(config, main_div, item) {
      * Calls setCurrentPage() internally.
      */
     var loadThumnailImage = function(url, v_margin, parent, div_title) {
-        var on_fail = function() {
-            // ### TODO
+        // Preconditions
+        assert(url && typeof url === 'string');
+        assert(typeof v_margin === 'number');
+        assert(parent.length === 1);
+        assert(div_title.length === 1);
+
+        var spin_timer;
+        var spinner = new ph.barthe.Spinner({
+            color:  '#fff',
+            lines:  11,
+            length: 3,
+            width: 3,
+            radius: 6,
+            speed: 1.5
+        });
+        var stop_spinner = function() {
+            if (spin_timer) {
+                clearTimeout(spin_timer);
+                spin_timer = null;
+            }
+            spinner.stop();
+            parent.hide();
+            div_title.show();
+        };
+        var center_element = function(el, ratio, natural_width, natural_height) {
+            var h_padding = Math.floor((el.outerWidth()-el.width())/2);
+            var v_padding = el.outerHeight()-el.height();
+            var parent_height = parent.height()-v_margin;
+            var top, height;
+            if (natural_width === undefined || natural_width >= natural_height) {
+                height = Math.floor(parent.width()/ratio);
+                top = Math.floor( (parent_height-height)/2 );
+                el.css({
+                    top: top,
+                    left: -h_padding,
+                    width: parent.width(),
+                    height: height
+                });
+            } else {
+                var w = Math.floor(parent_height*ratio);
+                top = 0;
+                height = parent_height;
+                el.css({
+                    top: 0,
+                    left: Math.floor( (parent.width()-w)/2 )-h_padding,
+                    width: w,
+                    height: parent_height
+                });
+            }
+            div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
+        };
+        var on_fail = function(img) {
+            // Reset spinner
+            stop_spinner();
+            if (img)
+                img.hide();
+
+            // Add error placeholder
+            var div_error = $('<div>');
+            div_error.addClass('item thumbnail error');
+            parent.append(div_error);
+            center_element(div_error, 1.5);
+            parent.show();
+            console.error('Failed to download thumbnail: '+url);
         };
         var on_success = function(img) {
             try
             {
-                var h_padding = Math.floor((img.outerWidth()-img.width())/2);
-                var v_padding = img.outerHeight()-img.height();
+                // Reset spinner
+                stop_spinner();
+                img.show();
+
+                // Position image
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
-                var parent_height = parent.height()-v_margin;
-                var top, height;
-                if (img.get(0).naturalWidth >= img.get(0).naturalHeight) {
-                    height = Math.floor(parent.width()/ratio);
-                    top = Math.floor( (parent_height-height)/2 );
-                    img.css({
-                        top: top,
-                        left: -h_padding,
-                        width: parent.width(),
-                        height: height
-                    });
-                } else {
-                    var w = Math.floor(parent_height*ratio);
-                    top = 0;
-                    height = parent_height;
-                    img.css({
-                        top: 0,
-                        left: Math.floor( (parent.width()-w)/2 )-h_padding,
-                        width: w,
-                        height: parent_height
-                    });
-                }
-                div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
+                center_element(img, ratio, img.get(0).naturalWidth, img.get(0).naturalHeight);
+
                 parent.show();
             } catch (err) {
                 if (err && err.message)
@@ -170,7 +218,12 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 on_fail(img);
             }
         };
-
+        var start_spinner = function() {
+            parent.show();
+            div_title.show();
+            spinner.spin(parent[0]);
+        };
+        spin_timer = setTimeout(start_spinner, 500);
         return ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
     };
 
@@ -243,7 +296,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             m_children_count += 1;
 
             // Read properties
-            var url = PAGE_IMAGE+'?'+$.param({path:m_children[i].photo_path, size: THUMBNAIL_SIZE});
+            var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[i].photo_path);
             var id = m_children[i].id;
             var item = m_item.children()[i];
             assert(url && id && item);
@@ -256,16 +309,16 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 assert(item.isPhoto());
                 div_item.addClass('photo-item');
             }
-            div_item.click(on_click(item));
             div_item.css( {
                 width: THUMBNAIL_SIZE+'px',
                 height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
             });
-            var div_title = $('<div>').addClass('title').text( children[i].title() );
+            var div_title = $('<div>').addClass('title').text( children[i].title() ).hide();
                 // ### FIXME: What if title too large
             //var div_thumbnail = $('<div>').addClass('thumbnail');
-            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title);
+            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title).hide();
             img.addClass('thumbnail');
+            img.click(on_click(item));
             div_item.append(img);
             div_item.append(div_title);
             m_loading_div.append(div_item);
@@ -274,7 +327,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
         // Update layout
         self.updateLayout();
-        // m_loading_div.show(); // ### DEBUG
+
+        // ### FIXME:
+        m_on_ready.fire();
     };
 
     /**
@@ -309,6 +364,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         var HEIGHT      = THUMBNAIL_MARGIN + THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT;
         var COL_COUNT   = Math.floor( (VIEW_WIDTH-2*THUMBNAIL_MARGIN)/WIDTH );
         var ROW_COUNT   = Math.floor( (VIEW_HEIGHT-2*THUMBNAIL_MARGIN)/HEIGHT );
+        if (ROW_COUNT === 0) ROW_COUNT = 1;
+        if (COL_COUNT === 0) COL_COUNT = 1;
         var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + THUMBNAIL_MARGIN)/2 );
         var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + THUMBNAIL_MARGIN)/2 );
         if (COL_COUNT*ROW_COUNT > m_children_count)
@@ -337,14 +394,14 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         var y = V_MARGIN;
         m_page_count = 1;
         for (var i=0; i<m_children.length; ++i) {
-            
+
             // Skip empty
             if (!m_children[i])
                 continue;
 
             // Move item
             var item = $('#'+m_children[i].id);
-            assert(item.length>0);
+            assert(item.length === 1);
             item.css( {left:x, top:y} );
             pageElement.append(item);
 
@@ -361,7 +418,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 }
             }
         }
-        
+
         // Check if last page is empty
         if (pageElement.children().length === 0)
             m_page_count -= 1;
@@ -392,6 +449,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
      * total_page {int}     -> number of pages in total >= 1
      */
     self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);
+
+    /** onReady()            -> View is ready to show. */
+    self.onReady = new ph.barthe.Signal(m_on_ready);
 };
 
 // Use strict footer

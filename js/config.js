@@ -1,5 +1,9 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -30,29 +34,46 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     //
     var m_json;                             // Ajax values
     var m_thumnbail_title_height;           // Computed from CSS
+    var m_base_url;                         // The base URL is rewritten with HTML history
+
+    // REST API
+    var PAGE_CONFIG = 'api/config';
+    var PAGE_ITEM = 'api/item';
+    var PAGE_IMAGE = 'api/image';
+    var PAGE_CACHE = 'api/cache';
 
     //
     // Public members
     //
 
     // PHP Ajax Pages
-    self.pageConfig = function() {
-        return 'php/ajax/config.php';
+    self.makeItemUrl = function(path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        return m_base_url+PAGE_ITEM+path;
     };
-    self.pageItem = function() {
-        return 'php/ajax/item.php';
+    self.makeImageUrl = function(size, path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        assert(typeof size === 'number' && size>=0);
+        return m_base_url+PAGE_IMAGE+'/'+size+path;
     };
-    self.pageImage = function() {
-        return 'php/ajax/image.php';
+    self.makeCacheUrl = function(size, path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        assert(typeof size === 'number' && size>=0);
+        return m_base_url+PAGE_CACHE+'/'+size+path;
+    };
+    self.getCautionImageUrl = function() {
+        return m_base_url+'/css/caution.png';
     };
 
     // Server info
     self.info = function() {
         return m_json.info;
     };
-
     self.version = function() {
         return m_json.version;
+    };
+    self.galleryName = function() {
+        return m_json.gallery_name;
     };
 
     // Thumnails
@@ -106,6 +127,13 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         assert(ready_callback);
         assert(error_callback);
 
+        // Compute base URL
+        m_base_url = document.URL;
+        var query_index = m_base_url.lastIndexOf('?');
+        if (query_index>0)
+            m_base_url = m_base_url.substr(0, query_index);
+        m_base_url = m_base_url.substr(0, m_base_url.lastIndexOf('/')+1);
+
         // Compute m_thumnbail_title_height
         m_thumnbail_title_height = (function() {
             // Compute dynamically by reading CSS property of div class '.item .title'
@@ -119,37 +147,38 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         })();
 
         // Load ajax configuration
-        $.ajax(self.pageConfig())
+        $.ajax(PAGE_CONFIG)
             .fail( error_callback )
             .done( function(json) {
                 try {
                     // Check string parameters
                     var checkStringAttribute = function(name) {
                         if (! json[name]) {
-                            throw { message: 'Missing '+name+' attribute in JSON.' };
+                            throw new Error('Missing '+name+' attribute in JSON.');
                         }
                         if (typeof json[name] !== 'string') {
-                             throw { message: 'Attribute '+name+' should be a String in JSON.' };
+                             throw new Error('Attribute '+name+' should be a String in JSON.');
                         }
                     };
                     checkStringAttribute('version');
                     checkStringAttribute('info');
+                    checkStringAttribute('gallery_name');
 
                     // Check array of sizes
                     var checkSizeArray = function(name) {
                         var array = json[name];
                         if (! array) {
-                            throw { message: 'Missing '+name+' attribute in JSON.' };
+                            throw new Error('Missing '+name+' attribute in JSON.');
                         }
                         if( Object.prototype.toString.call( array ) !== '[object Array]' ) {
-                            throw { message: 'Attribute '+name+' should be an Array in JSON.' };
+                            throw new Error('Attribute '+name+' should be an Array in JSON.');
                         }
                         if ( array.length === 0) {
-                            throw { message: 'Attribute '+name+' should be not be an empty Array.' };
+                            throw new Error('Attribute '+name+' should be not be an empty Array.');
                         }
                         for (var i=0; i<array.length; ++i) {
                             if (typeof array[i] !== 'number' || array[i] % 1 !== 0) {
-                                throw { message: 'Attribute '+name+' should be integers.' };
+                                throw new Error('Attribute '+name+' should be integers.');
                             }
                         }
                     };
@@ -162,8 +191,6 @@ ph.barthe.Config = function(ready_callback, error_callback) {
 
                 } catch(e) {
                     error_callback(e);
-                    if (ph.barthe.debug)
-                        throw e;
                 }
             });
 

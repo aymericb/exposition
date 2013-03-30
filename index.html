@@ -14,26 +14,19 @@
     <script src="js/page_handler.js"></script>
     <script src="js/photo_view.js"></script>
     <script src="js/breadcrumb_handler.js"></script>
+    <script src="js/spin.js"></script>
     <script>
         // Main function
         $(document).ready(function() {
-            var on_success = function() {
-                console.log(config.info());
-                var divs = {
-                    main: $('#main'),
-                    breadcrumb: $('#breadcrumb'),
-                    page_handler: $('#page-handler'),
-                    page_handler_center: $('#page-handler-center'),
-                    page_handler_left: $('#page-handler-left'),
-                    page_handler_right: $('#page-handler-right')
-                };
-                var expo = new ph.barthe.Exposition(config, divs);                
-            }
-            var on_fail = function(err) {
-                // ### FIXME: Improve error handling
-                console.error('Failed '+err.message);                
-            }
-            var config = new ph.barthe.Config(on_success, on_fail);
+            var divs = {
+                main: $('#main'),
+                breadcrumb: $('#breadcrumb'),
+                page_handler: $('#page-handler'),
+                page_handler_center: $('#page-handler-center'),
+                page_handler_left: $('#page-handler-left'),
+                page_handler_right: $('#page-handler-right')
+            };
+            var expo = new ph.barthe.Exposition(divs);                
         });
     </script>
 </head>
@@ -42,6 +35,9 @@
         <div id="breadcrumb"></div>
     </div>
     <div id="main">
+        <noscript>
+            <div id="error"><p>Error.</p><p>You need to activate Javascript to use this website.</p></div>
+        </noscript>
     </div>
     <div id="footer">
         <div id="page-handler" style="display:none">

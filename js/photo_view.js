@@ -1,5 +1,9 @@
 //
-// Exposition. © 2013 Aymeric Barthe
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
 //
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -22,7 +26,7 @@ ph.barthe = ph.barthe || {};
  *
  * Constructor
  * - config                     -> A ph.barthe.Config object
- * - main_div                   -> display area for the photo
+ * - main_div                   -> The display area for the photo
  * - item                       -> A ph.barthe.Item representing the item to display
  */
 ph.barthe.PhotoView = function(config, main_div, item) {
@@ -38,22 +42,24 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     //
 
     // Data Model
-	var m_item = item;			// Photo item to display
-	var m_album;				// Parent item
+    var m_is_loaded;            // Flag to remember is first image was loaded (m_on_ready)
+    var m_item = item;          // Photo item to display
+    var m_album;                // Parent item
     var m_item_index;           // Current child index for m_item within m_album
 
     // HTML
     var m_main_div = main_div;  // Root view
     var m_current_img;          // Currently displayed IMG element
-    var m_loading_div;          // Contains IMG elements being loaded
-    var m_ready_div;            // Contains IMG elements ready to display
+    var m_images_ready = {};    // Map path->size(str)->IMG element. Fully loaded images.
+    var m_images_loading = {};  // Map path->size(str)->IMG element. Images being loaded.
 
     // Signal emitters
+    var m_on_path_changed = {};
     var m_on_page_update = {};
     var m_on_load_path = {};
+    var m_on_ready = {};
 
     // Constants
-    var PAGE_IMAGE = config.pageImage();
     var IMAGE_SIZES = config.photoSizes().sort(function(a,b){return a-b;});
 
     /**
@@ -66,12 +72,6 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         assert(m_main_div);
         assert(m_item);
         assert(m_item.isPhoto());
-
-        // Create laoding and ready divs
-        m_loading_div = $('<div>').attr('id', 'photo-loading').hide();
-        m_ready_div = $('<div>').attr('id', 'photo-ready');
-        m_main_div.append(m_loading_div);
-        m_main_div.append(m_ready_div);
 
         // Load parent album (for photo navigation prev/next)
         var album_path = m_item.path().substring(0, m_item.path().lastIndexOf('/'));
@@ -101,15 +101,40 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             }
             m_on_page_update.fire(m_item_index, children.length);
 
+            // Prefetch prev/next images
+            var size = chooseSize(IMAGE_SIZES);
+            prefetchImages(size);
+
             // Postcondition
             assert(m_item_index !== undefined);
         };
-        ph.barthe.Item.Load(config.pageItem(), album_path, on_album_success, on_album_error);
+        ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
     })();
 
-    var generateId = function(path) {
-        assert(path);
-        return ph.barthe.generateId(path, 'photo');
+    /**
+     * Add image to cache.
+     * @param {obj} cache. Either m_images_ready or m_images_loading
+     * @param {string} path. From Item.path().
+     * @param {int} size. From IMAGE_SIZES.
+     * @param {jQuery el} img
+     */
+    var setImage = function(cache, path, size, img) {
+        if (!cache[path])
+            cache[path] = {};
+        cache[path][size] = img;
+    };
+
+    /**
+     * Get images from cache
+     * @param {obj} cache. Either m_images_ready or m_images_loading
+     * @param {string} path. From Item.path().
+     * @return {obj} Map size(str)->jQuery IMG.
+     */
+    var getImages = function(cache, path) {
+        if (cache[path])
+            return cache[path];
+        else
+            return [];
     };
 
     /**
@@ -145,20 +170,76 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      * @param size {int}       value from IMAGE_SIZES
      */
     var loadImage = function(path, size) {
-        var url = PAGE_IMAGE+'?'+$.param({path:m_item.path(), size: size});
+        // Precondition
+        assert(!(size in getImages(m_images_ready, path)), 'Image '+path+'@'+size+'px is already loaded');
+        assert(!(size in getImages(m_images_loading, path)), 'Image '+path+'@'+size+'px is already being loaded');
+
+        var url = config.makeImageUrl(size, path);
         var on_fail = function() {
-            // ### TODO
+            console.error('Failed to load image: '+url);
+            img.remove();
+
+            // ### TODO. This is a very hacky way to provide
+            // feedback by showing the caution icon instead of the image.
+            // A better alternative would be to put this setting in a CSS and
+            // make sure all CSS assets are pre-loaded at startup.
+            // We should also display a regular div with text, rather than an image.
+            img = $('<img>');
+            setImage(m_images_loading, path, size, img);
+            img.addClass('error');
+            img.attr('src', config.getCautionImageUrl());
+            img.hide();
+            var show_error = function() {
+                setImage(m_images_ready, path, size, img);
+                self.updateLayout();
+                if (!m_is_loaded && m_item.path()===path) {
+                    m_is_loaded = true;
+                    m_on_ready.fire();
+                }
+            };
+            img.load(show_error);
+            img.error(show_error);
         };
         var on_success = function(img) {
-            m_ready_div.append(img);
+            setImage(m_images_ready, path, size, img);
             self.updateLayout();
+            if (!m_is_loaded && m_item.path()===path) {
+                m_is_loaded = true;
+                m_on_ready.fire();
+                prefetchImages(size);
+            }
         };
         var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
-        img.addClass(generateId(path));
-        img.attr('data-size', size);
+        setImage(m_images_loading, path, size, img);
         img.hide();
-        m_loading_div.append(img);
+        m_main_div.append(img);
     };
+
+    /**
+     * Prefetch the next and previous images at the current size
+     */
+    var prefetchImages = function(size) {
+        // Check if album is loaded
+        if (!m_album)
+            return;
+
+        // Helper function
+        var prefetch = function(index) {
+            var path = children[index].path();
+            if (!m_images_ready[path] && !m_images_loading[path]) {
+                loadImage(path, size);
+            }
+        };
+
+        // Prefetch next/previous image
+        var children = m_album.children();
+        if (m_item_index>0)
+            prefetch(m_item_index-1);
+        if (m_item_index+1<children.length)
+            prefetch(m_item_index+1);
+    };
+
+
 
     /**
      * Load photo into view
@@ -171,8 +252,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.load = function() {
 
-        // Clear main view
-        // ### m_main_div.empty();
+        m_is_loaded = false;
 
         // Load best size
         var size = chooseSize(IMAGE_SIZES);
@@ -189,41 +269,32 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.updateLayout = function() {
 
-        // Helper function
-        var get_size = function(img) {
-            var size = img.attr('data-size');
-            assert(size);
-            size = parseInt(size, 10);
-            assert(!isNaN(size));
-            return size;
-        };
-
         // Find the best loaded image for the current size of the view
         var sizes = [];         // size array
-        var ready_imgs = {};    // Map: size => jQuery element
-        m_ready_div.find('.'+generateId(m_item.path())).each(function() {
-            var size = get_size( $(this) );
-            ready_imgs[size] = $(this);
-            sizes.push(size);
-        });
+        var ready_imgs = getImages(m_images_ready, m_item.path());    // Map: size => jQuery element
+        for (var key in ready_imgs)
+            sizes.push(parseInt(key, 10));
         var size, img;
         if (sizes.length !== 0)
         {
             size = chooseSize(sizes);
             img = ready_imgs[size];
             //console.log('sizes: '+ sizes + '  size: '+size+'  ready_imgs: '+ready_imgs);
-            assert(img && img.length > 0);
+            assert(img && img.length === 1);
         }
 
         // Request a better image if necessary
         var best_size = chooseSize(IMAGE_SIZES);
-        if (size === undefined || (best_size !== 0 && best_size > size) ||
-                                  (size !== 0 && best_size === 0)) {
+        var is_best_size = !(size === undefined ||
+            (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
+        if (! is_best_size) {
             var already_loading = false;
-            m_loading_div.find('.'+generateId(m_item.path())).each(function() {
-                if (get_size($(this)) === best_size)
+            for (key in getImages(m_images_loading, m_item.path())) {
+                if (parseInt(key, 10) === best_size) {
                     already_loading = true;
-            });
+                    break;
+                }
+            }
             if (!already_loading) {
                 //console.log('load '+best_size);
                 loadImage(m_item.path(), best_size);
@@ -260,6 +331,16 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             img.width(Math.floor(view_width-2*h_margin));
             img.height(Math.floor(img.width()/img_ratio));
         }
+
+        // Make sure the image is not scaled up ... 
+        // ... unless a larger is being downloaded.
+        if (is_best_size) {
+            if (img.width()>img[0].naturalWidth)
+                img.width(img[0].naturalWidth);
+            if (img.height()>img[0].naturalHeight)
+                img.height(img[0].naturalHeight);
+        }
+
         img.css({
             top:Math.floor((view_height-img.outerHeight(true))/2),
             left:Math.floor((view_width-img.outerWidth(true))/2)
@@ -269,23 +350,62 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         img.show();
     };
 
-    // ### FIXME. Currently we force a re-loading of the next photo
-    // This is stupid. We should keep the current AlbumView and update
-    // the status of Exposition. Additionally, we can modify AlbumView to
-    // prefetch previous/next images.
+    /** 
+     * Go to next or previous page. The PhotoView handles the internal navigation instead
+     * of emitting a onLoadPath signal. This is an optimization that makes it possible
+     * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
+     * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
+     * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
+     */
+    var gotoPage = function(offset) {
+        // Preconditions
+        assert(offset === 1 || offset === -1);
+
+        // Change current state
+        var children = m_album.children();
+        m_item_index = m_item_index+offset;
+        m_item = children[m_item_index];
+        if (m_current_img)
+            m_current_img.hide();
+        m_current_img = null;
+
+        // Notify application
+        var path = m_item.path();
+        m_on_page_update.fire(m_item_index, children.length);
+        m_on_path_changed.fire(path);
+        m_is_loaded = false;
+
+        // Load best size
+        var size = chooseSize(IMAGE_SIZES);
+        if (size in getImages(m_images_ready, path)) {
+            m_on_ready.fire();
+            self.updateLayout();
+        } else if (size in getImages(m_images_loading, path)) {
+            // Another loadImage() is in progress.
+            // Wait for image to be loaded. updateLoayout() will be called to display the photo
+        } else {
+            loadImage(path, size);
+        }
+
+        // Prefetch prev/next images
+        prefetchImages(size);
+    };
 
     /** Go to next page */
     self.goToNext = function() {
-        m_on_load_path.fire(m_album.children()[m_item_index+1].path());
+        gotoPage(+1);
     };
 
     /** Go to previous page */
     self.goToPrev = function() {
-        m_on_load_path.fire(m_album.children()[m_item_index-1].path());
+        gotoPage(-1);
     };
 
     /** onLoadPath(path) -> path is a string pointing to the path to load. */
     self.onLoadPath = new ph.barthe.Signal(m_on_load_path);
+
+    /** onPathChanged(path) -> path changed within the view. */
+    self.onPathChanged = new ph.barthe.Signal(m_on_path_changed);
 
     /**
      * onPageUpdate(show, current_page, total_page)
@@ -294,6 +414,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.onPageUpdate = new ph.barthe.Signal(m_on_page_update);
 
+    /** onReady()            -> View is ready to show. */
+    self.onReady = new ph.barthe.Signal(m_on_ready);
 };
 
 // Use strict footer
