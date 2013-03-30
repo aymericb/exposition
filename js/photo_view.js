@@ -46,8 +46,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     // HTML
     var m_main_div = main_div;  // Root view
     var m_current_img;          // Currently displayed IMG element
-    var m_loading_div;          // Contains IMG elements being loaded
-    var m_ready_div;            // Contains IMG elements ready to display
+    var m_images_ready = {};    // Map path->size(str)->IMG element. Fully loaded images.
+    var m_images_loading = {};  // Map path->size(str)->IMG element. Images being loaded.
 
     // Signal emitters
     var m_on_page_update = {};
@@ -67,12 +67,6 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         assert(m_main_div);
         assert(m_item);
         assert(m_item.isPhoto());
-
-        // Create loading and ready divs
-        m_loading_div = $('<div>').attr('id', 'photo-loading').hide();
-        m_ready_div = $('<div>').attr('id', 'photo-ready');
-        m_main_div.append(m_loading_div);
-        m_main_div.append(m_ready_div);
 
         // Load parent album (for photo navigation prev/next)
         var album_path = m_item.path().substring(0, m_item.path().lastIndexOf('/'));
@@ -108,9 +102,30 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
     })();
 
-    var generateId = function(path) {
-        assert(path);
-        return ph.barthe.generateId(path, 'photo');
+    /**
+     * Add image to cache.
+     * @param {obj} cache. Either m_images_ready or m_images_loading
+     * @param {string} path. From Item.path().
+     * @param {int} size. From IMAGE_SIZES.
+     * @param {jQuery el} img
+     */
+    var setImage = function(cache, path, size, img) {
+        if (!cache[path])
+            cache[path] = {};
+        cache[path][size] = img;
+    };
+
+    /**
+     * Get images from cache
+     * @param {obj} cache. Either m_images_ready or m_images_loading
+     * @param {string} path. From Item.path().
+     * @return {obj} Map size(str)->jQuery IMG.
+     */
+    var getImages = function(cache, path) {
+        if (cache[path])
+            return cache[path];
+        else
+            return [];
     };
 
     /**
@@ -157,13 +172,12 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             // make sure all CSS assets are pre-loaded at startup.
             // We should also display a regular div with text, rather than an image.
             img = $('<img>');
-            img.addClass(generateId(path));
+            setImage(m_images_loading, path, size, img);
             img.addClass('error');
             img.attr('src', config.getCautionImageUrl());
-            img.attr('data-size', size);
             img.hide();
             var show_error = function() {
-                m_ready_div.append(img);
+                setImage(m_images_ready, path, size, img);
                 self.updateLayout();
                 if (!m_is_loaded) {
                     m_is_loaded = true;
@@ -174,7 +188,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             img.error(show_error);
         };
         var on_success = function(img) {
-            m_ready_div.append(img);
+            setImage(m_images_ready, path, size, img);
             self.updateLayout();
             if (!m_is_loaded) {
                 m_is_loaded = true;
@@ -182,10 +196,9 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             }
         };
         var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
-        img.addClass(generateId(path));
-        img.attr('data-size', size);
+        setImage(m_images_loading, path, size, img);
         img.hide();
-        m_loading_div.append(img);
+        m_main_div.append(img);
     };
 
     /**
@@ -216,23 +229,11 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     self.updateLayout = function() {
 
-        // Helper function
-        var get_size = function(img) {
-            var size = img.attr('data-size');
-            assert(size);
-            size = parseInt(size, 10);
-            assert(!isNaN(size));
-            return size;
-        };
-
         // Find the best loaded image for the current size of the view
         var sizes = [];         // size array
-        var ready_imgs = {};    // Map: size => jQuery element
-        m_ready_div.find('.'+generateId(m_item.path())).each(function() {
-            var size = get_size( $(this) );
-            ready_imgs[size] = $(this);
-            sizes.push(size);
-        });
+        var ready_imgs = getImages(m_images_ready, m_item.path());    // Map: size => jQuery element
+        for (var key in ready_imgs)
+            sizes.push(parseInt(key, 10));
         var size, img;
         if (sizes.length !== 0)
         {
@@ -248,10 +249,12 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
         if (! is_best_size) {
             var already_loading = false;
-            m_loading_div.find('.'+generateId(m_item.path())).each(function() {
-                if (get_size($(this)) === best_size)
+            for (key in getImages(m_images_loading, m_item.path())) {
+                if (parseInt(key, 10) === best_size) {
                     already_loading = true;
-            });
+                    break;
+                }
+            }
             if (!already_loading) {
                 //console.log('load '+best_size);
                 loadImage(m_item.path(), best_size);
