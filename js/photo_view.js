@@ -167,8 +167,8 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
     var loadImage = function(path, size) {
         // Precondition
-        //assert(!m_images_ready[path]);
-        //assert(!m_images_loading[path]);
+        assert(!(size in getImages(m_images_ready, path)), 'Image '+path+'@'+size+'px is already loaded');
+        assert(!(size in getImages(m_images_loading, path)), 'Image '+path+'@'+size+'px is already being loaded');
 
         var url = config.makeImageUrl(size, path);
         var on_fail = function() {
@@ -373,9 +373,12 @@ ph.barthe.PhotoView = function(config, main_div, item) {
 
         // Load best size
         var size = chooseSize(IMAGE_SIZES);
-        if (m_images_ready[path] && m_images_ready[path][size]) {
+        if (size in getImages(m_images_ready, path)) {
             m_on_ready.fire();
             self.updateLayout();
+        } else if (size in getImages(m_images_loading, path)) {
+            // Another loadImage() is in progress.
+            // Wait for image to be loaded. updateLoayout() will be called to display the photo
         } else {
             loadImage(path, size);
         }
