@@ -97,6 +97,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             }
             m_on_page_update.fire(m_item_index, children.length);
 
+            // Prefetch prev/next images
+            var size = chooseSize(IMAGE_SIZES);
+            prefetchImages(size);
+
             // Postcondition
             assert(m_item_index !== undefined);
         };
@@ -162,7 +166,11 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      * @param size {int}       value from IMAGE_SIZES
      */
     var loadImage = function(path, size) {
-        var url = config.makeImageUrl(size, m_item.path());
+        // Precondition
+        //assert(!m_images_ready[path]);
+        //assert(!m_images_loading[path]);
+
+        var url = config.makeImageUrl(size, path);
         var on_fail = function() {
             console.error('Failed to load image: '+url);
             img.remove();
@@ -180,7 +188,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             var show_error = function() {
                 setImage(m_images_ready, path, size, img);
                 self.updateLayout();
-                if (!m_is_loaded) {
+                if (!m_is_loaded && m_item.path()===path) {
                     m_is_loaded = true;
                     m_on_ready.fire();
                 }
@@ -191,9 +199,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         var on_success = function(img) {
             setImage(m_images_ready, path, size, img);
             self.updateLayout();
-            if (!m_is_loaded) {
+            if (!m_is_loaded && m_item.path()===path) {
                 m_is_loaded = true;
                 m_on_ready.fire();
+                prefetchImages(size);
             }
         };
         var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
@@ -201,6 +210,32 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         img.hide();
         m_main_div.append(img);
     };
+
+    /**
+     * Prefetch the next and previous images at the current size
+     */
+    var prefetchImages = function(size) {
+        // Check if album is loaded
+        if (!m_album)
+            return;
+
+        // Helper function
+        var prefetch = function(index) {
+            var path = children[index].path();
+            if (!m_images_ready[path] && !m_images_loading[path]) {
+                loadImage(path, size);
+            }
+        };
+
+        // Prefetch next/previous image
+        var children = m_album.children();
+        if (m_item_index>0)
+            prefetch(m_item_index-1);
+        if (m_item_index+1<children.length)
+            prefetch(m_item_index+1);
+    };
+
+
 
     /**
      * Load photo into view
@@ -344,6 +379,9 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         } else {
             loadImage(path, size);
         }
+
+        // Prefetch prev/next images
+        prefetchImages(size);
     };
 
     /** Go to next page */
