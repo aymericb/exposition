@@ -111,6 +111,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
     })();
 
+    //
+    // Image Cache (private)
+    //
+
     /**
      * Add image to cache.
      * @param {obj} cache. Either m_images_ready or m_images_loading
@@ -158,6 +162,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         else
             return [];
     };
+
+    //
+    // Image Loading (private)
+    //
 
     /**
      * Choose most appropriate size for image for the current view
@@ -268,6 +276,54 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             prefetch(m_item_index+1);
     };
 
+    //
+    // Event Handling (private)
+    //
+
+    /** 
+     * Go to next or previous page. The PhotoView handles the internal navigation instead
+     * of emitting a onLoadPath signal. This is an optimization that makes it possible
+     * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
+     * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
+     * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
+     */
+    var gotoPage = function(offset) {
+        // Preconditions
+        assert(offset === 1 || offset === -1);
+
+        // Change current state
+        var children = m_album.children();
+        m_item_index = m_item_index+offset;
+        m_item = children[m_item_index];
+        if (m_current_img)
+            m_current_img.hide();
+        m_current_img = null;
+
+        // Notify application
+        var path = m_item.path();
+        m_on_page_update.fire(m_item_index, children.length);
+        m_on_path_changed.fire(path);
+        m_is_loaded = false;
+
+        // Load best size
+        var size = chooseSize(IMAGE_SIZES);
+        if (size in getImages(m_images_ready, path)) {
+            m_on_ready.fire();
+            self.updateLayout();
+        } else if (size in getImages(m_images_loading, path)) {
+            // Another loadImage() is in progress.
+            // Wait for image to be loaded. updateLoayout() will be called to display the photo
+        } else {
+            loadImage(path, size);
+        }
+
+        // Prefetch prev/next images
+        prefetchImages(size);
+    };
+
+    //
+    // Public API
+    //
 
     /**
      * Load photo into view
@@ -378,47 +434,6 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         img.show();
     };
 
-    /** 
-     * Go to next or previous page. The PhotoView handles the internal navigation instead
-     * of emitting a onLoadPath signal. This is an optimization that makes it possible
-     * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
-     * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
-     * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
-     */
-    var gotoPage = function(offset) {
-        // Preconditions
-        assert(offset === 1 || offset === -1);
-
-        // Change current state
-        var children = m_album.children();
-        m_item_index = m_item_index+offset;
-        m_item = children[m_item_index];
-        if (m_current_img)
-            m_current_img.hide();
-        m_current_img = null;
-
-        // Notify application
-        var path = m_item.path();
-        m_on_page_update.fire(m_item_index, children.length);
-        m_on_path_changed.fire(path);
-        m_is_loaded = false;
-
-        // Load best size
-        var size = chooseSize(IMAGE_SIZES);
-        if (size in getImages(m_images_ready, path)) {
-            m_on_ready.fire();
-            self.updateLayout();
-        } else if (size in getImages(m_images_loading, path)) {
-            // Another loadImage() is in progress.
-            // Wait for image to be loaded. updateLoayout() will be called to display the photo
-        } else {
-            loadImage(path, size);
-        }
-
-        // Prefetch prev/next images
-        prefetchImages(size);
-    };
-
     /** Go to next page */
     self.goToNext = function() {
         gotoPage(+1);
@@ -427,6 +442,27 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     /** Go to previous page */
     self.goToPrev = function() {
         gotoPage(-1);
+    };
+
+    /** Keyboard handler */
+    self.onKeydown = function(ev) {
+        // Check if event can be handled
+        assert(ev.which);
+        if (!m_album)
+            return true;
+
+        // Check for left right arrow
+        var KEYCODE_LEFT = 37;
+        var KEYCODE_RIGHT = 39;
+        var KEYCODE_UP = 38;
+        var KEYCODE_ESCAPE = 27;
+        if (ev.which === KEYCODE_LEFT && m_item_index>0) {
+            gotoPage(-1);
+        } else if (ev.which === KEYCODE_RIGHT && m_item_index+1<m_album.children().length) {
+            gotoPage(+1);
+        } else if ((ev.which === KEYCODE_UP || ev.which === KEYCODE_ESCAPE) && m_album) {
+            m_on_load_path.fire(m_album.path());
+        }
     };
 
     /** onLoadPath(path) -> path is a string pointing to the path to load. */

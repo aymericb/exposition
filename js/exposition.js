@@ -207,6 +207,12 @@ ph.barthe.Exposition = function(divs) {
         }
     };
 
+    /** Global keyboard events */
+    var onKeydown = function(ev) {
+        if (m_view)
+            return m_view.onKeydown(ev);
+    };
+
     /** Event handler for m_divs.page_handler_left */
     var onGoToPrev = function() {
         m_view.goToPrev();
@@ -245,6 +251,9 @@ ph.barthe.Exposition = function(divs) {
             if (path && typeof path === 'string' && path.length>0);
                 loadPath(path, false);
         });
+
+        // Initialize key shortcuts handler
+        $(document).keydown(onKeydown);
 
         // Initialize view
         loadPath(m_path);

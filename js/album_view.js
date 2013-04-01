@@ -439,6 +439,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         setCurrentPage(m_current_page_index-1);
     };
 
+    /** Keyboard handler */
+    self.onKeydown = function(ev) {
+        assert(ev.which);
+    };
+
     /** onLoadPath(path)    -> path {string} the path to load. */
     self.onLoadPath = new ph.barthe.Signal(m_on_load_path);
 
