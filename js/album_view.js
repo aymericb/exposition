@@ -53,12 +53,12 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     // Data Model
     var m_album_to_photo = ph.barthe.AlbumViewCache.album_to_photo;
     var m_item = item;              // Root item of the album
+    var m_children = [];            // Array. idx => {photo_path: 'str', div: 'jQuery obj', item: 'ph.barthe.Item'}
+        // CAUTION: m_item.children() may have holes but not m_children. In that case indices do not match.
+    var m_selected_index = null;    // Int. Index (of m_children) of currently selected item. Null if none.
 
     // HTML
     var m_main_div = main_div;      // Root view
-    var m_children = [];            // Array. Child idx => {photo_path: 'str', div: 'jQuery obj'}
-        // CAUTION: m_children may have holes, has not all childrens may have photos
-    var m_children_count = 0;       // Real number of children (excluding holes)
     var m_loading_div;              // Hidden div used temporarily to load assets
 
     // Page Handling
@@ -92,7 +92,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
         // Fill children elements with the following properties
         // - photo-path: path to a random sub-photo in the album (or sub album)
-        // - id:         HTML id computed based on album path (not photo)
+        // - div:        HTML div of class 'thumbnail'
+        // - item:       underlying ph.barthe.Item object from m_item.children()
         var children = m_item.children();
         for (var i=0; i<children.length; ++i) {
 
@@ -111,10 +112,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 continue;
 
             // Store information
-            m_children[i] = {
+            m_children.push({
                 photo_path: path,
-                div: $('<div>').addClass('item').hide()
-            };
+                div: $('<div>').addClass('item').hide(),
+                item: children[i]
+            });
         }
     })();
 
@@ -258,6 +260,28 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         m_on_page_update.fire(true, page_index, m_page_count);
     };
 
+    /** 
+     * Change current selection. The previously selected item is automatically un-selected.
+     * @param {int} index of item to select, or null if deselecting the current item.
+     */
+    var selectItem = function(index) {
+        // Deselect current item
+        var div;
+        if (m_selected_index !== null) {
+            div = m_children[m_selected_index].div;
+            assert(div && div.length === 1);
+            div.removeClass('selected');
+        }
+
+        // Select new current item
+        m_selected_index = index;
+        if (m_selected_index !== null) {
+            div = m_children[m_selected_index].div;
+            assert(div && div.length === 1);
+            div.addClass('selected');
+        }
+    };
+
     //
     // Public API
     //
@@ -279,26 +303,30 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         m_loading_div = $('<div>').attr('id', 'album-loading').hide();
         m_main_div.append(m_loading_div);
 
-        // Click handler
+        // Event handlers
         var on_click = function(item) {
             return function() {
                 m_on_load_path.fire(item.path());
             };
         };
+        var on_mouseenter = function(index) {
+            return function() {
+                selectItem(index);
+            };
+        };
+        var on_mouseleave = function() {
+            return function() {
+                selectItem(null);
+            };
+        };
 
         // Load thumbnails
-        var children = m_item.children();
         for (var i=0; i<m_children.length; ++i) {
-
-            // Skip empty albums
-            if (!m_children[i])
-                continue;
-            m_children_count += 1;
 
             // Read properties
             var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[i].photo_path);
             var div_item = m_children[i].div;
-            var item = m_item.children()[i];
+            var item = m_children[i].item;
             assert(url && div_item && div_item.length === 1 && item);
 
             // Create elements
@@ -312,12 +340,14 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 width: THUMBNAIL_SIZE+'px',
                 height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
             });
-            var div_title = $('<div>').addClass('title').text( children[i].title() ).hide();
+            var div_title = $('<div>').addClass('title').text( item.title() ).hide();
                 // ### FIXME: What if title too large
             //var div_thumbnail = $('<div>').addClass('thumbnail');
             var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title).hide();
             img.addClass('thumbnail');
             img.click(on_click(item));
+            img.mouseenter(on_mouseenter(i));
+            img.mouseleave(on_mouseleave(i));
             div_item.append(img);
             div_item.append(div_title);
             m_loading_div.append(div_item);
@@ -357,9 +387,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         if (COL_COUNT === 0) COL_COUNT = 1;
         var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + THUMBNAIL_MARGIN)/2 );
         var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + THUMBNAIL_MARGIN)/2 );
-        if (COL_COUNT*ROW_COUNT > m_children_count)
+        if (COL_COUNT*ROW_COUNT > m_children.length)
             V_MARGIN = THUMBNAIL_MARGIN;
-        if (COL_COUNT >= m_children_count)
+        if (COL_COUNT >= m_children.length)
             H_MARGIN = THUMBNAIL_MARGIN;
         if (ph.barthe.debug) {
             console.log('Resizing album. Items: '+m_children.length+' COL_COUNT: '+COL_COUNT+' ROW_COUNT: '+ROW_COUNT);

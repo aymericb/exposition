@@ -176,7 +176,7 @@ html, body {
 	border-width: 1px;
 }
 
-.item .thumbnail:hover {
+.item.selected .thumbnail {
 	background-color: rgb(180, 240, 240);
 	/*box-shadow: rgb(240, 240, 240) 0px 0px 10px 0px;*/
 	box-shadow: rgb(180, 255, 255) 0px 0px 10px 0px;
@@ -184,7 +184,7 @@ html, body {
 	cursor: pointer;
 }
 
-.item .thumbnail:hover ~ .title {
+.item.selected .thumbnail ~ .title {
 	background-color: rgb(70, 90, 90);
 	color: white;
 }
