@@ -124,6 +124,28 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         cache[path][size] = img;
     };
 
+    var getCacheSize = function(hash_map) {
+        var count = 0;
+        for (var key in hash_map) {
+            if (hash_map.hasOwnProperty(key)) {
+                count += 1;
+            }
+        }
+        return count;
+    };
+
+    /**
+     * Remove image from m_images_loading cache
+     */
+    var removeLoadingImage = function(path, size) {
+        assert(m_images_loading[path]);
+        assert(m_images_loading[path][size]);
+
+        delete m_images_loading[path][size];               // Remove path+size
+        if (getCacheSize(m_images_loading[path]) === 0)    // Remove path if empty
+            delete m_images_loading[path];
+    };
+
     /**
      * Get images from cache
      * @param {obj} cache. Either m_images_ready or m_images_loading
@@ -177,6 +199,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         var url = config.makeImageUrl(size, path);
         var on_fail = function() {
             console.error('Failed to load image: '+url);
+            removeLoadingImage(path, size);
             img.remove();
 
             // ### TODO. This is a very hacky way to provide
@@ -190,6 +213,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             img.attr('src', config.getCautionImageUrl());
             img.hide();
             var show_error = function() {
+                removeLoadingImage(path, size);
                 setImage(m_images_ready, path, size, img);
                 self.updateLayout();
                 if (!m_is_loaded && m_item.path()===path) {
@@ -201,12 +225,13 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             img.error(show_error);
         };
         var on_success = function(img) {
+            removeLoadingImage(path, size);
+            prefetchImages(size);
             setImage(m_images_ready, path, size, img);
             self.updateLayout();
             if (!m_is_loaded && m_item.path()===path) {
                 m_is_loaded = true;
                 m_on_ready.fire();
-                prefetchImages(size);
             }
         };
         var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
@@ -221,6 +246,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     var prefetchImages = function(size) {
         // Check if album is loaded
         if (!m_album)
+            return;
+
+        // Check if no other image is loading
+        if (getCacheSize(m_images_loading) !== 0)
             return;
 
         // Helper function
@@ -238,7 +267,6 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         if (m_item_index+1<children.length)
             prefetch(m_item_index+1);
     };
-
 
 
     /**
