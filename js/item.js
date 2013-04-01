@@ -32,6 +32,12 @@ ph.barthe.Item = function(json) {
     var m_children = [];
 
     // Public methods
+    self.parentPath = function() {
+        var parent_path = self.path().substring(0, self.path().lastIndexOf('/'));
+        if (parent_path === '')
+            parent_path = '/';
+        return parent_path;
+    };
     self.isPhoto = function() {
         return (json.type === 'photo');
     };

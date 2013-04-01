@@ -60,6 +60,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     // HTML
     var m_main_div = main_div;      // Root view
     var m_loading_div;              // Hidden div used temporarily to load assets
+    var m_row_count;                // Number of rows per page
+    var m_col_count;                // Number of columns per page
 
     // Page Handling
     var m_page_count;
@@ -268,6 +270,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         // Deselect current item
         var div;
         if (m_selected_index !== null) {
+            // Remove CSS style
             div = m_children[m_selected_index].div;
             assert(div && div.length === 1);
             div.removeClass('selected');
@@ -276,9 +279,16 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         // Select new current item
         m_selected_index = index;
         if (m_selected_index !== null) {
+            // Add CSS style 
             div = m_children[m_selected_index].div;
             assert(div && div.length === 1);
             div.addClass('selected');
+
+            // Change current page if necessary
+            assert(m_row_count && m_col_count);
+            var page_index = Math.floor(m_selected_index/(m_row_count*m_col_count));
+            if (m_current_page_index !== page_index)
+                setCurrentPage(page_index);
         }
     };
 
@@ -314,6 +324,19 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 selectItem(index);
             };
         };
+        var on_mousemove = function(index) {
+            var m_prev_x;
+            var m_prev_y;
+            return function(ev) {
+                // We need to filter out 'fake' mousemove events which are generated
+                // when keyboard shortcuts are used and the mouse does not move.
+                if (ev.pageX !== m_prev_x || ev.pageY !== m_prev_y) {
+                    m_prev_x = ev.pageX;
+                    m_prev_y = ev.pageY;
+                    selectItem(index);
+                }
+            };
+        };
         var on_mouseleave = function() {
             return function() {
                 selectItem(null);
@@ -347,6 +370,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             img.addClass('thumbnail');
             img.click(on_click(item));
             img.mouseenter(on_mouseenter(i));
+            img.mousemove(on_mousemove(i));
             img.mouseleave(on_mouseleave(i));
             div_item.append(img);
             div_item.append(div_title);
@@ -385,6 +409,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         var ROW_COUNT   = Math.floor( (VIEW_HEIGHT-2*THUMBNAIL_MARGIN)/HEIGHT );
         if (ROW_COUNT === 0) ROW_COUNT = 1;
         if (COL_COUNT === 0) COL_COUNT = 1;
+        m_row_count = ROW_COUNT;
+        m_col_count = COL_COUNT;
         var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + THUMBNAIL_MARGIN)/2 );
         var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + THUMBNAIL_MARGIN)/2 );
         if (COL_COUNT*ROW_COUNT > m_children.length)
@@ -461,6 +487,60 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     /** Keyboard handler */
     self.onKeydown = function(ev) {
         assert(ev.which);
+        assert(m_col_count !== undefined && m_row_count !== undefined);
+
+        // Keycode constants
+        var KEYCODE_LEFT = 37;
+        var KEYCODE_RIGHT = 39;
+        var KEYCODE_UP = 38;
+        var KEYCODE_DOWN = 40;
+        var KEYCODE_ESCAPE = 27;
+        var KEYCODE_ENTER = 13;
+
+        // Handle ESC and ENTER
+        if (ev.which === KEYCODE_ESCAPE) {
+            if (m_selected_index === null) {
+                if (m_item.path() !== '/') {
+                    m_on_load_path.fire(m_item.parentPath());
+                    return false;
+               }
+            } else {
+                selectItem(null);
+                return false;
+            }
+            return true;
+        } else if (ev.which === KEYCODE_ENTER && m_selected_index !== null) {
+            m_on_load_path.fire(m_children[m_selected_index].item.path());
+            return false;
+        }
+
+        // Handle arrows when no selection exists
+        if (m_selected_index === null) {
+            if (ev.which === KEYCODE_LEFT || ev.which === KEYCODE_RIGHT || ev.which === KEYCODE_DOWN || ev.which === KEYCODE_ENTER) {
+                selectItem(m_row_count*m_col_count*m_current_page_index);
+                return false;
+            } else if (ev.which === KEYCODE_UP) {
+                if (m_item.path() !== '/') {
+                    m_on_load_path.fire(m_item.parentPath());
+                }
+            }
+        }
+
+        // Handle arrows when a current selection exists
+        if (ev.which === KEYCODE_LEFT && m_selected_index>0) {
+            selectItem(m_selected_index-1);
+            return false;
+        } else if (ev.which === KEYCODE_RIGHT && m_selected_index+1<m_children.length) {
+            selectItem(m_selected_index+1);
+            return false;
+        } else if (ev.which === KEYCODE_DOWN && m_selected_index+m_col_count<m_children.length) {
+            selectItem(m_selected_index+m_col_count);
+            return false;
+        } else if (ev.which === KEYCODE_UP && m_selected_index-m_col_count>=0) {
+            selectItem(m_selected_index-m_col_count);
+            return false;
+        }
+
     };
 
     /** onLoadPath(path)    -> path {string} the path to load. */

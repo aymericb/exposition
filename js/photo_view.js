@@ -74,9 +74,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         assert(m_item.isPhoto());
 
         // Load parent album (for photo navigation prev/next)
-        var album_path = m_item.path().substring(0, m_item.path().lastIndexOf('/'));
-        if (album_path === '')
-            album_path = '/';
+        var album_path = m_item.parentPath();
         var on_album_error = function(jqXHR, textStatus, error) {
             var msg = 'Cannot load parent album "'+album_path+'"';
             if (textStatus)
