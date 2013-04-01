@@ -56,7 +56,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
     // HTML
     var m_main_div = main_div;      // Root view
-    var m_children = [];            // Array. Child idx => {photo_path: 'str', id: 'str'}
+    var m_children = [];            // Array. Child idx => {photo_path: 'str', div: 'jQuery obj'}
         // CAUTION: m_children may have holes, has not all childrens may have photos
     var m_children_count = 0;       // Real number of children (excluding holes)
     var m_loading_div;              // Hidden div used temporarily to load assets
@@ -113,7 +113,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             // Store information
             m_children[i] = {
                 photo_path: path,
-                id: ph.barthe.generateId(children[i].path(), 'album-thumb')
+                div: $('<div>').addClass('item').hide()
             };
         }
     })();
@@ -297,12 +297,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
             // Read properties
             var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[i].photo_path);
-            var id = m_children[i].id;
+            var div_item = m_children[i].div;
             var item = m_item.children()[i];
-            assert(url && id && item);
+            assert(url && div_item && div_item.length === 1 && item);
 
             // Create elements
-            var div_item = $('<div>').addClass('item').attr('id', id).hide();
             if (item.isAlbum()) {
                 div_item.addClass('album-item');
             } else {
@@ -346,16 +345,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         // Precondition
         assert(m_main_div);
         assert(m_loading_div);
-        assert( (function() {
-            for (var i=0; i<m_children.length; ++i) {
-                if (m_children[i] && $('#'+m_children[i].id).length === 0) {
-                    $('#'+m_children[i].id).show();
-                    console.log("No div for "+m_children[i].id);
-                    return false;   // div element does not exist for child!
-                }
-            }
-            return true;
-        })() );
 
         // Compute sizes
         var VIEW_WIDTH  = m_main_div.width();
@@ -400,8 +389,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 continue;
 
             // Move item
-            var item = $('#'+m_children[i].id);
-            assert(item.length === 1);
+            var item = m_children[i].div;
+            assert(item && item.length === 1);
             item.css( {left:x, top:y} );
             pageElement.append(item);
 

@@ -52,12 +52,6 @@ ph.barthe.assert = function(cond, message) {
     }
 };
 
-/** Generate a suitable HTML id out of a prefix and a UNIX style path */
-ph.barthe.generateId = function(path, prefix) {
-    // ### FIXME: Not safe, names can conflict
-    return prefix+path.replace(/\//g, '-').replace(/[^A-Za-z0-9\-]/g, '_');
-};
-
 /** Check if object is an array */
 // ### FIXME: Use Array.isArray() instead!
 ph.barthe.isArray = function(object) {

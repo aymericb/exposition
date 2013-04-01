@@ -22,7 +22,7 @@ ph.barthe = ph.barthe || {};
  */
 
 ph.barthe.Item = function(json) {
-    
+
     // Redefinitions
     "use strict";
     var self = this;
