@@ -456,10 +456,13 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         var KEYCODE_ESCAPE = 27;
         if (ev.which === KEYCODE_LEFT && m_item_index>0) {
             gotoPage(-1);
+            return false;
         } else if (ev.which === KEYCODE_RIGHT && m_item_index+1<m_album.children().length) {
             gotoPage(+1);
+            return false;
         } else if ((ev.which === KEYCODE_UP || ev.which === KEYCODE_ESCAPE) && m_album) {
             m_on_load_path.fire(m_album.path());
+            return false;
         }
     };
 
