@@ -91,7 +91,8 @@ ph.barthe.Exposition = function(divs) {
      * Calls onFatalError on errors.
      */
     var loadPath = function(path, push_state) {
-        console.log("Loading: "+path);
+        if (ph.barthe.debug)
+            console.log("Loading: "+path);
         m_main_div.empty();
         m_page_handler.hide();
         m_breadcrumb_handler.setPath(path);

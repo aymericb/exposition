@@ -18,7 +18,7 @@ ph.barthe = ph.barthe || {};
 "use strict";
 
 // Debugging
-ph.barthe.debug = true;
+ph.barthe.debug = false;
 
 /**
  * Assert that throws.
