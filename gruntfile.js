@@ -40,6 +40,14 @@ module.exports = function(grunt) {
                 src: 'build/js/<%= pkg.name %>.js',
                 dest: 'build/js/<%= pkg.name %>.min.js'
             }
+        },
+        copy: {
+            build: {
+                files: [
+                    {src: ['php/**'], dest: 'build/'},
+                    {src: ['css/**'], dest: 'build/'}
+                ]
+            }
         }
     });
 
@@ -59,8 +67,9 @@ module.exports = function(grunt) {
     // Load plugins
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task(s).
-    grunt.registerTask('default', ['html', 'concat', 'uglify']);
+    grunt.registerTask('default', ['html', 'concat', 'uglify', 'copy']);
 
 };
