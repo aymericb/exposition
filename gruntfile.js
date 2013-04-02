@@ -1,10 +1,10 @@
 /*global module:false, require:false */
 module.exports = function(grunt) {
 
-    // Project configuration.
+    // Project configuration
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        html: {
+        html: { /* Custom task, see below */
             options: {
                 templateData: {
                     scripts: [
@@ -23,13 +23,10 @@ module.exports = function(grunt) {
         },
         concat: {
             options: {
-                // define a string to put between each file in the concatenated output
                 separator: ';'
             },
             build: {
-                // the files to concatenate
                 src: ['js/*.js'],
-                // the location of the resulting JS file
                 dest: 'build/js/<%= pkg.name %>.js'
             }
         },
@@ -63,9 +60,15 @@ module.exports = function(grunt) {
                     {src: 'htaccess', dest: 'build/.htaccess'}
                 ]
             }
+        },
+        clean: {
+            // Avoid deleting the 'build' directory, which is an SSHFS mount point on my dev machine
+            build: ['build/**', '!build']
         }
     });
 
+    // Custom tasks
+    // Generate HTML from Handlebar template. Dynamically add <script> statements.
     grunt.registerMultiTask('html', 'Generate HTML files based on Handlebar templates.', function() {
         var Handlebars = require('handlebars');
         var options = this.options();
@@ -84,8 +87,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
-    // Default task(s).
+    // Default tasks
     grunt.registerTask('default', ['html', 'concat', 'uglify', 'jshint', 'copy']);
 
 };
