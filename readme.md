@@ -12,7 +12,7 @@ Exposition is a modern HTML 5 photo gallery software for the Web.
 
 Exposition. Copyright (c) 2013 Aymeric Barthe.
 
-The software is covered by the **GNU Affero General Public License version 3**, with an additional restriction that forces a small copyright notice to be preserved in minified javascript code. You are free to distribute and use this software freely, but if modify it, you need to make your changes available with the same license. Check [the license](LICENSE.TXT) for more details.
+The software is covered by the **GNU Affero General Public License version 3**, with an additional restriction that forces a small copyright notice to be preserved in minified javascript code. You are free to distribute and use this software freely, but if modify it, you need to make your changes available with the same license. Check [the license](doc/license.txt) for more details.
 
 ## Download and Installation
 
@@ -47,7 +47,7 @@ The software is covered by the **GNU Affero General Public License version 3**, 
 * Optionally,  you can navigate to **update.html** to force your web server to cache your photos at all configured sizes.
 
 ## Futher Information 
-* [License](LICENSE.TXT)
+* [License](doc/license.txt)
 * Live Demo. **TODO**
-* [Changelog](changelog.md)
+* [Changelog](doc/changelog.md)
 

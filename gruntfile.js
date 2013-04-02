@@ -45,7 +45,9 @@ module.exports = function(grunt) {
             build: {
                 files: [
                     {src: ['php/**'], dest: 'build/'},
-                    {src: ['css/**'], dest: 'build/'}
+                    {src: ['css/**'], dest: 'build/'},
+                    {src: ['doc/**'], dest: 'build/'},
+                    {src: 'readme.md', dest: 'build/'}
                 ]
             }
         }
