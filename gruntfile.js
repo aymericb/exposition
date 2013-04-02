@@ -59,7 +59,8 @@ module.exports = function(grunt) {
                     {src: ['php/**'], dest: 'build/'},
                     {src: ['css/**'], dest: 'build/'},
                     {src: ['doc/**'], dest: 'build/'},
-                    {src: 'readme.md', dest: 'build/'}
+                    {src: 'readme.md', dest: 'build/'},
+                    {src: 'htaccess', dest: 'build/.htaccess'}
                 ]
             }
         }
