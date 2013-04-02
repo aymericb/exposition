@@ -1,3 +1,4 @@
+/*global module:false, require:false */
 module.exports = function(grunt) {
 
     // Project configuration.
@@ -41,6 +42,17 @@ module.exports = function(grunt) {
                 dest: 'build/js/<%= pkg.name %>.min.js'
             }
         },
+        jshint: {
+            files: ['gruntfile.js', 'js/*.js', 'build/*.js', '!*/spin.js'],
+            options: {
+                eqeqeq: true,
+                browser: true,
+                jquery: true,
+                globals: {
+                    console: false
+                }
+            }
+        },
         copy: {
             build: {
                 files: [
@@ -70,8 +82,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
     // Default task(s).
-    grunt.registerTask('default', ['html', 'concat', 'uglify', 'copy']);
+    grunt.registerTask('default', ['html', 'concat', 'uglify', 'jshint', 'copy']);
 
 };
