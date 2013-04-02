@@ -2,3 +2,5 @@
 ._.gitignore
 build
 node_modules
+exposition.sublime-workspace
+exposition.sublime-project
