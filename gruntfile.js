@@ -1,4 +1,4 @@
-/*global module:false, require:false */
+/*global module:false, require:false, process:false */
 module.exports = function(grunt) {
 
     // Project configuration
@@ -76,6 +76,10 @@ module.exports = function(grunt) {
         clean: {
             // Avoid deleting the 'build' directory, which is an SSHFS mount point on my dev machine
             build: ['build/**', '!build']
+        },
+        watch: {
+            files: ['js/*.js', 'php/**/*.php'],
+            tasks: ['default']
         }
     });
 
@@ -119,6 +123,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default tasks
     grunt.registerTask('default', ['html:build', 'jshint', 'copy']);
