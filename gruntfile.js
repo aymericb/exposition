@@ -5,27 +5,34 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         html: { /* Custom task, see below */
-            options: {
-                templateData: {
-                    scripts: [
-                        'js/<%= pkg.name %>.min.js'
-                    ]
-                }
+            build: {
+                options: {
+                    templateData: {
+                        scripts: grunt.file.expand('js/*.js')
+                    }
+                },
+                files: [
+                    {src: ['*.html'], dest: 'build/'}
+                ]
             },
-            index: {
-                src: 'index.html',
-                dest: 'build/index.html'
-            },
-            update: {
-                src: 'update.html',
-                dest: 'build/update.html'
+            release: {
+                options: {
+                    templateData: {
+                        scripts: [
+                            'js/<%= pkg.name %>.min.js'
+                        ]
+                    }
+                },
+                files: [
+                    {src: ['*.html'], dest: 'build/'}
+                ]
             }
         },
         concat: {
             options: {
                 separator: ';'
             },
-            build: {
+            release: {
                 src: ['js/*.js'],
                 dest: 'build/js/<%= pkg.name %>.js'
             }
@@ -34,7 +41,7 @@ module.exports = function(grunt) {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
-            build: {
+            release: {
                 src: 'build/js/<%= pkg.name %>.js',
                 dest: 'build/js/<%= pkg.name %>.min.js'
             }
@@ -53,6 +60,11 @@ module.exports = function(grunt) {
         copy: {
             build: {
                 files: [
+                    {src: ['js/**'], dest: 'build/'}
+                ]
+            },
+            release: {
+                files: [
                     {src: ['php/**'], dest: 'build/'},
                     {src: ['css/**'], dest: 'build/'},
                     {src: ['doc/**'], dest: 'build/'},
@@ -67,18 +79,37 @@ module.exports = function(grunt) {
         }
     });
 
-    // Custom tasks
+    // Custom task
     // Generate HTML from Handlebar template. Dynamically add <script> statements.
+    // Code adapted from grunt-contrib-copy
     grunt.registerMultiTask('html', 'Generate HTML files based on Handlebar templates.', function() {
         var Handlebars = require('handlebars');
+        var path = require('path');
         var options = this.options();
         var templateData = options.templateData || {};
         //grunt.log.writeln(this.target + ': ' + JSON.stringify(this.data));
-        this.files.forEach(function(f) {
-            grunt.log.writeln('Source file "' + f.src + '"');
-            grunt.log.writeln('Dest file "' + f.dest + '"');
-            var template = Handlebars.compile(grunt.file.read(f.src));
-            grunt.file.write(f.dest, template(templateData));
+
+        var unixifyPath = function(filepath) {
+            if (process.platform === 'win32') {
+                return filepath.replace(/\\/g, '/');
+            } else {
+                return filepath;
+            }
+        };
+        this.files.forEach(function(filePair) {
+
+            var isExpandedPair = filePair.orig.expand || false;
+            filePair.src.forEach(function(src) {
+                var dest;
+                if (grunt.util._.endsWith(filePair.dest, '/')) {
+                    dest = (isExpandedPair) ? filePair.dest : unixifyPath(path.join(filePair.dest, src));
+                } else {
+                    dest = filePair.dest;
+                }
+                grunt.log.writeln('Generating: "'+dest+'"');
+                var template = Handlebars.compile(grunt.file.read(src));
+                grunt.file.write(dest, template(templateData));
+            });
         });
     });
 
@@ -90,6 +121,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default tasks
-    grunt.registerTask('default', ['html', 'concat', 'uglify', 'jshint', 'copy']);
+    grunt.registerTask('default', ['html:build', 'jshint', 'copy']);
+    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release']);
 
 };
