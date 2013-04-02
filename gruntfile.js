@@ -19,7 +19,7 @@ module.exports = function(grunt) {
                 options: {
                     templateData: {
                         scripts: [
-                            'js/<%= pkg.name %>.min.js'
+                            'js/<%= pkg.name %>-<%= pkg.version %>.min.js'
                         ]
                     }
                 },
@@ -34,7 +34,7 @@ module.exports = function(grunt) {
             },
             release: {
                 src: ['js/*.js'],
-                dest: 'build/js/<%= pkg.name %>.js'
+                dest: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
         uglify: {
@@ -42,8 +42,8 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             release: {
-                src: 'build/js/<%= pkg.name %>.js',
-                dest: 'build/js/<%= pkg.name %>.min.js'
+                src: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: 'build/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             }
         },
         jshint: {
