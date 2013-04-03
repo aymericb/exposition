@@ -18,7 +18,7 @@ module.exports = function(grunt) {
                 options: {
                     templateData: {
                         scripts: grunt.file.expand('js/*.js'),
-                        stylesheet: 'css/exposition.css'
+                        stylesheet: 'css/exposition-<%= pkg.version %>.css'
                     }
                 },
                 files: [
@@ -71,14 +71,13 @@ module.exports = function(grunt) {
         copy: {
             build: {
                 files: [
-                    {src: ['js/**'], dest: 'build/'},
-                    {src: ['css/*.css'], dest: 'build/'}
+                    {src: ['js/**'], dest: 'build/'}
                 ]
             },
             release: {
                 files: [
                     {src: ['php/**'], dest: 'build/'},
-                    {src: ['css/**'], dest: 'build/'},
+                    {src: ['css/**', '!**/*.less'], dest: 'build/'},
                     {src: ['doc/**'], dest: 'build/'},
                     {src: 'readme.md', dest: 'build/'},
                     {src: 'htaccess', dest: 'build/.htaccess'}
@@ -90,7 +89,7 @@ module.exports = function(grunt) {
             build: ['build/**', '!build', 'release']
         },
         watch: {
-            files: ['js/*.js', 'php/**/*.php'],
+            files: ['js/*.js', 'php/**/*.php', 'css/*.less'],
             tasks: ['default']
         },
         compress: {
@@ -110,7 +109,14 @@ module.exports = function(grunt) {
                     banner: '<%= pkg.copyright_notice %>'
                 },
                 files: [
-                    {src: 'build/css/exposition.css', dest: 'build/css/exposition-<%= pkg.version %>.min.css'}
+                    {src: 'build/css/exposition-<%= pkg.version %>.css', dest: 'build/css/exposition-<%= pkg.version %>.min.css'}
+                ]
+            }
+        },
+        less: {
+            build: {
+                files: [
+                    {src: 'css/exposition.less', dest: 'build/css/exposition-<%= pkg.version %>.css'}
                 ]
             }
         }
@@ -159,9 +165,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
     // Default tasks
-    grunt.registerTask('default', ['html:build', 'jshint', 'copy']);
-    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'cssmin', 'compress']);
+    grunt.registerTask('default', ['html:build', 'jshint', 'less', 'copy']);
+    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'less', 'cssmin', 'compress']);
 
 };
