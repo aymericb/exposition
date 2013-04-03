@@ -1,9 +1,10 @@
 <?php 
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 

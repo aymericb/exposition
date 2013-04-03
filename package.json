@@ -1,0 +1,37 @@
+{
+  "name": "exposition",
+  "version": "0.3.0",
+  "description": "A modern HTML5 photo gallery",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aymericb/exposition.git"
+  },
+  "keywords": [
+    "PHP",
+    "HTML5",
+    "photo",
+    "gallery"
+  ],
+  "author": "Aymeric Barthe",
+  "license": "AGPLv3",
+  "copyright_notice": "/*\n   Exposition <%= pkg.version %>. Copyright (c) 2013 Aymeric Barthe.\n   The Exposition code base is licensed under the GNU Affero General Public \n   License 3 (GNU AGPLv3) with the following additional terms. This copyright\n   notice must be preserved in all source files, including files which are \n   minified or otherwise processed automatically. \n   For further details, see http://exposition.barthe.ph/\n*/\n",
+  "readmeFilename": "readme.md",
+  "gitHead": "38011f0d2a944a02120463580117601143bdc215",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.1.3",
+    "grunt-contrib-uglify": "~0.2.0",
+    "handlebars": "~1.0.10",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-jshint": "~0.3.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-contrib-compress": "~0.4.7",
+    "grunt-contrib-cssmin": "~0.5.0",
+    "grunt-contrib-less": "~0.5.0"
+  }
+}
