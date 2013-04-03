@@ -75,11 +75,22 @@ module.exports = function(grunt) {
         },
         clean: {
             // Avoid deleting the 'build' directory, which is an SSHFS mount point on my dev machine
-            build: ['build/**', '!build']
+            build: ['build/**', '!build', 'release']
         },
         watch: {
             files: ['js/*.js', 'php/**/*.php'],
             tasks: ['default']
+        },
+        compress: {
+            release: {
+                options: {
+                    archive: 'release/<%= pkg.name %>-<%= pkg.version %>.tar.gz',
+                    mode: 'tgz'
+                },
+                files: [
+                    {expand: true, cwd: 'build/', src: ['**'] }
+                ]
+            }
         }
     });
 
@@ -124,9 +135,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
     // Default tasks
     grunt.registerTask('default', ['html:build', 'jshint', 'copy']);
-    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release']);
+    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'compress']);
 
 };
