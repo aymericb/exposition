@@ -17,7 +17,8 @@ module.exports = function(grunt) {
             build: {
                 options: {
                     templateData: {
-                        scripts: grunt.file.expand('js/*.js')
+                        scripts: grunt.file.expand('js/*.js'),
+                        stylesheet: 'css/exposition.css'
                     }
                 },
                 files: [
@@ -27,6 +28,7 @@ module.exports = function(grunt) {
             release: {
                 options: {
                     templateData: {
+                        stylesheet: 'css/exposition-<%= pkg.version %>.min.css',
                         scripts: [
                             'js/<%= pkg.name %>-<%= pkg.version %>.min.js'
                         ]
@@ -69,7 +71,8 @@ module.exports = function(grunt) {
         copy: {
             build: {
                 files: [
-                    {src: ['js/**'], dest: 'build/'}
+                    {src: ['js/**'], dest: 'build/'},
+                    {src: ['css/*.css'], dest: 'build/'}
                 ]
             },
             release: {
@@ -98,6 +101,16 @@ module.exports = function(grunt) {
                 },
                 files: [
                     {expand: true, cwd: 'build/', src: ['**'] }
+                ]
+            }
+        },
+        cssmin: {
+            release: {
+                options: {
+                    banner: '<%= pkg.copyright_notice %>'
+                },
+                files: [
+                    {src: 'build/css/exposition.css', dest: 'build/css/exposition-<%= pkg.version %>.min.css'}
                 ]
             }
         }
@@ -145,9 +158,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 
     // Default tasks
     grunt.registerTask('default', ['html:build', 'jshint', 'copy']);
-    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'compress']);
+    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'cssmin', 'compress']);
 
 };
