@@ -33,9 +33,10 @@ To produce an Exposition package from the source:
 
 5. Run Grunt.
 
-  * `grunt release` produces a production ready tar.gz package. The javascript and CSS are minified.
-  * `grunt` performs an incremental build. Javascript files are not minified. Best for development and debugging.
+  * `grunt release` produces a production ready tar.gz package. The javascript and CSS files are minified.
   * `grunt clean` cleans the *build* directory. Used by *grunt release*.
+  * `grunt` performs an incremental build. Javascript files are not minified. Best for development and debugging.
+  * `grunt copy` copy static assets and PHP files to the server. It's a prerequisite to use the default grunt build on a server.
   * `grunt watch` watches for source files and automatically trigger the default grunt build, when changes are detected.
 
 
