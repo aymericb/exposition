@@ -50,4 +50,5 @@ The software is covered by the **GNU Affero General Public License version 3**, 
 * [License](doc/license.txt)
 * Live Demo. **TODO**
 * [Changelog](doc/changelog.md)
+* [Build from Source](doc/build.md)
 
