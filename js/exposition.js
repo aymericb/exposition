@@ -86,19 +86,24 @@ ph.barthe.Exposition = function(divs) {
 
     /**
      * Load photo or album at path
-     * @param {string} path      The virtual path of the item to display (album or photo)
-     * @param {bool} push_state  Optional. Default true. Whether the state should be
-     * be pushed to the browser history. Typically false when handling popstate event.
+     * @param {string} path           The virtual path of the item to display (album or photo)
+     * @param {bool} push_state       Optional. Default true. Whether the state should be
+     *   be pushed to the browser history. Typically false when handling popstate event.
+     * @param {bool} delayed_loading  Optional. Default true. Whather the showDelayedLoading() is called
      * Calls onFatalError on errors.
      */
-    var loadPath = function(path, push_state) {
+    var loadPath = function(path, push_state, delayed_loading) {
         if (ph.barthe.debug)
             console.log("Loading: "+path);
         m_main_div.empty();
         m_page_handler.hide();
         m_breadcrumb_handler.setPath(path);
-        hideLoading();
-        showDelayedLoading();
+
+        // At startup we avoid showing/hiding the loading spin twice.
+        if (delayed_loading === undefined || delayed_loading === true) {
+            hideLoading();
+            showDelayedLoading();
+        }
 
         var on_error = function(jqXHR, textStatus, error) {
             onFatalError("Cannot navigate to page "+path, error);
@@ -258,7 +263,7 @@ ph.barthe.Exposition = function(divs) {
         $(document).keydown(onKeydown);
 
         // Initialize view
-        loadPath(m_path);
+        loadPath(m_path, true, false);
         $(window).resize(onResize);
     };
 
@@ -286,7 +291,7 @@ ph.barthe.Exposition = function(divs) {
                 onFatalError('Cannot load configuration.', err);
             };
             var on_success = function() {
-                hideLoading();
+                // NOT hideLoading(); Loading is not finished. More in init(). 
                 m_config = config;      // Make sure m_config is undefined, unless fully loaded
                 init();
             };
