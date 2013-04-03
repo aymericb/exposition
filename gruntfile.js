@@ -1,3 +1,11 @@
+//
+// Exposition. Copyright (c) 2013 Aymeric Barthe.
+// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
+// with the following additional terms. This copyright notice must be preserved in all source 
+// files, including files which are minified or otherwise processed automatically.
+// For further details, see http://exposition.barthe.ph/
+//
+
 /*global module:false, require:false, process:false */
 module.exports = function(grunt) {
 
@@ -39,7 +47,7 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '<%= pkg.copyright_notice %>'
             },
             release: {
                 src: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js',

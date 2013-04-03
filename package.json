@@ -18,6 +18,7 @@
   ],
   "author": "Aymeric Barthe",
   "license": "AGPLv3",
+  "copyright_notice": "/*\n   Exposition <%= pkg.version %>. Copyright (c) 2013 Aymeric Barthe.\n   The Exposition code base is licensed under the GNU Affero General Public \n   License 3 (GNU AGPLv3) with the following additional terms. This copyright\n   notice must be preserved in all source files, including files which are \n   minified or otherwise processed automatically. \n   For further details, see http://exposition.barthe.ph/\n*/\n",
   "readmeFilename": "readme.md",
   "gitHead": "38011f0d2a944a02120463580117601143bdc215",
   "devDependencies": {
