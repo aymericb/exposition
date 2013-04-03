@@ -7,6 +7,39 @@
  * For further details, see http://exposition.barthe.ph/
  */
 
+/* Colors */
+@color_main_bg: rgb(32, 32, 32);
+@color_header_bg: rgb(55, 55, 55);
+@color_normal_text: rgb(240, 240, 240);
+@color_image_frame: @color_normal_text;
+@color_link_hover: rgb(100, 255, 255);
+@color_black_shadow: black;
+
+/* Constants */
+@height_header_footer: 60px;
+@height_breadcrumb_text: 18px;
+@height_pagehandler_text: 18px;
+
+/* Common Mixins */
+.overlay-box (@width, @height) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: @width;
+    height: @height;
+    margin-top: -@height/2;
+    margin-left: -@width/2;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.2);    
+}
+
+.default-text (@fontsize: 16px) {
+	color: @color_normal_text;    
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: @fontsize;	
+}
+
 /**
  * Main page
  * Adjust to 100% of visible area.
@@ -26,50 +59,29 @@ html, body {
 
 #error
 {
+    .overlay-box(280px, 100px);
     z-index: 999;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    height: 100px;
-    width: 280px;
-    margin-top: -60px;
-    margin-left: -150px;
     background-color: rgb(180, 30, 30);
-    color: white;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.2);
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 16px;
+
+    .default-text;
     text-align: center;
 }
 
 #loading
 {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    height: 100px;
-    width: 150px;
-    margin-top: -60px;
-    margin-left: -75px;
-	background-color: rgb(55, 55, 55);
+    .overlay-box(150px, 100px);
+	background-color: @color_header_bg;
     color: white;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.2);
-
 }
 #loading p {
     position: absolute;
-    text-align: center;
     left: 0px;
     right: 0px;
     margin: 0px;
     bottom: 16px;
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 16px;
-	color: rgb(240, 240, 240);    
+
+    .default-text;
+    text-align: center;
 }
 
 #loading .spinner {
@@ -79,60 +91,48 @@ html, body {
     bottom: 32px; /*16+16/2*/
 }
 
-#header {
+.header-footer {
 	position: absolute;
-	top: 0px;
 	width: 100%;
-	height: 60px;
-	background-color: rgb(55, 55, 55);
+	height: @height_header_footer;
+	background-color: @color_header_bg;
 	/*box-shadow: inset 0px -5px 5px -5px rgba(0, 0, 0, 0.8);*/
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	border-bottom-color: rgb(65, 65, 65);
+	border-bottom-color: rgb(65, 65, 65);	
 }
-
-#header p {
-	margin-top: 19px;
-	margin-left: 19px;			
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 22px;
-	color: rgb(240, 240, 240);
+#header {
+	.header-footer();
+	top: 0px;
 }
 
 #footer {
-	position: absolute;
 	bottom: 0px;
-	width: 100%;
-	height: 60px;
-	background-color: rgb(55, 55, 55);
-	/*box-shadow: inset 0px 5px 5px -5px rgba(0, 0, 0, 0.8);	*/
-	border-top-style: solid;
-	border-top-width: 1px;
-	border-top-color: rgb(65, 65, 65);			
+	.header-footer();
 }
 
 #main {
 	position: absolute;
 	left: 0px;
 	right: 0px;
-	top: 62px;
-	bottom: 62px;
-	background-color: rgb(32, 32, 32);
-	box-shadow: inset 5px 0px 5px -5px rgba(0, 0, 0, 1), inset -5px 0px 5px -5px rgba(0, 0, 0, 1), inset 0px 6px 5px -5px rgba(0, 0, 0, 1), inset 0px -6px 5px -5px rgba(0, 0, 0, 1);
+	top: @height_header_footer+2;
+	bottom: @height_header_footer+2;
+	background-color: @color_main_bg;
+	box-shadow: inset 5px 0px 5px -5px @color_black_shadow, inset -5px 0px 5px -5px @color_black_shadow, inset 0px 6px 5px -5px @color_black_shadow, inset 0px -6px 5px -5px @color_black_shadow;
 }
 
 /** Photo View */
 .photo {
 	margin: 20px;
-	background-color: rgb(240, 240, 240);			
+	background-color: @color_image_frame;			
 	padding: 4px;
-	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;	
+	box-shadow: @color_black_shadow 0px 0px 4px 0px;	
 	position: absolute;
 }
 
 .photo.error {
 	/*content: url('caution.png');*/
-	background-color: rgb(55, 55, 55);
+	background-color: @color_header_bg;
 	padding: 2%;
 	border-radius: 10px;
 }
@@ -146,28 +146,17 @@ html, body {
 
 .item {
 	position: absolute;
-
-	/* Debugging */
-	/*border-color: red;
-	border-style: solid;
-	border-width: 1px;*/
 }
 
 .item .thumbnail {
 	position: absolute;
 	margin: 0px;
-	background-color: rgb(240, 240, 240);			
+	background-color: @color_image_frame;			
 	padding: 4px;
-	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
-
-	/* Debugging */
-	/*
-	border-color: white;
-	border-style: solid;
-	border-width: 1px;*/
+	box-shadow: @color_black_shadow 0px 0px 4px 0px;
 }
 .item .error {
-	background-color: rgb(55, 55, 55);
+	background-color: @color_header_bg;
 	background-image: url('caution.png');
 	background-repeat: no-repeat;
 	background-position: center center;
@@ -179,7 +168,7 @@ html, body {
 
 .item.selected .thumbnail {
 	background-color: rgb(180, 240, 240);
-	/*box-shadow: rgb(240, 240, 240) 0px 0px 10px 0px;*/
+	/*box-shadow: @color_image_frame 0px 0px 10px 0px;*/
 	box-shadow: rgb(180, 255, 255) 0px 0px 10px 0px;
 	/*opacity: 0.6;*/
 	cursor: pointer;
@@ -188,9 +177,6 @@ html, body {
 .item.selected .thumbnail ~ .title {
 	background-color: rgb(70, 90, 90);
 	color: white;
-}
-
-.item:hover {
 }
 
 .item .title {
@@ -215,7 +201,7 @@ html, body {
 	border-bottom-right-radius: 10px;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
-	box-shadow: rgb(0, 0, 0) 0px 0px 4px 0px;
+	box-shadow: @color_black_shadow 0px 0px 4px 0px;
 
 	/* Debugging */
 	/*border-color: green;
@@ -228,38 +214,38 @@ html, body {
  * Used in album and photo view.
  */
 #page-handler {
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 18px;
-	top: 20px;
-	right: 0px;
-	margin-right: 20px;
 	position: absolute;
+	.default-text(@height_pagehandler_text);
+
+	@margin: ((@height_header_footer)-@height_pagehandler_text)/2;
+	top: @margin;
+	right: 0px;
+	margin-right: @margin;
 }
 #page-handler div {
 	display: inline;
 }
 #page-handler-left:hover, #page-handler-right:hover {
-	color: rgb(100, 255, 255);
+	color: @color_link_hover;
 	font-weight: bolder;
 	cursor: pointer;
 }
 
 /**
- * Breaccrumb section. 
+ * Breadcrumb section. 
  * Contained within #header.
  */
 
 #breadcrumb {
-	margin: 21px;
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 18px;
-	color: rgb(240, 240, 240);
 	display: block;
+	margin: ((@height_header_footer)-@height_breadcrumb_text)/2;
+	.default-text(@height_breadcrumb_text);
 }
 
 #breadcrumb .title {
-	font-size: 22px;
-	margin-top: -2px;
+	@height_increment: 4px;
+	font-size: @height_breadcrumb_text+@height_increment;
+	margin-top: -@height_increment/2;
 }
 
 #breadcrumb .subpath {
@@ -269,7 +255,7 @@ html, body {
 }
 #breadcrumb .subpath:hover {
 	display: inline-block;
-	color: rgb(100, 255, 255);
+	color: @color_link_hover;
 	cursor: pointer;	
 }
 #breadcrumb .separator {
