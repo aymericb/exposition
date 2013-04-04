@@ -27,7 +27,7 @@ ph.barthe.AlbumViewCache = {
  * AlbumView class
  *
  * The album view provides the mechanism for loading an album into the browser view.
- * It is reponsible for creating, loading and displaying the thumnails. It also
+ * It is responsible for creating, loading and displaying the thumbnails. It also
  * dynamically adjusts the layout to fit within the view, and creates as many pages
  * as necessary.
  *
@@ -124,11 +124,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     })();
 
     /**
-     * Load thumnail image asynchronously and center it.
+     * Load thumbnail image asynchronously and center it.
      *
      * This function create an IMG element for url.
      * The image is centered using v_margin (extra height for title) within the parent jQuery element.
-     * The div_title is positionned directly under the thumnail image (v_maring accounts for its height).
+     * The div_title is positioned directly under the thumbnail image (v_maring accounts for its height).
      *
      * Error handling. This function may throw or return an empty jQuery object. However the
      * image loading errors are handled internally.
@@ -300,11 +300,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     /**
      * Load album into view
      *
-     * This method clears album_div, create and layout the photo thumbails for
-     * the current album. This method implictely calls updateLayout().
+     * This method clears album_div, create and layout the photo thumbnails for
+     * the current album. This method implicitly calls updateLayout().
      *
-     * Throws on error. However thumnail image loading errors are handled
-     * interally as non critical errors, and display to the end-user.
+     * Throws on error. However thumbnail image loading errors are handled
+     * internally as non critical errors, and display to the end-user.
      *
      */
     self.load = function() {
@@ -391,7 +391,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
      *
      * This methods should be called whenever the view size changes. It should be called
      * only after the album was loaded with load(). This methods updates the layouts
-     * of the album items the items (and thumnails). It tries to display as many of them
+     * of the album items the items (and thumbnails). It tries to display as many of them
      * as possible, and create pagination if there are too many.
      *
      */

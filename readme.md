@@ -2,7 +2,7 @@
 
 Exposition is a modern HTML 5 photo gallery software for the Web. 
 
-* **Maximize the use of the window** by dynamically adjusting the number of thumbnails of the size of pictures.
+* **Maximize the use of the window** by dynamically adjusting the number of thumbnails and the size of pictures.
 * **Easy deployment**. Rely on common web technologies. Apache with PHP and GD.
 * **No Database**. No SQL. The filesystem is your database. An album is a directory. A photo an an image within.
 * **No complex administration console** to upload and manage photos. Just upload files to the right place to add new photos.
@@ -21,7 +21,7 @@ The software is covered by the **GNU Affero General Public License version 3**, 
 * Upload the Exposition files to your web server.
 * Edit the **php/core/config.php** file, in particular 
   * **PHOTO\_DIR** must point to the directory containing album and photos
-  * **CACHE\_DIR** must point to a writable, cache directory, which will contain the thumnails and photos generated at smaller sizes
+  * **CACHE\_DIR** must point to a writable, cache directory, which will contain the thumbnails and photos generated at smaller sizes
 * Upload albums and photos to **PHOTO\_DIR**
   * Each directory represents an album and each image file represents a photo. 
   * Albums can have sub-albums and/or photos.

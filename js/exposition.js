@@ -22,7 +22,7 @@ ph.barthe = ph.barthe || {};
  * Application Singleton
  *
  * Constructor parameters
- * - divs An object containing all the necesessary divs as properties
+ * - divs An object containing all the necessary divs as properties
  *      - main                  -> main display area
  *      - breadcrumb            -> breadcrumb section
  *      - page_handler          -> display area for page handling ui
@@ -89,7 +89,7 @@ ph.barthe.Exposition = function(divs) {
      * @param {string} path           The virtual path of the item to display (album or photo)
      * @param {bool} push_state       Optional. Default true. Whether the state should be
      *   be pushed to the browser history. Typically false when handling popstate event.
-     * @param {bool} delayed_loading  Optional. Default true. Whather the showDelayedLoading() is called
+     * @param {bool} delayed_loading  Optional. Default true. Whether the showDelayedLoading() is called
      * Calls onFatalError on errors.
      */
     var loadPath = function(path, push_state, delayed_loading) {

@@ -330,7 +330,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      * This method clears m_main_div and load the photo.
      *
      * Throws on error. However the internal image loading errors are handled
-     * interally as non critical errors, and displayed to the end-user.
+     * internally as non critical errors, and displayed to the end-user.
      *
      */
     self.load = function() {
