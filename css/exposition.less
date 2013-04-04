@@ -151,10 +151,24 @@ html, body {
 .item .thumbnail {
 	position: absolute;
 	margin: 0px;
-	background-color: @color_image_frame;			
-	padding: 4px;
+	/*background-color: @color_image_frame;
+	padding: 4px;*/
+	border-style: solid;
+	border-width: 4px;
+	border-color: @color_image_frame;
 	box-shadow: @color_black_shadow 0px 0px 4px 0px;
 }
+.item .album-background {
+	transform: rotate(-5deg);
+	-ms-transform: rotate(-5deg); /* IE 9 */
+	-moz-transform: rotate(-5deg); /* Firefox */
+	-webkit-transform: rotate(-5deg); /* Safari and Chrome */
+	-o-transform: rotate(-5deg); /* Opera */
+	margin-top: -3px;
+	margin-left: -3px;
+	background-color: rgb(100, 100, 100);
+}
+
 .item .error {
 	background-color: @color_header_bg;
 	background-image: url('caution.png');
@@ -167,7 +181,8 @@ html, body {
 }
 
 .item.selected .thumbnail {
-	background-color: rgb(180, 240, 240);
+	border-color: rgb(180, 240, 240);
+	/*background-color: rgb(180, 240, 240);*/
 	/*box-shadow: @color_image_frame 0px 0px 10px 0px;*/
 	box-shadow: rgb(180, 255, 255) 0px 0px 10px 0px;
 	/*opacity: 0.6;*/

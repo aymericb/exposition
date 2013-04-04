@@ -139,7 +139,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
      *
      * Calls setCurrentPage() internally.
      */
-    var loadThumnailImage = function(url, v_margin, parent, div_title) {
+    var loadThumnailImage = function(url, v_margin, parent, div_title, is_album) {
         // Preconditions
         assert(url && typeof url === 'string');
         assert(typeof v_margin === 'number');
@@ -190,6 +190,11 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 });
             }
             div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
+            if (is_album) {
+                var div_album_bg = $('<div>').addClass('thumbnail');
+                div_album_bg.css(el.css(['top', 'left', 'width', 'height']));
+                parent.prepend(div_album_bg.addClass('album-background'));
+            }
         };
         var on_fail = function(img) {
             // Reset spinner
@@ -366,8 +371,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             });
             var div_title = $('<div>').addClass('title').text( item.title() ).hide();
                 // ### FIXME: What if title too large
-            //var div_thumbnail = $('<div>').addClass('thumbnail');
-            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title).hide();
+            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title, item.isAlbum()).hide();
             img.addClass('thumbnail');
             img.click(on_click(item));
             img.mouseenter(on_mouseenter(i));
