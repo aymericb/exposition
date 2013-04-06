@@ -7,7 +7,11 @@
  * For further details, see http://exposition.barthe.ph/
  */
 
-/* Colors */
+
+/* ==========================================================================
+ * Colors
+ * ========================================================================== */
+
 @color_main_bg: rgb(32, 32, 32);
 @color_header_bg: rgb(55, 55, 55);
 @color_normal_text: rgb(240, 240, 240);
@@ -40,11 +44,11 @@
     font-size: @fontsize;	
 }
 
-/**
+/* ==========================================================================
  * Main page
  * Adjust to 100% of visible area.
  * header is on top, footer at the bottom
- */
+ * ========================================================================== */
 html, body {
 	width: 100%;
 	height: 100%;
@@ -137,12 +141,15 @@ html, body {
 	border-radius: 10px;
 }
 
-/** 
- * 'item' is the enclosing DIV used in AlbumView
- * It contains a 'thumbnail' and 'title' div.
- * 'thumbnail' may also be of class 'photo-item' or 'album-item' depending
- * whether the element is sub album or a photo
- */
+/* ==========================================================================
+ * AlbumView
+ *
+ * .item is the enclosing DIV used in AlbumView which contains both .thumbnail 
+ * IMG and .title DIV. A .thumbnail may also be a .photo-item or .album-item
+ * depending on the type. A photo album also has an .album-background DIV to
+ * display album in a different way. There is an .error DIV that is used
+ * when the thumbnail IMG cannot be created.
+ * ========================================================================== */
 
 .item {
 	position: absolute;
@@ -222,10 +229,11 @@ html, body {
 	border-width: 1px;*/
 }
 
-/**
- * Page handler is used to show current, next and previous page control.
- * Used in album and photo view.
- */
+/* ==========================================================================
+ * Page handler
+ * Used to show current, next and previous page control, in AlbumView 
+ * and PhotoView.
+ * ========================================================================== */
 #page-handler {
 	position: absolute;
 	.default-text(@height_pagehandler_text);
@@ -244,10 +252,10 @@ html, body {
 	cursor: pointer;
 }
 
-/**
- * Breadcrumb section. 
+/* ==========================================================================
+ * Breadcrumb. 
  * Contained within #header.
- */
+ * ========================================================================== */
 
 #breadcrumb {
 	display: block;
