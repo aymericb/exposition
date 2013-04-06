@@ -125,22 +125,26 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
     /** 
      * Load thumbnail asynchronously
-     * @param {int} index                    Index representing the data to load from m_children.
-     * @param {function()} on_mouse_click    The event handlers are to be attached to the relevant ..
-     * @param {function()} on_mouse_enter    ... elements, descendant of the returned div
-     * @param {function()} on_mouse_leave    ...
-     * @param {function(ev)} on_mouse_move   ...
+     * @param {int} index     Index representing the data to load from m_children.
+     * @param {obj} events    An event object that contains the event handlers that needs to be
+     *                        attached to the element representing the item. This can be an IMG
+     *                        element if the image loaded properly or a special div or class 'error'
+     *   - events.on_mouse_click   function()
+     *   - events.on_mouse_enter   function()
+     *   - events.on_mouse_leave   function()
+     *   - events.on_mouse_move    function(ev)  ev = jQuery event
      * @return {jQuery obj} The div representing the item whose data is being loaded.
      // ### TODO: Pass parameters as struct obj
      */
-    var loadThumnail = function(index, on_mouse_click, on_mouse_enter, on_mouse_leave, on_mouse_move) {
+    var loadThumnail = function(index, events) {
 
         // Preconditions
         assert(typeof index === 'number');
-        assert(on_mouse_click && typeof on_mouse_click === 'function');
-        assert(on_mouse_enter && typeof on_mouse_enter === 'function');
-        assert(on_mouse_leave && typeof on_mouse_leave === 'function');
-        assert(on_mouse_move  && typeof on_mouse_move === 'function');
+        assert(events);
+        assert('on_mouse_click' in events && typeof events.on_mouse_click === 'function');
+        assert('on_mouse_enter' in events && typeof events.on_mouse_enter === 'function');
+        assert('on_mouse_leave' in events && typeof events.on_mouse_leave === 'function');
+        assert('on_mouse_move' in events  && typeof events.on_mouse_move === 'function');
 
         // Extract data from model
         var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[index].photo_path);
@@ -164,6 +168,15 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
         // Add final img element to DOM
         var add_thumbnail_element = function(el, ratio, natural_width, natural_height) {
+
+            // Add image and text to DOM (required to compute graphics margins)
+            el.addClass('thumbnail');
+            el.click(events.on_mouse_click);
+            el.mouseenter(events.on_mouse_enter);
+            el.mousemove(events.on_mouse_move);
+            el.mouseleave(events.on_mouse_leave);
+            div_item.append(el);
+
             // Compute position
             var v_margin = THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT;
             var h_padding = Math.floor((el.outerWidth()-el.width())/2);
@@ -200,14 +213,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 div_album_bg.css(el.css(['top', 'left', 'width', 'height']));
                 div_item.prepend(div_album_bg.addClass('album-background'));
             }
-
-            // Add image to DOM
-            el.addClass('thumbnail');
-            el.click(on_mouse_click);
-            el.mouseenter(on_mouse_enter);
-            el.mousemove(on_mouse_move);
-            el.mouseleave(on_mouse_leave);
-            div_item.append(el);
         };
 
         // Setup load spinner
@@ -362,12 +367,12 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 m_on_load_path.fire(item.path());
             };
         };
-        var on_mouseenter = function(index) {
+        var on_mouse_enter = function(index) {
             return function() {
                 selectItem(index);
             };
         };
-        var on_mousemove = function(index) {
+        var on_mouse_move = function(index) {
             var m_prev_x;
             var m_prev_y;
             return function(ev) {
@@ -380,7 +385,7 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 }
             };
         };
-        var on_mouseleave = function() {
+        var on_mouse_leave = function() {
             return function() {
                 selectItem(null);
             };
@@ -388,7 +393,12 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
         // Load thumbnails
         for (var i=0; i<m_children.length; ++i) {
-            var div_item = loadThumnail(i, on_click(m_children[i].item), on_mouseenter(i), on_mouseleave(i), on_mousemove(i));
+            var div_item = loadThumnail(i, {
+                on_mouse_click: on_click(m_children[i].item),
+                on_mouse_enter: on_mouse_enter(i),
+                on_mouse_leave: on_mouse_leave(i),
+                on_mouse_move:  on_mouse_move(i)
+            });
             m_loading_div.append(div_item);
         }
 
