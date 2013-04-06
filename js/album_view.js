@@ -123,30 +123,94 @@ ph.barthe.AlbumView = function(config, main_div, item) {
         }
     })();
 
-    /**
-     * Load thumbnail image asynchronously and center it.
-     *
-     * This function create an IMG element for url.
-     * The image is centered using v_margin (extra height for title) within the parent jQuery element.
-     * The div_title is positioned directly under the thumbnail image (v_maring accounts for its height).
-     *
-     * Error handling. This function may throw or return an empty jQuery object. However the
-     * image loading errors are handled internally.
-     *
-     * Design loosely inspired by
-     * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
-     * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
-     *
-     * Calls setCurrentPage() internally.
+    /** 
+     * Load thumbnail asynchronously
+     * @param {int} index                    Index representing the data to load from m_children.
+     * @param {function()} on_mouse_click    The event handlers are to be attached to the relevant ..
+     * @param {function()} on_mouse_enter    ... elements, descendant of the returned div
+     * @param {function()} on_mouse_leave    ...
+     * @param {function(ev)} on_mouse_move   ...
+     * @return {jQuery obj} The div representing the item whose data is being loaded.
+     // ### TODO: Pass parameters as struct obj
      */
-    var loadThumnailImage = function(url, v_margin, parent, div_title, is_album) {
-        // Preconditions
-        assert(url && typeof url === 'string');
-        assert(typeof v_margin === 'number');
-        assert(parent.length === 1);
-        assert(div_title.length === 1);
+    var loadThumnail = function(index, on_mouse_click, on_mouse_enter, on_mouse_leave, on_mouse_move) {
 
-        var spin_timer;
+        // Preconditions
+        assert(typeof index === 'number');
+        assert(on_mouse_click && typeof on_mouse_click === 'function');
+        assert(on_mouse_enter && typeof on_mouse_enter === 'function');
+        assert(on_mouse_leave && typeof on_mouse_leave === 'function');
+        assert(on_mouse_move  && typeof on_mouse_move === 'function');
+
+        // Extract data from model
+        var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[index].photo_path);
+        var div_item = m_children[index].div;
+        var item = m_children[index].item;
+        assert(url && div_item && div_item.length === 1 && item);
+
+        // Setup DOM
+        if (item.isAlbum()) {
+            div_item.addClass('album-item');
+        } else {
+            assert(item.isPhoto());
+            div_item.addClass('photo-item');
+        }
+        div_item.css( {
+            width: THUMBNAIL_SIZE+'px',
+            height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
+        });
+        var div_title = $('<div>').addClass('title').text( item.title() ).hide();
+        div_item.append(div_title);
+
+        // Add final img element to DOM
+        var add_thumbnail_element = function(el, ratio, natural_width, natural_height) {
+            // Compute position
+            var v_margin = THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT;
+            var h_padding = Math.floor((el.outerWidth()-el.width())/2);
+            var v_padding = el.outerHeight()-el.height();
+            var parent_height = div_item.height()-v_margin;
+            var top, height;
+
+            // Center element
+            if (natural_width === undefined || natural_width >= natural_height) {
+                height = Math.floor(div_item.width()/ratio);
+                top = Math.floor( (parent_height-height)/2 );
+                el.css({
+                    top: top,
+                    left: -h_padding,
+                    width: div_item.width(),
+                    height: height
+                });
+            } else {
+                var w = Math.floor(parent_height*ratio);
+                top = 0;
+                height = parent_height;
+                el.css({
+                    top: 0,
+                    left: Math.floor( (div_item.width()-w)/2 )-h_padding,
+                    width: w,
+                    height: parent_height
+                });
+            }
+
+            // Setup title and album background element
+            div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
+            if (item.isAlbum()) {
+                var div_album_bg = $('<div>').addClass('thumbnail');
+                div_album_bg.css(el.css(['top', 'left', 'width', 'height']));
+                div_item.prepend(div_album_bg.addClass('album-background'));
+            }
+
+            // Add image to DOM
+            el.addClass('thumbnail');
+            el.click(on_mouse_click);
+            el.mouseenter(on_mouse_enter);
+            el.mousemove(on_mouse_move);
+            el.mouseleave(on_mouse_leave);
+            div_item.append(el);
+        };
+
+        // Setup load spinner
         var spinner = new ph.barthe.Spinner({
             color:  '#fff',
             lines:  11,
@@ -161,41 +225,17 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 spin_timer = null;
             }
             spinner.stop();
-            parent.hide();
+            //div_item.hide();
             div_title.show();
         };
-        var center_element = function(el, ratio, natural_width, natural_height) {
-            var h_padding = Math.floor((el.outerWidth()-el.width())/2);
-            var v_padding = el.outerHeight()-el.height();
-            var parent_height = parent.height()-v_margin;
-            var top, height;
-            if (natural_width === undefined || natural_width >= natural_height) {
-                height = Math.floor(parent.width()/ratio);
-                top = Math.floor( (parent_height-height)/2 );
-                el.css({
-                    top: top,
-                    left: -h_padding,
-                    width: parent.width(),
-                    height: height
-                });
-            } else {
-                var w = Math.floor(parent_height*ratio);
-                top = 0;
-                height = parent_height;
-                el.css({
-                    top: 0,
-                    left: Math.floor( (parent.width()-w)/2 )-h_padding,
-                    width: w,
-                    height: parent_height
-                });
-            }
-            div_title.css('top', top+height+v_margin-div_title.outerHeight()+v_padding);
-            if (is_album) {
-                var div_album_bg = $('<div>').addClass('thumbnail');
-                div_album_bg.css(el.css(['top', 'left', 'width', 'height']));
-                parent.prepend(div_album_bg.addClass('album-background'));
-            }
+        var start_spinner = function() {
+            div_item.show();
+            div_title.show();
+            spinner.spin(div_item[0]);
         };
+        var spin_timer = setTimeout(start_spinner, 500);
+
+        // Load image asynchronously
         var on_fail = function(img) {
             // Reset spinner
             stop_spinner();
@@ -205,9 +245,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
             // Add error placeholder
             var div_error = $('<div>');
             div_error.addClass('item thumbnail error');
-            parent.append(div_error);
-            center_element(div_error, 1.5);
-            parent.show();
+            div_item.append(div_error);
+            add_thumbnail_element(div_error, 1.5);
+            div_item.show();
             console.error('Failed to download thumbnail: '+url);
         };
         var on_success = function(img) {
@@ -219,22 +259,19 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
                 // Position image
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
-                center_element(img, ratio, img.get(0).naturalWidth, img.get(0).naturalHeight);
+                add_thumbnail_element(img, ratio, img.get(0).naturalWidth, img.get(0).naturalHeight);
 
-                parent.show();
+                div_item.show();
             } catch (err) {
                 if (err && err.message)
                     console.error("Error: "+err.message);
                 on_fail(img);
             }
         };
-        var start_spinner = function() {
-            parent.show();
-            div_title.show();
-            spinner.spin(parent[0]);
-        };
-        spin_timer = setTimeout(start_spinner, 500);
-        return ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
+        ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
+
+        // Return containing div
+        return div_item;
     };
 
     /**
@@ -351,36 +388,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
         // Load thumbnails
         for (var i=0; i<m_children.length; ++i) {
-
-            // Read properties
-            var url = config.makeImageUrl(THUMBNAIL_SIZE, m_children[i].photo_path);
-            var div_item = m_children[i].div;
-            var item = m_children[i].item;
-            assert(url && div_item && div_item.length === 1 && item);
-
-            // Create elements
-            if (item.isAlbum()) {
-                div_item.addClass('album-item');
-            } else {
-                assert(item.isPhoto());
-                div_item.addClass('photo-item');
-            }
-            div_item.css( {
-                width: THUMBNAIL_SIZE+'px',
-                height: (THUMBNAIL_SIZE+THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT)+'px'
-            });
-            var div_title = $('<div>').addClass('title').text( item.title() ).hide();
-                // ### FIXME: What if title too large
-            var img = loadThumnailImage(url, THUMBNAIL_TITLE_MARGIN+THUMBNAIL_TITLE_HEIGHT, div_item, div_title, item.isAlbum()).hide();
-            img.addClass('thumbnail');
-            img.click(on_click(item));
-            img.mouseenter(on_mouseenter(i));
-            img.mousemove(on_mousemove(i));
-            img.mouseleave(on_mouseleave(i));
-            div_item.append(img);
-            div_item.append(div_title);
+            var div_item = loadThumnail(i, on_click(m_children[i].item), on_mouseenter(i), on_mouseleave(i), on_mousemove(i));
             m_loading_div.append(div_item);
-            // ### DEBUG console.log(url);
         }
 
         // Update layout
