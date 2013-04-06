@@ -7,24 +7,29 @@
  * For further details, see http://exposition.barthe.ph/
  */
 
-
 /* ==========================================================================
- * Colors
+ * Common
  * ========================================================================== */
 
+/* Colors */
 @color_main_bg: rgb(32, 32, 32);
 @color_header_bg: rgb(55, 55, 55);
 @color_normal_text: rgb(240, 240, 240);
+@color_thumnail_text: rgb(220, 220, 220);
 @color_image_frame: @color_normal_text;
 @color_link_hover: rgb(100, 255, 255);
 @color_black_shadow: black;
+@color_button_bg: rgb(20, 20, 20);
 
-/* Constants */
+/* Size constants */
 @height_header_footer: 60px;
 @height_breadcrumb_text: 18px;
 @height_pagehandler_text: 18px;
+@height_thumbnail_text: 11px;
+@height_button_text: 18px;
+@height_button_padding: 6px;
 
-/* Common Mixins */
+/* Mixins */
 .overlay-box (@width, @height) {
     position: absolute;
     left: 50%;
@@ -200,19 +205,23 @@ html, body {
 }
 
 .item .title {
-	position: absolute;
-	color: rgb(220, 220, 220);			
+
+	/* Text */
+	color: @color_thumnail_text;			
 	text-align: center;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: @height_thumbnail_text;
+
+	/* Positioning */
+	position: absolute;
 	left: 14px;
 	right: 14px;
 	height: 17px;
 	bottom: 20px;	/* Used only when no image is shown (spinner, error, etc... ) */
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 11px;
-	/*text-shadow: rgb(0, 0, 0) 0px 0px 1px;*/
 	padding-top: 4px;
-	padding-bottom: 0px;
 	padding-top: 4px;	/* Used to center text, increase height by 4px */
+
+	/* Background */
 	background-clip: border-box;
 	background-color: rgb(60, 60, 60);
 	background-image: none;
@@ -222,11 +231,27 @@ html, body {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 	box-shadow: @color_black_shadow 0px 0px 4px 0px;
+}
 
-	/* Debugging */
-	/*border-color: green;
-	border-style: solid;
-	border-width: 1px;*/
+/* ==========================================================================
+ * Toolbar
+ * ========================================================================== */
+#toolbar {
+	position: absolute;
+	@height: @height_button_text+2*@height_button_padding;
+	@margin: ((@height_header_footer)-@height)/2;
+	left: 0px;
+	height: @height;
+	margin-top: @margin;
+	left: @margin;
+}
+.button {
+	background-color: @color_button_bg;
+	.default-text(@height_button_text);	
+	padding: @height_button_padding;
+	border-radius: 4px;
+	font-variant: small-caps;
+	font-weight: bold;
 }
 
 /* ==========================================================================
