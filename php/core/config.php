@@ -23,7 +23,7 @@ class Config
 	const CACHE_DIR = '/nas/unsafe/ExpositionCache';
 	static public function PHOTO_EXTENSIONS() 
 	{
-		return array('jpg', 'jpeg');		// In lowercase.
+		return array('jpg', 'jpeg', 'png');		// In lowercase.
 	}
 	static public function PHOTO_SIZES() 
 	{
