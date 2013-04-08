@@ -99,7 +99,7 @@ module.exports = function(grunt) {
                     mode: 'tgz'
                 },
                 files: [
-                    {expand: true, cwd: 'build/', src: ['**'] }
+                    {expand: true, cwd: 'build/', src: ['**', '.htaccess'] }
                 ]
             }
         },
