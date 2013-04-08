@@ -12,8 +12,8 @@ namespace Barthe\Exposition;
 
 class Config 
 {
-	const VERSION = '0.2 alpha';
-	const INFO = 'Exposition 0.2 alpha. (c) 2013 Aymeric Barthe.';
+	const VERSION = '0.3 beta';
+	const INFO = 'Exposition 0.3 beta. (c) 2013 Aymeric Barthe.';
 
 	const GALLERY_NAME = 'Exposition';
 
