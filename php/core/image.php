@@ -68,6 +68,12 @@ class Image
 	// Create cache asset
 	private function cache($path, $size) {
 
+		// Erase existing file if necessary
+		if (file_exists($this->cachePath)) {
+			if (! unlink($this->cachePath))
+				throw new \Exception("Cannot delete \"$path\" from cache");
+		}
+
 		// Read asset size
 		$image_size = getimagesize($path);
 		if (! $image_size)
