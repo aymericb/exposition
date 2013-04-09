@@ -18,10 +18,65 @@ ph.barthe = ph.barthe || {};
 (function() {
 "use strict";
 
-// Cache shared between all AlbumView instances
-ph.barthe.AlbumViewCache = {
-    album_to_photo: {}     // Map album_path -> photo_path.
+/**
+ * Shared photo cache between all AlbumView instances. 
+ * This is used so that an album using a photo from a sub album, and the sub album itself,
+ * have the same thumbnail in the AlbumView.
+ */
+var PhotoCache = function() {
+    // Private members
+    var self = this;
+    var m_photo_cache = {};               // Map. ph.barthe.item -> {str} path
+
+    // Public API
+    self.getPhotoPath = function(item) {
+        // Precondition
+        ph.barthe.assert(item.isAlbum());
+
+        // Handle empty album case
+        var children = item.children();
+        if (children.length === 0)
+            return '';
+
+        // Handle cached photos
+        var item_key = item.path();
+        if (item_key in m_photo_cache)
+            return m_photo_cache[item_key];
+
+        // Extract items within album which are photos
+        var photos = [];
+        var albums = [];
+        for (var i=0; i<children.length; ++i) {
+            if (children[i].isPhoto())
+                photos.push(children[i]);
+            else
+                albums.push(children[i]);
+        }
+
+        // Get random photo
+        if (photos.length === 0) {
+            // Recurse until we find an album with a photo
+            while (albums.length > 0) {
+                var r1 = Math.floor(Math.random() * albums.length);
+                var recursive_photo_path = self.getPhotoPath(children[r1]);
+                if (recursive_photo_path) {
+                    m_photo_cache[item_key] = recursive_photo_path;
+                    return recursive_photo_path;
+                }
+                albums.splice(r1, 1);
+            }
+            return '';
+        } else {
+            var r2 = Math.floor(Math.random() * photos.length);
+            var photo_path = photos[r2].path();
+            m_photo_cache[item_key] = photo_path;
+            return photo_path;
+        }
+    };
 };
+
+// Global instance
+var g_photo_cache = new PhotoCache();
 
 /**
  * AlbumView class
@@ -52,7 +107,6 @@ ph.barthe.AlbumView = function(config, main_div, item) {
     //
 
     // Data Model
-    var m_album_to_photo = ph.barthe.AlbumViewCache.album_to_photo;
     var m_item = item;              // Root item of the album
     var m_children = [];            // Array. idx => {photo_path: 'str', div: 'jQuery obj', item: 'ph.barthe.Item'}
         // CAUTION: m_item.children() may have holes but not m_children. In that case indices do not match.
@@ -102,13 +156,8 @@ ph.barthe.AlbumView = function(config, main_div, item) {
 
             // Get path to photo element
             var path = children[i].path();
-            if (children[i].isAlbum()) {
-                path = m_album_to_photo[children[i].path()];
-                if (!path) {
-                    path = children[i].getRandomPhotoPath();
-                    m_album_to_photo[children[i].path()] = path;
-                }
-            }
+            if (children[i].isAlbum())
+                path = g_photo_cache.getPhotoPath(children[i]);
 
             // It is possible to get an empty album. Skip it.
             if (!path)
