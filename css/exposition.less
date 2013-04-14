@@ -265,16 +265,44 @@ html, body {
 
 	@margin: ((@height_header_footer)-@height_pagehandler_text)/2;
 	top: @margin;
-	right: 0px;
+	right: 25px;
 	margin-right: @margin;
 }
 #page-handler div {
 	display: inline;
 }
-#page-handler-left:hover, #page-handler-right:hover {
-	color: @color_link_hover;
-	font-weight: bolder;
+.buttons-image(@x, @y) {
+	width: 25px;
+	height: 25px;
+	/* 	Fallback for browsers without SVG. 
+		See http://www.broken-links.com/2010/06/14/using-svg-in-backgrounds-with-png-fallback/
+		Unfortunately, it does not work, probably because of the transparency... The following 
+		should make it sort of work on IE8 and below, because it does not support multiple backgrounds.
+		But it breaks on Android 2.x ... Wont fix.
+	*/
+	background-image: url("buttons.png");
+	background-image: none, url("buttons.svg");
+	background-position: -@x -@y;	
+}
+#page-handler-right {
+	position: absolute;
 	cursor: pointer;
+	top: -2px;
+	right: -30px;
+	.buttons-image(0px, 0px)
+}
+#page-handler-right:hover {
+	.buttons-image(50px, 0px)
+}
+#page-handler-left {
+	position: absolute;
+	cursor: pointer;
+	top: -2px;
+	left: -30px;
+	.buttons-image(25px, 0px)
+}
+#page-handler-left:hover {
+	.buttons-image(75px, 0px)
 }
 
 /* ==========================================================================

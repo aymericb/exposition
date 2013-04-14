@@ -1,0 +1,35 @@
+<?xml version="1.0" standalone="no"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Basic//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-basic.dtd">
+
+<svg id="pic" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 200 200" width="200" height="200">
+
+    <defs>
+        <style type="text/css"><![CDATA[
+            .symbol {
+                stroke: white;
+                stroke-width: 15;
+            }
+            .hover {
+                stroke: rgb(100, 255, 255);
+            }
+        ]]>
+        </style>
+    </defs>
+
+    <symbol id="arrow-page" viewBox="-100 -100 200 200">
+        <path d="M -13 -40 L 33 0 -13 40" fill="none" stroke-linejoin="round" />
+        <circle cx="0" cy="0" r="80" fill="none" />
+    </symbol>
+
+    <!-- <rect x="0" y="0" width="100" height="100" fill="black" /> -->
+
+    <use x="0" y="0" xlink:href="#arrow-page" transform="scale(0.125)" class="symbol" />
+    <use x="-400" y="0" xlink:href="#arrow-page" transform="scale(-0.125, 0.125) " class="symbol"  />
+    <use x="400" y="0" xlink:href="#arrow-page" transform="scale(0.125)" class="symbol hover" />
+    <use x="-800" y="0" xlink:href="#arrow-page" transform="scale(-0.125, 0.125)" class="symbol hover" />
+
+    <text x="0" y="50" fill="red">Exposition</text>
+    <text x="0" y="75" fill="red">(c) A. Barthe</text>
+
+</svg>

@@ -89,7 +89,7 @@ module.exports = function(grunt) {
             build: ['build/**', '!build', 'release']
         },
         watch: {
-            files: ['js/*.js', 'php/**/*.php', 'css/*.less', '*.html'],
+            files: ['js/*.js', 'php/**/*.php', '*.html', 'css/**'],
             tasks: ['default']
         },
         compress: {
