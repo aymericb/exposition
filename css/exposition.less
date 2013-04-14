@@ -26,8 +26,8 @@
 @height_breadcrumb_text: 18px;
 @height_pagehandler_text: 18px;
 @height_thumbnail_text: 11px;
-@height_button_text: 18px;
-@height_button_padding: 6px;
+@height_button_text: 16px;
+@height_button_padding: 8px;
 
 /* Mixins */
 .overlay-box (@width, @height) {
@@ -250,8 +250,13 @@ html, body {
 	.default-text(@height_button_text);	
 	padding: @height_button_padding;
 	border-radius: 4px;
-	font-variant: small-caps;
-	font-weight: bold;
+	//font-variant: small-caps;
+	.default-text(@height_button_text);
+
+	cursor: pointer;
+}
+.button:hover {
+	color: @color_link_hover;
 }
 
 /* ==========================================================================
