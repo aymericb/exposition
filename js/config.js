@@ -119,6 +119,11 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         return arrayUnique(m_json.photo_sizes.concat(m_json.thumnail_sizes));
     };
 
+    // Behaviors
+    self.isDownloadAllowed = function() {
+        return m_json.is_download_allowed && ($.inArray(0, m_json.photo_sizes)>=0);
+    };
+
     //
     // Constructor
     //
@@ -185,6 +190,12 @@ ph.barthe.Config = function(ready_callback, error_callback) {
                     };
                     checkSizeArray('photo_sizes');
                     checkSizeArray('thumnail_sizes');
+
+                    // Check allow_download
+                    if (! ('is_download_allowed' in json))
+                        throw new Error('Missing is_download_allowed attribute in JSON');
+                    if (typeof json.is_download_allowed !== 'boolean')
+                        throw new Error('Attribute is_download_allowed should be a boolean');
 
                     // Finish constructor
                     m_json = json;

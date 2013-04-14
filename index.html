@@ -19,7 +19,8 @@
                 page_handler: $('#page-handler'),
                 page_handler_center: $('#page-handler-center'),
                 page_handler_left: $('#page-handler-left'),
-                page_handler_right: $('#page-handler-right')
+                page_handler_right: $('#page-handler-right'),
+                btn_download: $('#btn-download')
             };
             var expo = new ph.barthe.Exposition(divs);                
         });
@@ -36,7 +37,7 @@
     </div>
     <div id="footer">
         <div id="toolbar">
-            <!--<div class="button">Slideshow</div>-->
+            <div id="btn-download" class="button" style="display:none;">Download</div>
         </div>
         <div id="page-handler" style="display:none">
             <div id="page-handler-left"></div>

@@ -19,7 +19,8 @@ try {
 		'info' => Config::INFO, 
 		'gallery_name' => Config::GALLERY_NAME,
 		'photo_sizes' => Config::PHOTO_SIZES(), 
-		'thumnail_sizes' => Config::THUMBMAIL_SIZES()		
+		'thumnail_sizes' => Config::THUMBMAIL_SIZES(),
+		'is_download_allowed' => Config::IS_DOWNLOAD_ALLOWED
 	);	
 
 	// Send JSON

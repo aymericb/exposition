@@ -37,6 +37,10 @@ class Config
 		// Larger sizes are provided for devices with a pixel ratio larger than 1
 		return array(160, 320 /* retina screen ratio=2*/);
 	}
+
+	// Download is only allowed for albums without sub albums and individual photos
+	// This requires size '0', i.e. native size, to be enabled in PHOTO_SIZES
+	const IS_DOWNLOAD_ALLOWED = TRUE;
 }
 
 ?>
