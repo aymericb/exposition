@@ -55,7 +55,7 @@ class Image
 		// Check if image is really cached
 		$cached = false;
 		if (file_exists($this->cachePath)) {
-			$cacheTime = @fileatime($this->cachePath);
+			$cacheTime = @filemtime($this->cachePath);
 			$cached = $cacheTime && ($cacheTime > $originalTime);
 		}
 
