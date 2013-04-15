@@ -42,6 +42,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     var PAGE_ITEM = 'api/item';
     var PAGE_IMAGE = 'api/image';
     var PAGE_CACHE = 'api/cache';
+    var PAGE_DOWNLOAD = 'api/download';
 
     //
     // Public members
@@ -61,6 +62,10 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
         assert(typeof size === 'number' && size>=0);
         return m_base_url+PAGE_CACHE+'/'+size+path;
+    };
+    self.makeDownloadUrl = function(path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        return m_base_url+PAGE_DOWNLOAD+path;
     };
     self.getCautionImageUrl = function() {
         return m_base_url+'/css/caution.png';

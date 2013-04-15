@@ -170,11 +170,12 @@ ph.barthe.Exposition = function(divs) {
                     }
                     return true;
                 };
-                if (can_download())
+                if (can_download()) {
                     m_divs.btn_download.show();
-                else
+                    m_divs.btn_download.attr('href', m_config.makeDownloadUrl(m_path));
+                } else {
                     m_divs.btn_download.hide();
-                // ### TODO: Implement download
+                }
             } catch(e) {
                 onFatalError("Cannot navigate to page "+path, e);
             }
