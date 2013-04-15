@@ -12,6 +12,7 @@ RewriteEngine on
 # Rewrite rules for RESTFul API for PHP server
 RewriteRule ^api/item/(.*)$ php/ajax/item.php?path=/$1 [L]
 RewriteRule ^api/config$ php/ajax/config.php [L]
+RewriteRule ^api/download/(.*)$ php/ajax/download.php?path=/$1 [L]
 RewriteRule ^api/image/([0-9]+)/(.*)$ php/ajax/image.php?size=$1&path=/$2 [L]
 RewriteRule ^api/cache/([0-9]+)/(.*)$ php/ajax/image.php?cache&size=$1&path=/$2 [L]
 
