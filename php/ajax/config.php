@@ -24,10 +24,11 @@ try {
 	);	
 
 	// Send JSON
-	header('content-type: application/json; charset=utf-8');
+	header('Content-Type: application/json; charset=utf-8');
 	print(json_encode($data));
 
 } catch (\Exception $e) {
+	header_remove('Content-Type');	
 	header('HTTP/1.1 500 Internal Server Error', true);
 	echo('<br><br><b>ERROR: '.$e->getMessage().'</b');
 }

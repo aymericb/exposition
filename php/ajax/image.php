@@ -37,6 +37,7 @@ try {
 		$image->writeImage();
 
 } catch (\Exception $e) {
+	header_remove('Content-Type');	
 	header('HTTP/1.1 500 Internal Server Error', true);
 	echo('<br><br><b>ERROR: '.$e->getMessage().'</b');
 }
