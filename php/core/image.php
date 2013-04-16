@@ -163,7 +163,7 @@ class Image
 			header('Content-Type: image/jpeg', true);
 			header("Content-Length: " . filesize($filepath), true);
 			if (! @readfile($this->getPath()))
-				throw new \Exception("Cannot read image file \"" . $filepath . "\"");
+				throw new \Exception("Cannot read image file \"$filepath\"");
 		}
 	}
 }

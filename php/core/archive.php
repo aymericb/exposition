@@ -30,11 +30,11 @@ class Archive
 		if (!Config::IS_DOWNLOAD_ALLOWED)
 			throw new \Exception('Downloads are not allowed. Edit Config::IS_DOWNLOAD_ALLOWED');
 		if (!Album::isAlbum($item))
-			throw new \Exceptions('Archive not supported because item is not an album: \"'.$item->getPath().'
-				\"');
+			throw new \Exceptions('Archive not supported because item is not an album: "'.$item->getPath().'
+				"');
 		foreach ($item->getChildren() as $subitem) {
 			if (Album::isAlbum($subitem))
-				throw new \Exception('Cannot create archive because the album contains at least one sub-album: \"'.$item->getPath().'\"');
+				throw new \Exception('Cannot create archive because the album contains at least one sub-album: "'.$item->getPath().'"');
 		}
 
 		// Compute archive path
@@ -48,7 +48,7 @@ class Archive
 			foreach ($item->getChildren() as $subitem) {
 				$photoTime = @filemtime(joinPath(Config::PHOTO_DIR, $subitem->getPath()));
 				if (!$photoTime)
-					throw new \Exception('Cannot read timestamp for photo: \"'.$subitem->getPath().'\"');
+					throw new \Exception('Cannot read timestamp for photo: "'.$subitem->getPath().'"');
 				if ($photoTime>$originalTime)
 					$originalTime=$photoTime;
 			}
@@ -76,7 +76,7 @@ class Archive
 		// Create archive
 		$zip = new ZipArchive;
 		if ($zip->open($this->archivePath, ZIPARCHIVE::CREATE|ZIPARCHIVE::OVERWRITE) !== TRUE)
-			throw new \Exception('Cannot create ZIP archive: \"'.$this->archivePath.'\"');
+			throw new \Exception('Cannot create ZIP archive: "'.$this->archivePath.'"');
 
 		// Add photos
 		foreach ($item->getChildren() as $subitem) {
@@ -87,7 +87,7 @@ class Archive
 
 		// Close archive
 		if (!$zip->close())
-			throw new \Exception('Failed to close ZIP archive: \"'.$this->archivePath.'\"');
+			throw new \Exception('Failed to close ZIP archive: "'.$this->archivePath.'"');
 	}
 
 	public function writeArchive() {	
@@ -119,7 +119,7 @@ class Archive
 			header('Content-Type: application/zip, application/octet-stream', true);
 			header("Content-Length: " . filesize($filepath), true);
 			if (! @readfile($filepath))
-				throw new \Exception("Cannot read image file \"" . $filepath . "\"");
+				throw new \Exception("Cannot read image file \"$filepath\"");
 		}
 	}
 }
