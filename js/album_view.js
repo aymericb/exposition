@@ -315,6 +315,9 @@ ph.barthe.AlbumView = function(config, main_div, item) {
                 var ratio = img.get(0).naturalWidth/img.get(0).naturalHeight;
                 add_thumbnail_element(img, ratio, img.get(0).naturalWidth, img.get(0).naturalHeight);
 
+                // Show
+                img.attr('alt', item.title());
+                img.attr('title', item.title());
                 div_item.show();
             } catch (err) {
                 if (err && err.message)
