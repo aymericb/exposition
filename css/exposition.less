@@ -211,6 +211,9 @@ html, body {
 	text-align: center;
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: @height_thumbnail_text;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 
 	/* Positioning */
 	position: absolute;
@@ -218,8 +221,9 @@ html, body {
 	right: 14px;
 	height: 17px;
 	bottom: 20px;	/* Used only when no image is shown (spinner, error, etc... ) */
-	padding-top: 4px;
 	padding-top: 4px;	/* Used to center text, increase height by 4px */
+	padding-left: 6px;
+	padding-right: 6px;
 
 	/* Background */
 	background-clip: border-box;
