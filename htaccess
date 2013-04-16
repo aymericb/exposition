@@ -21,3 +21,20 @@ RewriteRule ^api/cache/([0-9]+)/(.*)$ php/ajax/image.php?cache&size=$1&path=/$2 
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)/?$ ?path=/$1 [L,R]
+
+# Enable GZIP compression for HTML, CSS, SVG and JS files
+# Contrary what the name of the option, it is GZIP and not DEFLATE which is used. The latter is usually broken in browsers.
+<ifmodule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript image/svg+xml
+</ifmodule>
+
+# Add Expire headers for JS and CSS minified releases.
+# We MUST change the filename before release a new version, to be sure it is downloaded
+<ifModule mod_expires.c>
+	<FilesMatch "^exposition\-[0-9]\.[0-9]\.[0-9]\.min\.(css|js)$">
+		ExpiresActive on
+		# A29030400=1 year
+		ExpiresDefault A29030400
+	</FilesMatch>
+</ifmodule>
+
