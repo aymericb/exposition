@@ -214,14 +214,17 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             // A better alternative would be to put this setting in a CSS and
             // make sure all CSS assets are pre-loaded at startup.
             // We should also display a regular div with text, rather than an image.
-            img = $('<img>');
+            img = $('<img>').hide();
+            m_main_div.append(img);
             setImage(m_images_loading, path, size, img);
             img.addClass('error');
             img.attr('src', config.getCautionImageUrl());
-            img.hide();
+            img.attr('alt', path);
+            img.attr('title', 'Image '+path+' failed to load');
             var show_error = function() {
-                removeLoadingImage(path, size);
+                //removeLoadingImage(path, size);
                 setImage(m_images_ready, path, size, img);
+                console.log('path: '+path+'    size: '+size+'    img:'+img);
                 self.updateLayout();
                 if (!m_is_loaded && m_item.path()===path) {
                     m_is_loaded = true;
