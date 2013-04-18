@@ -19,7 +19,7 @@ If you want to acquire the software under a proprietary license more suitable fo
 ## Download and Installation
 
 * Get an Apache web server supporting PHP 5.3 with [GD](http://php.net/manual/en/book.image.php).
-* Download [the latest release](https://github.com/aymericb/exposition/archive/master.zip) of Exposition or clone the **master** branch. 
+* Download [the latest release](http://exposition.barthe.ph/download/exposition-0.3.0.tar.gz) of Exposition.
 * Upload the Exposition files to your web server.
 * Edit the **php/core/config.php** file, in particular 
   * **PHOTO\_DIR** must point to the directory containing album and photos
@@ -49,6 +49,7 @@ If you want to acquire the software under a proprietary license more suitable fo
 * Optionally,  you can navigate to **update.html** to force your web server to cache your photos at all configured sizes.
 
 ## Futher Information 
+* [Download Exposition 0.3.0](http://exposition.barthe.ph/download/exposition-0.3.0.tar.gz)
 * [License](doc/license.txt)
 * Live Demo. **TODO**
 * [Changelog](doc/changelog.md)

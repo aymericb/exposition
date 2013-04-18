@@ -1,6 +1,9 @@
 # Exposition Change History
 
 ## 0.3 (2013-04-18)
+
+Download [Exposition 0.3.0.tar.gz](http://exposition.barthe.ph/download/exposition-0.3.0.tar.gz)
+
 * New Features
   * Added keyboard shortcuts in AlbumView and PhotoView (arrows, enter, esc)
   * Added different style for album thumnails. It is now possible to distinguish them from photos.
