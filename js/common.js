@@ -165,10 +165,8 @@ console = window.console || {
     info: function() {}
 };
 
-history = window.history || {
-    replaceState: function() {},
-    pushState: function() {}
-};
+if (! ('history' in window))
+    history = window.history || { };
 if (! ('replaceState' in history))
     history.replaceState = function() {};
 if (! ('pushState' in history))
