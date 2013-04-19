@@ -158,13 +158,13 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
 // Internet Explorer compatibility 
 //
 
-console = window.console || {
-    log: function() {},
-    error: function() {},
-    warn: function() {},
-    info: function() {}
-};
-
+if (! ('console' in window))
+    console = window.console || {
+        log: function() {},
+        error: function() {},
+        warn: function() {},
+        info: function() {}
+    };
 if (! ('history' in window))
     history = window.history || { };
 if (! ('replaceState' in history))
