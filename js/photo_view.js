@@ -1,8 +1,9 @@
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -74,9 +75,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         assert(m_item.isPhoto());
 
         // Load parent album (for photo navigation prev/next)
-        var album_path = m_item.path().substring(0, m_item.path().lastIndexOf('/'));
-        if (album_path === '')
-            album_path = '/';
+        var album_path = m_item.parentPath();
         var on_album_error = function(jqXHR, textStatus, error) {
             var msg = 'Cannot load parent album "'+album_path+'"';
             if (textStatus)
@@ -111,6 +110,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
     })();
 
+    //
+    // Image Cache (private)
+    //
+
     /**
      * Add image to cache.
      * @param {obj} cache. Either m_images_ready or m_images_loading
@@ -122,6 +125,28 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         if (!cache[path])
             cache[path] = {};
         cache[path][size] = img;
+    };
+
+    var getCacheSize = function(hash_map) {
+        var count = 0;
+        for (var key in hash_map) {
+            if (hash_map.hasOwnProperty(key)) {
+                count += 1;
+            }
+        }
+        return count;
+    };
+
+    /**
+     * Remove image from m_images_loading cache
+     */
+    var removeLoadingImage = function(path, size) {
+        assert(m_images_loading[path]);
+        assert(m_images_loading[path][size]);
+
+        delete m_images_loading[path][size];               // Remove path+size
+        if (getCacheSize(m_images_loading[path]) === 0)    // Remove path if empty
+            delete m_images_loading[path];
     };
 
     /**
@@ -136,6 +161,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         else
             return [];
     };
+
+    //
+    // Image Loading (private)
+    //
 
     /**
      * Choose most appropriate size for image for the current view
@@ -177,6 +206,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         var url = config.makeImageUrl(size, path);
         var on_fail = function() {
             console.error('Failed to load image: '+url);
+            removeLoadingImage(path, size);
             img.remove();
 
             // ### TODO. This is a very hacky way to provide
@@ -184,13 +214,17 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             // A better alternative would be to put this setting in a CSS and
             // make sure all CSS assets are pre-loaded at startup.
             // We should also display a regular div with text, rather than an image.
-            img = $('<img>');
+            img = $('<img>').hide();
+            m_main_div.append(img);
             setImage(m_images_loading, path, size, img);
             img.addClass('error');
             img.attr('src', config.getCautionImageUrl());
-            img.hide();
+            img.attr('alt', path);
+            img.attr('title', 'Image '+path+' failed to load');
             var show_error = function() {
+                //removeLoadingImage(path, size);
                 setImage(m_images_ready, path, size, img);
+                console.log('path: '+path+'    size: '+size+'    img:'+img);
                 self.updateLayout();
                 if (!m_is_loaded && m_item.path()===path) {
                     m_is_loaded = true;
@@ -201,12 +235,13 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             img.error(show_error);
         };
         var on_success = function(img) {
+            removeLoadingImage(path, size);
+            prefetchImages(size);
             setImage(m_images_ready, path, size, img);
             self.updateLayout();
             if (!m_is_loaded && m_item.path()===path) {
                 m_is_loaded = true;
                 m_on_ready.fire();
-                prefetchImages(size);
             }
         };
         var img = ph.barthe.loadImage(url, on_success, on_fail, m_item.title());
@@ -221,6 +256,10 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     var prefetchImages = function(size) {
         // Check if album is loaded
         if (!m_album)
+            return;
+
+        // Check if no other image is loading
+        if (getCacheSize(m_images_loading) !== 0)
             return;
 
         // Helper function
@@ -239,7 +278,54 @@ ph.barthe.PhotoView = function(config, main_div, item) {
             prefetch(m_item_index+1);
     };
 
+    //
+    // Event Handling (private)
+    //
 
+    /** 
+     * Go to next or previous page. The PhotoView handles the internal navigation instead
+     * of emitting a onLoadPath signal. This is an optimization that makes it possible
+     * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
+     * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
+     * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
+     */
+    var gotoPage = function(offset) {
+        // Preconditions
+        assert(offset === 1 || offset === -1);
+
+        // Change current state
+        var children = m_album.children();
+        m_item_index = m_item_index+offset;
+        m_item = children[m_item_index];
+        if (m_current_img)
+            m_current_img.hide();
+        m_current_img = null;
+
+        // Notify application
+        var path = m_item.path();
+        m_on_page_update.fire(m_item_index, children.length);
+        m_on_path_changed.fire(path);
+        m_is_loaded = false;
+
+        // Load best size
+        var size = chooseSize(IMAGE_SIZES);
+        if (size in getImages(m_images_ready, path)) {
+            m_on_ready.fire();
+            self.updateLayout();
+        } else if (size in getImages(m_images_loading, path)) {
+            // Another loadImage() is in progress.
+            // Wait for image to be loaded. updateLoayout() will be called to display the photo
+        } else {
+            loadImage(path, size);
+        }
+
+        // Prefetch prev/next images
+        prefetchImages(size);
+    };
+
+    //
+    // Public API
+    //
 
     /**
      * Load photo into view
@@ -247,7 +333,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      * This method clears m_main_div and load the photo.
      *
      * Throws on error. However the internal image loading errors are handled
-     * interally as non critical errors, and displayed to the end-user.
+     * internally as non critical errors, and displayed to the end-user.
      *
      */
     self.load = function() {
@@ -350,47 +436,6 @@ ph.barthe.PhotoView = function(config, main_div, item) {
         img.show();
     };
 
-    /** 
-     * Go to next or previous page. The PhotoView handles the internal navigation instead
-     * of emitting a onLoadPath signal. This is an optimization that makes it possible
-     * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
-     * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
-     * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
-     */
-    var gotoPage = function(offset) {
-        // Preconditions
-        assert(offset === 1 || offset === -1);
-
-        // Change current state
-        var children = m_album.children();
-        m_item_index = m_item_index+offset;
-        m_item = children[m_item_index];
-        if (m_current_img)
-            m_current_img.hide();
-        m_current_img = null;
-
-        // Notify application
-        var path = m_item.path();
-        m_on_page_update.fire(m_item_index, children.length);
-        m_on_path_changed.fire(path);
-        m_is_loaded = false;
-
-        // Load best size
-        var size = chooseSize(IMAGE_SIZES);
-        if (size in getImages(m_images_ready, path)) {
-            m_on_ready.fire();
-            self.updateLayout();
-        } else if (size in getImages(m_images_loading, path)) {
-            // Another loadImage() is in progress.
-            // Wait for image to be loaded. updateLoayout() will be called to display the photo
-        } else {
-            loadImage(path, size);
-        }
-
-        // Prefetch prev/next images
-        prefetchImages(size);
-    };
-
     /** Go to next page */
     self.goToNext = function() {
         gotoPage(+1);
@@ -399,6 +444,30 @@ ph.barthe.PhotoView = function(config, main_div, item) {
     /** Go to previous page */
     self.goToPrev = function() {
         gotoPage(-1);
+    };
+
+    /** Keyboard handler */
+    self.onKeydown = function(ev) {
+        // Check if event can be handled
+        assert(ev.which);
+        if (!m_album)
+            return true;
+
+        // Check for left right arrow
+        var KEYCODE_LEFT = 37;
+        var KEYCODE_RIGHT = 39;
+        var KEYCODE_UP = 38;
+        var KEYCODE_ESCAPE = 27;
+        if (ev.which === KEYCODE_LEFT && m_item_index>0) {
+            gotoPage(-1);
+            return false;
+        } else if (ev.which === KEYCODE_RIGHT && m_item_index+1<m_album.children().length) {
+            gotoPage(+1);
+            return false;
+        } else if ((ev.which === KEYCODE_UP || ev.which === KEYCODE_ESCAPE) && m_album) {
+            m_on_load_path.fire(m_album.path());
+            return false;
+        }
     };
 
     /** onLoadPath(path) -> path is a string pointing to the path to load. */

@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <head>
     <title>Exposition Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" type="text/css" href="css/exposition.css">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">    
+    <link rel="stylesheet" type="text/css" href="{{stylesheet}}">
 
-    <!-- ### TODO: Minify code -->
-    <script src="js/common.js"></script>
-    <script src="js/item.js"></script>
-    <script src="js/album_view.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/exposition.js"></script>
-    <script src="js/page_handler.js"></script>
-    <script src="js/photo_view.js"></script>
-    <script src="js/breadcrumb_handler.js"></script>
-    <script src="js/spin.js"></script>
+    <!-- Scripts -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    {{#each scripts}}<script src="{{this}}"></script>
+    {{/each}}
+
+    <!-- Main -->
     <script>
         // Main function
         $(document).ready(function() {
@@ -24,7 +19,8 @@
                 page_handler: $('#page-handler'),
                 page_handler_center: $('#page-handler-center'),
                 page_handler_left: $('#page-handler-left'),
-                page_handler_right: $('#page-handler-right')
+                page_handler_right: $('#page-handler-right'),
+                btn_download: $('#btn-download')
             };
             var expo = new ph.barthe.Exposition(divs);                
         });
@@ -40,10 +36,13 @@
         </noscript>
     </div>
     <div id="footer">
+        <div id="toolbar">
+            <a id="btn-download" class="button" style="display:none;">Download</a>
+        </div>
         <div id="page-handler" style="display:none">
-            <div id="page-handler-left">&larr;</div>
+            <div id="page-handler-left"></div>
             <div id="page-handler-center">Page 1/2</div>
-            <div id="page-handler-right">&rarr;</div>
+            <div id="page-handler-right"></div>
         </div>
     </div>
 </body>

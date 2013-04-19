@@ -1,0 +1,354 @@
+/*
+ * Exposition. Copyright (c) 2013 Aymeric Barthe.
+ * The Exposition code base is licensed under the GNU Affero General Public 
+ * License 3 (GNU AGPL 3) with the following additional terms. This copyright
+ * notice must be preserved in all source files, including files which are 
+ * minified or otherwise processed automatically.
+ * For further details, see http://exposition.barthe.ph/
+ */
+
+/* ==========================================================================
+ * Common
+ * ========================================================================== */
+
+/* Colors */
+@color_main_bg: rgb(32, 32, 32);
+@color_header_bg: rgb(55, 55, 55);
+@color_normal_text: rgb(240, 240, 240);
+@color_thumnail_text: rgb(220, 220, 220);
+@color_image_frame: @color_normal_text;
+@color_link_hover: rgb(100, 255, 255);
+@color_black_shadow: black;
+@color_button_bg: rgb(20, 20, 20);
+
+/* Size constants */
+@height_header_footer: 60px;
+@height_breadcrumb_text: 18px;
+@height_pagehandler_text: 18px;
+@height_thumbnail_text: 11px;
+@height_button_text: 16px;
+@height_button_padding: 8px;
+
+/* Mixins */
+.overlay-box (@width, @height) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: @width;
+    height: @height;
+    margin-top: -@height/2;
+    margin-left: -@width/2;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.2);    
+}
+
+.default-text (@fontsize: 16px) {
+	color: @color_normal_text;    
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: @fontsize;	
+}
+
+/* ==========================================================================
+ * Main page
+ * Adjust to 100% of visible area.
+ * header is on top, footer at the bottom
+ * ========================================================================== */
+html, body {
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	margin: 0px;
+	color: white;
+}
+
+* {
+	-webkit-user-select: none;
+}
+
+#error
+{
+    .overlay-box(280px, 100px);
+    z-index: 999;
+    background-color: rgb(180, 30, 30);
+
+    .default-text;
+    text-align: center;
+}
+
+#loading
+{
+    .overlay-box(150px, 100px);
+	background-color: @color_header_bg;
+    color: white;
+}
+#loading p {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    margin: 0px;
+    bottom: 16px;
+
+    .default-text;
+    text-align: center;
+}
+
+#loading .spinner {
+    left: 0px;
+    right: 0px;
+    margin: 0px;
+    bottom: 32px; /*16+16/2*/
+}
+
+.header-footer {
+	position: absolute;
+	width: 100%;
+	height: @height_header_footer;
+	background-color: @color_header_bg;
+	/*box-shadow: inset 0px -5px 5px -5px rgba(0, 0, 0, 0.8);*/
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: rgb(65, 65, 65);	
+}
+#header {
+	.header-footer();
+	top: 0px;
+}
+
+#footer {
+	bottom: 0px;
+	.header-footer();
+}
+
+#main {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: @height_header_footer+2;
+	bottom: @height_header_footer+2;
+	background-color: @color_main_bg;
+	box-shadow: inset 5px 0px 5px -5px @color_black_shadow, inset -5px 0px 5px -5px @color_black_shadow, inset 0px 6px 5px -5px @color_black_shadow, inset 0px -6px 5px -5px @color_black_shadow;
+}
+
+/** Photo View */
+.photo {
+	margin: 20px;
+	background-color: @color_image_frame;			
+	padding: 4px;
+	box-shadow: @color_black_shadow 0px 0px 4px 0px;	
+	position: absolute;
+}
+
+.photo.error {
+	/*content: url('caution.png');*/
+	background-color: @color_header_bg;
+	padding: 2%;
+	border-radius: 10px;
+}
+
+/* ==========================================================================
+ * AlbumView
+ *
+ * .item is the enclosing DIV used in AlbumView which contains both .thumbnail 
+ * IMG and .title DIV. A .thumbnail may also be a .photo-item or .album-item
+ * depending on the type. A photo album also has an .album-background DIV to
+ * display album in a different way. There is an .error DIV that is used
+ * when the thumbnail IMG cannot be created.
+ * ========================================================================== */
+
+.item {
+	position: absolute;
+}
+
+.item .thumbnail {
+	position: absolute;
+	margin: 0px;
+	/*background-color: @color_image_frame;
+	padding: 4px;*/
+	border-style: solid;
+	border-width: 4px;
+	border-color: @color_image_frame;
+	box-shadow: @color_black_shadow 0px 0px 4px 0px;
+}
+.item .album-background {
+	transform: rotate(-5deg);
+	-ms-transform: rotate(-5deg); /* IE 9 */
+	-moz-transform: rotate(-5deg); /* Firefox */
+	-webkit-transform: rotate(-5deg); /* Safari and Chrome */
+	-o-transform: rotate(-5deg); /* Opera */
+	margin-top: -3px;
+	margin-left: -3px;
+	background-color: rgb(100, 100, 100);
+}
+
+.item .error {
+	background-color: @color_header_bg;
+	background-image: url('caution.png');
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 32px 28px;
+	border-color: rgb(180, 0, 0);
+}
+
+.item.selected .thumbnail {
+	border-color: rgb(180, 240, 240);
+	/*background-color: rgb(180, 240, 240);*/
+	/*box-shadow: @color_image_frame 0px 0px 10px 0px;*/
+	box-shadow: rgb(180, 255, 255) 0px 0px 10px 0px;
+	/*opacity: 0.6;*/
+	cursor: pointer;
+}
+
+.item.selected .title {
+	background-color: rgb(70, 90, 90);
+	color: white;
+}
+
+.item .title {
+
+	/* Text */
+	color: @color_thumnail_text;			
+	text-align: center;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: @height_thumbnail_text;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+
+	/* Positioning */
+	position: absolute;
+	left: 14px;
+	right: 14px;
+	height: 17px;
+	bottom: 20px;	/* Used only when no image is shown (spinner, error, etc... ) */
+	padding-top: 4px;	/* Used to center text, increase height by 4px */
+	padding-left: 6px;
+	padding-right: 6px;
+
+	/* Background */
+	background-clip: border-box;
+	background-color: rgb(60, 60, 60);
+	background-image: none;
+	background-origin: padding-box;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	box-shadow: @color_black_shadow 0px 0px 4px 0px;
+}
+
+/* ==========================================================================
+ * Toolbar
+ * ========================================================================== */
+#toolbar {
+	position: absolute;
+	@height: @height_button_text+2*@height_button_padding;
+	@margin: ((@height_header_footer)-@height)/2;
+	left: 0px;
+	height: @height;
+	margin-top: @margin;
+	left: @margin;
+}
+.button {
+	background-color: @color_button_bg;
+	.default-text(@height_button_text);	
+	padding: @height_button_padding;
+	border-radius: 4px;
+	//font-variant: small-caps;
+	.default-text(@height_button_text);
+	text-decoration: none;
+	cursor: pointer;
+}
+.button:hover {
+	color: @color_link_hover;
+}
+#btn-download {
+	position: absolute;
+}
+
+/* ==========================================================================
+ * Page handler
+ * Used to show current, next and previous page control, in AlbumView 
+ * and PhotoView.
+ * ========================================================================== */
+#page-handler {
+	position: absolute;
+	.default-text(@height_pagehandler_text);
+
+	@margin: ((@height_header_footer)-@height_pagehandler_text)/2;
+	top: @margin;
+	right: 25px;
+	margin-right: @margin;
+}
+#page-handler div {
+	display: inline;
+}
+.buttons-image(@x, @y) {
+	width: 25px;
+	height: 25px;
+	/* 	Fallback for browsers without SVG. 
+		See http://www.broken-links.com/2010/06/14/using-svg-in-backgrounds-with-png-fallback/
+		Unfortunately, it does not work, probably because of the transparency... The following 
+		should make it sort of work on IE8 and below, because it does not support multiple backgrounds.
+		But it breaks on Android 2.x ... Wont fix.
+	*/
+	background-image: url("buttons.png");
+	background-image: none, url("buttons.svg");
+	background-position: -@x -@y;	
+}
+#page-handler-right {
+	position: absolute;
+	cursor: pointer;
+	top: -2px;
+	right: -30px;
+	.buttons-image(0px, 0px)
+}
+#page-handler-right:hover {
+	.buttons-image(50px, 0px)
+}
+#page-handler-left {
+	position: absolute;
+	cursor: pointer;
+	top: -2px;
+	left: -30px;
+	.buttons-image(25px, 0px)
+}
+#page-handler-left:hover {
+	.buttons-image(75px, 0px)
+}
+
+/* ==========================================================================
+ * Breadcrumb. 
+ * Contained within #header.
+ * ========================================================================== */
+
+#breadcrumb {
+	display: block;
+	margin: ((@height_header_footer)-@height_breadcrumb_text)/2;
+	.default-text(@height_breadcrumb_text);
+}
+
+#breadcrumb .title {
+	@height_increment: 4px;
+	font-size: @height_breadcrumb_text+@height_increment;
+	margin-top: -@height_increment/2;
+}
+
+#breadcrumb .subpath {
+	display: inline-block;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+#breadcrumb .subpath:hover {
+	display: inline-block;
+	color: @color_link_hover;
+	cursor: pointer;
+}
+#breadcrumb .separator {
+	display: inline-block;
+}
+#breadcrumb .separator:before {
+	display: inline-block;
+	content: "/";
+	color: rgb(180, 180, 180);	
+}

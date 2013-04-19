@@ -1,8 +1,9 @@
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -18,7 +19,7 @@ ph.barthe = ph.barthe || {};
 "use strict";
 
 // Debugging
-ph.barthe.debug = true;
+ph.barthe.debug = false;
 
 /**
  * Assert that throws.
@@ -50,12 +51,6 @@ ph.barthe.assert = function(cond, message) {
         else
             throw new Error(str_msg);
     }
-};
-
-/** Generate a suitable HTML id out of a prefix and a UNIX style path */
-ph.barthe.generateId = function(path, prefix) {
-    // ### FIXME: Not safe, names can conflict
-    return prefix+path.replace(/\//g, '-').replace(/[^A-Za-z0-9\-]/g, '_');
 };
 
 /** Check if object is an array */
@@ -163,17 +158,15 @@ ph.barthe.loadImage = function(url, on_success, on_fail, alt_text, user_data) {
 // Internet Explorer compatibility 
 //
 
-console = window.console || {
-    log: function() {},
-    error: function() {},
-    warn: function() {},
-    info: function() {}
-};
-
-history = window.history || {
-    replaceState: function() {},
-    pushState: function() {}
-};
+if (! ('console' in window))
+    console = window.console || {
+        log: function() {},
+        error: function() {},
+        warn: function() {},
+        info: function() {}
+    };
+if (! ('history' in window))
+    history = window.history || { };
 if (! ('replaceState' in history))
     history.replaceState = function() {};
 if (! ('pushState' in history))

@@ -1,8 +1,9 @@
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -21,7 +22,7 @@ ph.barthe = ph.barthe || {};
  * Application Singleton
  *
  * Constructor parameters
- * - divs An object containing all the necesessary divs as properties
+ * - divs An object containing all the necessary divs as properties
  *      - main                  -> main display area
  *      - breadcrumb            -> breadcrumb section
  *      - page_handler          -> display area for page handling ui
@@ -83,28 +84,36 @@ ph.barthe.Exposition = function(divs) {
         error_div.html('<p>Error</p><p>'+_friendly_message+'</p>');
     };
 
-    /**
-     * Load photo or album at path
-     * @param {string} path      The virtual path of the item to display (album or photo)
-     * @param {bool} push_state  Optional. Default true. Whether the state should be
-     * be pushed to the browser history. Typically false when handling popstate event.
-     * Calls onFatalError on errors.
+    /** 
+     * Create a success callback for loadPath().
+     *
+     * The callback is responsible for creating the internal view m_view, updating 
+     * the page handler, breadcrumb and toolbar.
+     *
+     * @param {string} path           The virtual path of the item to display (album or photo)
+     * @param {bool} push_state       Optional. Default true. Whether the state should be
+     *   be pushed to the browser history. Typically false when handling popstate event.
+     * 
+     * @return A callback function({ph.barthe.Item} path)
+     *
+     * Does not throw
      */
-    var loadPath = function(path, push_state) {
-        console.log("Loading: "+path);
-        m_main_div.empty();
-        m_page_handler.hide();
-        m_breadcrumb_handler.setPath(path);
-        hideLoading();
-        showDelayedLoading();
+    var onPathLoaded = function(path, push_state) {
+        // Precondition
+        assert(path);
 
-        var on_error = function(jqXHR, textStatus, error) {
-            onFatalError("Cannot navigate to page "+path, error);
-        };
-        var on_success = function(item) {
+        return function(item) {
+            // Precondition
+            assert(item);
+
+            // Handle internal errors.
             try {
+
+                // Set internal status
                 m_item = item;
                 m_path = path;
+
+                // Update HTML5 History
                 if (push_state === true || push_state === undefined) {
                     if (m_first_push_state) {
                         m_first_push_state = false;
@@ -113,6 +122,8 @@ ph.barthe.Exposition = function(divs) {
                         history.pushState(m_path, m_item.title(), m_path);
                     }
                 }
+
+                // Create view and update page handler
                 if (m_item.isAlbum()) {
                     m_view = new ph.barthe.AlbumView(m_config, m_main_div, m_item);
                     m_view.onPageUpdate.on(function(show, current_page, total_page) {
@@ -139,20 +150,70 @@ ph.barthe.Exposition = function(divs) {
                         history.pushState(m_path, m_item.title(), m_path);
                     });
                 }
+
+                // Connect view callbacks and load item
                 m_view.onLoadPath.on(loadPath); // ### FIXME. See goToNext/goToPrev in PhotoView
                 m_view.onReady.on(hideLoading);
                 m_view.load();
+
+                // Update toolbar
+                var can_download = function() {
+                    if (!m_config.isDownloadAllowed())
+                        return false;
+                    if (item.isPhoto())
+                        return true;
+                    assert(item.isAlbum());
+                    var children = item.children();
+                    for (var i=0; i<children.length; ++i) {
+                        if (children[i].isAlbum())
+                            return false;
+                    }
+                    return true;
+                };
+                if (can_download()) {
+                    m_divs.btn_download.show();
+                    m_divs.btn_download.attr('href', m_config.makeDownloadUrl(m_path));
+                } else {
+                    m_divs.btn_download.hide();
+                }
             } catch(e) {
-                on_error(null, null, e);
+                onFatalError("Cannot navigate to page "+path, e);
             }
         };
-        ph.barthe.Item.Load(m_config, path, on_success, on_error);
+    };
+
+    /**
+     * Load photo or album at path
+     * @param {string} path           The virtual path of the item to display (album or photo)
+     * @param {bool} push_state       Optional. Default true. Whether the state should be
+     *   be pushed to the browser history. Typically false when handling popstate event.
+     * @param {bool} delayed_loading  Optional. Default true. Whether the showDelayedLoading() is called
+     * Calls onFatalError on errors.
+     */
+    var loadPath = function(path, push_state, delayed_loading) {
+        if (ph.barthe.debug)
+            console.log("Loading: "+path);
+        m_main_div.empty();
+        m_page_handler.hide();
+        m_breadcrumb_handler.setPath(path);
+
+        // At startup we avoid showing/hiding the loading spin twice.
+        if (delayed_loading === undefined || delayed_loading === true) {
+            hideLoading();
+            showDelayedLoading();
+        }
+
+        // Trigger async load of the item
+        var on_error = function(jqXHR, textStatus, error) {
+            onFatalError("Cannot navigate to page "+path, error);
+        };
+        ph.barthe.Item.Load(m_config, path, onPathLoaded(path, push_state), on_error);
     };
 
     /** 
      * Show loading box in main view.
      * The loading box is not shown right away, this after some delay, and should
-     * be visible on slowo connections only
+     * be visible on slow connections only
      */
     var showDelayedLoading = function() {
         // Preconditions
@@ -207,6 +268,12 @@ ph.barthe.Exposition = function(divs) {
         }
     };
 
+    /** Global keyboard events */
+    var onKeydown = function(ev) {
+        if (m_view)
+            return m_view.onKeydown(ev);
+    };
+
     /** Event handler for m_divs.page_handler_left */
     var onGoToPrev = function() {
         m_view.goToPrev();
@@ -246,8 +313,11 @@ ph.barthe.Exposition = function(divs) {
                 loadPath(path, false);
         });
 
+        // Initialize key shortcuts handler
+        $(document).keydown(onKeydown);
+
         // Initialize view
-        loadPath(m_path);
+        loadPath(m_path, true, false);
         $(window).resize(onResize);
     };
 
@@ -264,6 +334,7 @@ ph.barthe.Exposition = function(divs) {
             assert(m_divs.page_handler_left && m_divs.page_handler_left.length===1);
             assert(m_divs.page_handler_center && m_divs.page_handler_center.length===1);
             assert(m_divs.page_handler_right && m_divs.page_handler_right.length===1);
+            assert(m_divs.btn_download && m_divs.btn_download.length===1);
 
             // Loading box
             showDelayedLoading();
@@ -275,7 +346,7 @@ ph.barthe.Exposition = function(divs) {
                 onFatalError('Cannot load configuration.', err);
             };
             var on_success = function() {
-                hideLoading();
+                // NOT hideLoading(); Loading is not finished. More in init(). 
                 m_config = config;      // Make sure m_config is undefined, unless fully loaded
                 init();
             };

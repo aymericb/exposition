@@ -1,8 +1,9 @@
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -41,6 +42,7 @@ ph.barthe.Config = function(ready_callback, error_callback) {
     var PAGE_ITEM = 'api/item';
     var PAGE_IMAGE = 'api/image';
     var PAGE_CACHE = 'api/cache';
+    var PAGE_DOWNLOAD = 'api/download';
 
     //
     // Public members
@@ -60,6 +62,10 @@ ph.barthe.Config = function(ready_callback, error_callback) {
         assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
         assert(typeof size === 'number' && size>=0);
         return m_base_url+PAGE_CACHE+'/'+size+path;
+    };
+    self.makeDownloadUrl = function(path) {
+        assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');
+        return m_base_url+PAGE_DOWNLOAD+path;
     };
     self.getCautionImageUrl = function() {
         return m_base_url+'/css/caution.png';
@@ -116,6 +122,11 @@ ph.barthe.Config = function(ready_callback, error_callback) {
             return a;
         };
         return arrayUnique(m_json.photo_sizes.concat(m_json.thumnail_sizes));
+    };
+
+    // Behaviors
+    self.isDownloadAllowed = function() {
+        return m_json.is_download_allowed && ($.inArray(0, m_json.photo_sizes)>=0);
     };
 
     //
@@ -184,6 +195,12 @@ ph.barthe.Config = function(ready_callback, error_callback) {
                     };
                     checkSizeArray('photo_sizes');
                     checkSizeArray('thumnail_sizes');
+
+                    // Check allow_download
+                    if (! ('is_download_allowed' in json))
+                        throw new Error('Missing is_download_allowed attribute in JSON');
+                    if (typeof json.is_download_allowed !== 'boolean')
+                        throw new Error('Attribute is_download_allowed should be a boolean');
 
                     // Finish constructor
                     m_json = json;

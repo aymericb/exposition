@@ -1,9 +1,10 @@
 <?php 
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -54,7 +55,7 @@ class Image
 		// Check if image is really cached
 		$cached = false;
 		if (file_exists($this->cachePath)) {
-			$cacheTime = @fileatime($this->cachePath);
+			$cacheTime = @filemtime($this->cachePath);
 			$cached = $cacheTime && ($cacheTime > $originalTime);
 		}
 
@@ -66,6 +67,12 @@ class Image
 
 	// Create cache asset
 	private function cache($path, $size) {
+
+		// Erase existing file if necessary
+		if (file_exists($this->cachePath)) {
+			if (! unlink($this->cachePath))
+				throw new \Exception("Cannot delete \"$path\" from cache");
+		}
 
 		// Read asset size
 		$image_size = getimagesize($path);
@@ -156,7 +163,7 @@ class Image
 			header('Content-Type: image/jpeg', true);
 			header("Content-Length: " . filesize($filepath), true);
 			if (! @readfile($this->getPath()))
-				throw new \Exception("Cannot read image file \"" . $filepath . "\"");
+				throw new \Exception("Cannot read image file \"$filepath\"");
 		}
 	}
 }

@@ -1,8 +1,9 @@
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -22,7 +23,7 @@ ph.barthe = ph.barthe || {};
  */
 
 ph.barthe.Item = function(json) {
-    
+
     // Redefinitions
     "use strict";
     var self = this;
@@ -32,6 +33,12 @@ ph.barthe.Item = function(json) {
     var m_children = [];
 
     // Public methods
+    self.parentPath = function() {
+        var parent_path = self.path().substring(0, self.path().lastIndexOf('/'));
+        if (parent_path === '')
+            parent_path = '/';
+        return parent_path;
+    };
     self.isPhoto = function() {
         return (json.type === 'photo');
     };
@@ -47,33 +54,6 @@ ph.barthe.Item = function(json) {
     self.children = function() {
         assert(self.isAlbum());
         return m_children;
-    };
-    self.getRandomPhotoPath = function() {
-        assert(self.isAlbum());
-        if (m_children.length === 0)
-            return '';
-        var photos = [];
-        var albums = [];
-        for (var i=0; i<m_children.length; ++i) {
-            if (m_children[i].isPhoto())
-                photos.push(m_children[i]);
-            else
-                albums.push(m_children[i]);
-        }
-        if (photos.length === 0) {
-            // Continue until we find an album with a photo
-            while (albums.length > 0) {
-                var r1 = Math.floor(Math.random() * albums.length);
-                var value = m_children[r1].getRandomPhotoPath();
-                if (value)
-                    return value;
-                albums.splice(r1, 1);
-            }
-            return '';
-        } else {
-            var r2 = Math.floor(Math.random() * photos.length);
-            return photos[r2].path();
-        }
     };
 
     // Constructor: validate data

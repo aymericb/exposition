@@ -1,9 +1,10 @@
 <?php 
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
-// The Exposition codebadase is licensed under the GNU Affero General Public License 3 (GNU AGPL 3)
-// with the following additional terms. This copyright notice must be preserved in all source 
-// files, including files which are minified or otherwise processed automatically.
+// The Exposition code base is licensed under the GNU Affero General Public 
+// License 3 (GNU AGPL 3) with the following additional terms. This copyright
+// notice must be preserved in all source files, including files which are 
+// minified or otherwise processed automatically.
 // For further details, see http://exposition.barthe.ph/
 //
 
@@ -11,8 +12,8 @@ namespace Barthe\Exposition;
 
 class Config 
 {
-	const VERSION = '0.2 alpha';
-	const INFO = 'Exposition 0.2 alpha. (c) 2013 Aymeric Barthe.';
+	const VERSION = '0.3 beta';
+	const INFO = 'Exposition 0.3 beta. (c) 2013 Aymeric Barthe.';
 
 	const GALLERY_NAME = 'Exposition';
 
@@ -22,7 +23,7 @@ class Config
 	const CACHE_DIR = '/nas/unsafe/ExpositionCache';
 	static public function PHOTO_EXTENSIONS() 
 	{
-		return array('jpg', 'jpeg');		// In lowercase.
+		return array('jpg', 'jpeg', 'png');		// In lowercase.
 	}
 	static public function PHOTO_SIZES() 
 	{
@@ -36,6 +37,10 @@ class Config
 		// Larger sizes are provided for devices with a pixel ratio larger than 1
 		return array(160, 320 /* retina screen ratio=2*/);
 	}
+
+	// Download is only allowed for albums without sub albums and individual photos
+	// This requires size '0', i.e. native size, to be enabled in PHOTO_SIZES
+	const IS_DOWNLOAD_ALLOWED = TRUE;
 }
 
 ?>

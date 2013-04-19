@@ -9,35 +9,40 @@
 //
 
 namespace Barthe\Exposition;
+require_once('../core/item.php');
+require_once('../core/photo.php');
 require_once('../core/image.php');
+require_once('../core/archive.php');
 
 try {
 
 	// Get parameters
-	$cacheOnly = isset($_GET['cache']);
-
 	$path = $_GET['path'];
 	if (!isset($path) || !$path || empty($path))
 		throw new \Exception('Missing path parameter');
 
-	$size = $_GET['size'];
-	if (!isset($size))
-		throw new \Exception('Missing size parameter');
-	if ($size === '0') {
-		$size = 0;
+	// Check if download is allowed
+	if (!Config::IS_DOWNLOAD_ALLOWED)
+		throw new \Exception('Download is not allowed');
+
+	// Load item
+	$item = Item::createItem($path);
+	if (!$item)
+		throw new \Exception("Item \"$path\" cannot be not found");
+
+	// Send content
+	if (Photo::isPhoto($item)) {
+		header('Content-Disposition: attachment; filename=' . basename($path), true); 
+		$image = new Image($path, 0);
+		$image->writeImage();		
 	} else {
-		$size = intval($size);
-		if (!$size)
-			throw new \Exception('Invalid size parameter');
+		$archive = new Archive($item);
+		$archive->writeArchive();
 	}
 
-	// Get cached image
-	$image = new Image($path, $size);
-	if (!$cacheOnly)
-		$image->writeImage();
-
 } catch (\Exception $e) {
-	header_remove('Content-Type');	
+	header_remove('Content-Disposition');
+	header_remove('Content-Type');
 	header('HTTP/1.1 500 Internal Server Error', true);
 	echo('<br><br><b>ERROR: '.$e->getMessage().'</b');
 }
