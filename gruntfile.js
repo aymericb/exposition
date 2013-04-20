@@ -17,7 +17,7 @@ module.exports = function(grunt) {
             build: {
                 options: {
                     templateData: {
-                        scripts: grunt.file.expand('js/*.js'),
+                        scripts: grunt.file.expand({cwd: 'build'}, 'js/*.js'),
                         stylesheet: 'css/exposition-<%= pkg.version %>.css'
                     }
                 },
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
                 separator: ';'
             },
             release: {
-                src: ['js/*.js'],
+                src: ['js/*.js', 'build/js/*.js'],
                 dest: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
@@ -71,7 +71,7 @@ module.exports = function(grunt) {
         copy: {
             build: {
                 files: [
-                    {src: ['js/**'], dest: 'build/'}
+                    {src: ['js/*.js'], dest: 'build/'}
                 ]
             },
             release: {
@@ -89,7 +89,7 @@ module.exports = function(grunt) {
             build: ['build/**', '!build', 'release']
         },
         watch: {
-            files: ['js/*.js', 'php/**/*.php', '*.html', 'css/**'],
+            files: ['js/*.js', 'js/*.ts', 'php/**/*.php', '*.html', 'css/**'],
             tasks: ['default']
         },
         compress: {
@@ -118,6 +118,12 @@ module.exports = function(grunt) {
                 files: [
                     {src: 'css/exposition.less', dest: 'build/css/exposition-<%= pkg.version %>.css'}
                 ]
+            }
+        },
+        typescript: {
+            base: {
+                src: ['js/*.ts'],
+                dest: 'build'
             }
         }
     });
@@ -166,9 +172,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-typescript');
 
     // Default tasks
-    grunt.registerTask('default', ['html:build', 'jshint', 'less', 'copy']);
-    grunt.registerTask('release', ['clean', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'less', 'cssmin', 'compress']);
+    grunt.registerTask('default', ['typescript', 'jshint', 'less', 'copy', 'html:build']);
+    grunt.registerTask('release', ['clean', 'typescript', 'html:release', 'concat', 'uglify', 'jshint', 'copy:release', 'less', 'cssmin', 'compress']);
 
 };
