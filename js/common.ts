@@ -71,42 +71,44 @@ module Exposition {
      * public 'on' and 'off' methods.
      *
      */
-    export var Signal = function(emitter) {
+    export class Signal {
         // Private
-        var self = this;
-        var m_list = [];
+        private list = [];
 
         /** Add listener */
-        self.on = function(listener) {
-            assert(m_list.indexOf(listener) === -1);
+        on(listener) {
+            assert(this.list.indexOf(listener) === -1);
             assert(typeof listener === 'function');
-            m_list.push(listener);
+            this.list.push(listener);
         };
 
         /** Remove listener */
-        self.off = function(listener) {
+        off(listener) {
             assert(typeof listener === 'function');
-            var index = m_list.indexOf(listener);
+            var index = this.list.indexOf(listener);
             assert(index !== -1);
-            m_list.splice(index, 1);
+            this.list.splice(index, 1);
         };
 
         /**
          * Fire the signal. It is possible to provide optional arguments to pass to the
          * listener functions, using the regular function syntax.
          */
-        emitter.fire = function() {
-            for (var i=0; i<m_list.length; ++i) {
-                assert(arguments.length<=m_list[i].length);
-                m_list[i].apply(/*this object*/null , arguments);
-            }
-        };
+        constructor(emitter) {
+            var list = this.list;
+            emitter.fire = function() {
+                for (var i=0; i<list.length; ++i) {
+                    assert(arguments.length<=list[i].length);
+                    list[i].apply(/*this object*/null , arguments);
+                }
+            };
+        }
     };
 
     /**
      * Load image asynchronously
      *
-     * Creates an IMG element for the givern URL and returns it (as a JQuery element).
+     * Creates an IMG element for the given URL and returns it (as a JQuery element).
      *
      * Error handling. The function may throw or return an empty jQuery object. However the
      * image loading callback does not throw, and call the on_fail handler instead. On success
