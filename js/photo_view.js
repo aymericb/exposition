@@ -173,7 +173,7 @@ ph.barthe.PhotoView = function(config, main_div, item) {
      */
      var chooseSize = function(sizes) {
         // Precondition
-        assert(ph.barthe.isArray(sizes) && sizes.length>0);
+        assert(Array.isArray(sizes) && sizes.length>0);
 
         // Get the size one step larger than view_size
         var view_size = Math.max(m_main_div.innerWidth(), m_main_div.innerHeight());

@@ -51,14 +51,6 @@ module Exposition {
         }
     };
 
-    /** Check if object is an array */
-    // ### FIXME: Use Array.isArray() instead!
-    export var isArray = function(object) {
-        return Object.prototype.toString.call(object) === '[object Array]' ;
-    };
-
-    // ### TODO: Define HTML5 History API for backward compatibility?
-
     /**
      * Helps implementing the design pattern Observer.
      *
@@ -161,7 +153,6 @@ ph.barthe = ph.barthe || {};
 ph.barthe.assert = Exposition.assert;
 ph.barthe.Signal = Exposition.Signal;
 ph.barthe.loadImage = Exposition.loadImage;
-ph.barthe.isArray = Exposition.isArray;
 
 
 
