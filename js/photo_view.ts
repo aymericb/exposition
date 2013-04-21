@@ -10,11 +10,22 @@
 /// <reference path="../lib/jquery.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
+/// <reference path="item.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
 
 module Exposition {
+
+    // Map size:string ->IMG element. 
+    export interface SizeToImgElementMap {
+        [size: string]: JQuery;
+    }
+
+    // Map path->size:string->IMG element. 
+    export interface PathToSizeToImgElementMap {
+        [path: string]: SizeToImgElementMap;
+    }
 
     /**
      * PhotoView class
@@ -26,22 +37,25 @@ module Exposition {
      */
     export class PhotoView  {
 
+
+
         //
         // Private members
         //
 
         // Data Model
         private config: Config;
-        private is_loaded: bool;            // Flag to remember is first image was loaded (m_on_ready)
-        private item: Item;                 // Photo item to display
-        private album: Item;                // Parent item
-        private item_index: number;         // Current child index for this.item within this.album
+        private is_loaded: bool;                                // Flag to remember is first image was loaded (m_on_ready)
+        private item: Item;                                     // Photo item to display
+        private album: Item;                                    // Parent item
+        private item_index: number;                             // Current child index for this.item within this.album
 
         // HTML
-        private main_div: JQuery;           // Root view
-        private current_img: JQuery;        // Currently displayed IMG element
-        private images_ready = {};          // Map path->size(str)->IMG element. Fully loaded images.
-        private images_loading = {};        // Map path->size(str)->IMG element. Images being loaded.
+        private main_div: JQuery;                               // Root view
+        private current_img: JQuery;                            // Currently displayed IMG element
+        private images_ready: PathToSizeToImgElementMap = {};      // Fully loaded images.
+        private images_loading: PathToSizeToImgElementMap = {};    // Images being loaded.
+
 
         // Signal emitters
         private on_path_changed: any = {};
@@ -62,9 +76,9 @@ module Exposition {
         constructor(config: Config, main_div: JQuery, item: Item) {
 
             // Preconditions
-            assert(this.main_div);
-            assert(this.item);
-            assert(this.item.isPhoto());
+            assert(main_div);
+            assert(item);
+            assert(item.isPhoto());
 
             // Prepare IMAGE_SIZES
             this.config = config;
@@ -74,7 +88,7 @@ module Exposition {
 
             // Load parent album (for photo navigation prev/next)
             var album_path = this.item.parentPath();
-            var on_album_error = function(jqXHR, textStatus, error) {
+            var on_album_error = (jqXHR, textStatus, error) => {
                 var msg = 'Cannot load parent album "'+album_path+'"';
                 if (textStatus)
                     msg += '  '+textStatus;
@@ -82,7 +96,7 @@ module Exposition {
                     msg += '  '+error.message;
                 console.error(msg);
             };
-            var on_album_success  = function(item) {
+            var on_album_success = (item) => {
                 // Precondition
                 this.album = item;
                 assert(this.album);
@@ -121,15 +135,15 @@ module Exposition {
 
         /**
          * Add image to cache.
-         * @param {obj} cache. Either this.images_ready or this.images_loading
-         * @param {string} path. From Item.path().
-         * @param {int} size. From IMAGE_SIZES.
-         * @param {jQuery el} img
+         * @param cache. Either this.images_ready or this.images_loading
+         * @param path. From Item.path().
+         * @param size. From IMAGE_SIZES.
+         * @param el. IMG element
          */
-        private setImage(cache, path: string, size: number, img: JQuery) {
+        private setImage(cache: PathToSizeToImgElementMap, path: string, size: number, img: JQuery) {
             if (!cache[path])
                 cache[path] = {};
-            cache[path][size] = img;
+            cache[path][size.toString()] = img;
         };
 
         private getCacheSize(hash_map) {
@@ -147,24 +161,24 @@ module Exposition {
          */
         private removeLoadingImage(path: string, size: number) {
             assert(this.images_loading[path]);
-            assert(this.images_loading[path][size]);
+            assert(this.images_loading[path][size.toString()]);
 
-            delete this.images_loading[path][size];               // Remove path+size
+            delete this.images_loading[path][size.toString()];               // Remove path+size
             if (this.getCacheSize(this.images_loading[path]) === 0)    // Remove path if empty
                 delete this.images_loading[path];
         };
 
         /**
          * Get images from cache
-         * @param {obj} cache. Either this.images_ready or this.images_loading
-         * @param {string} path. From Item.path().
-         * @return {obj} Map size(str)->jQuery IMG.
+         * @param cache param Either this.images_ready or this.images_loading
+         * @param path  from Item.path().
+         * @return The map containing the sizes and assets.
          */
-        private getImages(cache, path: string) {
+        private getImages(cache: PathToSizeToImgElementMap, path: string): SizeToImgElementMap {
             if (cache[path])
                 return cache[path];
             else
-                return [];
+                return {};
         };
 
         //
@@ -176,7 +190,7 @@ module Exposition {
          * @param sizes {array} Integers sorted by increasing number
          * @return the chosen size
          */
-        private chooseSize(sizes) {
+        private chooseSize(sizes: number[]) {
             // Precondition
             assert(Array.isArray(sizes) && sizes.length>0);
 
@@ -200,16 +214,16 @@ module Exposition {
 
         /**
          * Load the image for path and size given
-         * @param path {string}    album path
-         * @param size {int}       value from IMAGE_SIZES
+         * @param path 
+         * @param size value from IMAGE_SIZES
          */
-        private loadImage(path, size) {
+        private loadImage(path: string, size: number) {
             // Precondition
-            assert(!(size in this.getImages(this.images_ready, path)), 'Image '+path+'@'+size+'px is already loaded');
-            assert(!(size in this.getImages(this.images_loading, path)), 'Image '+path+'@'+size+'px is already being loaded');
+            assert(!(size.toString() in this.getImages(this.images_ready, path)), 'Image '+path+'@'+size+'px is already loaded');
+            assert(!(size.toString() in this.getImages(this.images_loading, path)), 'Image '+path+'@'+size+'px is already being loaded');
 
             var url = this.config.makeImageUrl(size, path);
-            var on_fail = function() {
+            var on_fail = () => {
                 console.error('Failed to load image: '+url);
                 this.removeLoadingImage(path, size);
                 img.remove();
@@ -231,21 +245,21 @@ module Exposition {
                     this.setImage(this.images_ready, path, size, img);
                     console.log('path: '+path+'    size: '+size+'    img:'+img);
                     this.updateLayout();
-                    if (!this.m_is_loaded && this.item.path()===path) {
-                        this.m_is_loaded = true;
+                    if (!this.is_loaded && this.item.path()===path) {
+                        this.is_loaded = true;
                         this.m_on_ready.fire();
                     }
                 };
                 img.load(show_error);
                 img.error(show_error);
             };
-            var on_success = function(img) {
+            var on_success = () => {
                 this.removeLoadingImage(path, size);
                 this.prefetchImages(size);
                 this.setImage(this.images_ready, path, size, img);
                 this.updateLayout();
-                if (!this.m_is_loaded && this.item.path()===path) {
-                    this.m_is_loaded = true;
+                if (!this.is_loaded && this.item.path()===path) {
+                    this.is_loaded = true;
                     this.m_on_ready.fire();
                 }
             };
@@ -258,7 +272,7 @@ module Exposition {
         /**
          * Prefetch the next and previous images at the current size
          */
-        private prefetchImages(size) {
+        private prefetchImages(size: number) {
             // Check if album is loaded
             if (!this.album)
                 return;
@@ -268,7 +282,7 @@ module Exposition {
                 return;
 
             // Helper function
-            var prefetch = function(index) {
+            var prefetch = (index) => {
                 var path = children[index].path();
                 if (!this.images_ready[path] && !this.images_loading[path]) {
                     this.loadImage(path, size);
@@ -294,7 +308,7 @@ module Exposition {
          * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
          * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
          */
-        private gotoPage(offset) {
+        private gotoPage(offset: number) {
             // Preconditions
             assert(offset === 1 || offset === -1);
 
@@ -314,10 +328,10 @@ module Exposition {
 
             // Load best size
             var size = this.chooseSize(this.IMAGE_SIZES);
-            if (size in this.getImages(this.images_ready, path)) {
+            if (size.toString() in this.getImages(this.images_ready, path)) {
                 this.m_on_ready.fire();
                 this.updateLayout();
-            } else if (size in this.getImages(this.images_loading, path)) {
+            } else if (size.toString() in this.getImages(this.images_loading, path)) {
                 // Another loadImage() is in progress.
                 // Wait for image to be loaded. updateLoayout() will be called to display the photo
             } else {
