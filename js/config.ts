@@ -158,7 +158,7 @@ module Exposition {
             // Load ajax configuration
             $.ajax(Config.PAGE_CONFIG)
                 .fail( error_callback )
-                .done( function(json) {
+                .done( (json) => {
                     try {
                         // Check string parameters
                         var checkStringAttribute = function(name) {
