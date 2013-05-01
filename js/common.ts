@@ -86,9 +86,10 @@ module Exposition {
          * Fire the signal. It is possible to provide optional arguments to pass to the
          * listener functions, using the regular function syntax.
          */
-        constructor(emitter) {
+        constructor(emitter?) {
             var list = this.list;
-            emitter.fire = function() {
+            var real_emitter = emitter || this;
+            real_emitter.fire = function() {
                 for (var i=0; i<list.length; ++i) {
                     assert(arguments.length<=list[i].length);
                     list[i].apply(/*this object*/null , arguments);
@@ -148,8 +149,8 @@ module Exposition {
 }
 
 // Javascript compatibility
-var ph = ph || {};
-ph.barthe = ph.barthe || {};
+//var ph = ph || {};
+//ph.barthe = ph.barthe || {};
 ph.barthe.assert = Exposition.assert;
 ph.barthe.Signal = Exposition.Signal;
 ph.barthe.loadImage = Exposition.loadImage;
