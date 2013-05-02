@@ -7,6 +7,9 @@
 // For further details, see http://exposition.barthe.ph/
 //
 
+/// <reference path="config.ts" />
+/// <reference path="common.ts" />
+
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 
 // Namespace declarations
@@ -86,7 +89,7 @@ module Exposition {
             }
         }
 
-        static Load(config, path:string, on_success, on_fail) {
+        static Load(config:Config, path:string, on_success, on_fail) {
 
             // Precondition
             assert(path && typeof path === 'string' && path.length>0 && path.substring(0, 1) === '/');

@@ -68,14 +68,14 @@ module Exposition {
         private list = [];
 
         /** Add listener */
-        on(listener) {
+        public on(listener) {
             assert(this.list.indexOf(listener) === -1);
             assert(typeof listener === 'function');
             this.list.push(listener);
         };
 
         /** Remove listener */
-        off(listener) {
+        public off(listener) {
             assert(typeof listener === 'function');
             var index = this.list.indexOf(listener);
             assert(index !== -1);
