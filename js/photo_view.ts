@@ -508,6 +508,6 @@ module Exposition {
 
 }
 
-// Javascript compatibility
+// JavaScript compatibility
 ph.barthe.PhotoView = Exposition.PhotoView;
 
