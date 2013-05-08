@@ -102,9 +102,9 @@ module Exposition {
         };
 
         // Raw size info
-        public allImageSizes() {
+        public allImageSizes(): number[] {
             // http://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript
-            var arrayUnique = function(array) {
+            var arrayUnique = (array) => {
                 var a = array.concat();
                 for(var i=0; i<a.length; ++i) {
                     for(var j=i+1; j<a.length; ++j) {
@@ -130,11 +130,7 @@ module Exposition {
          * instead, you must abort. The 'error' function takes a single and optional 
          * argument, that is the exception object that caused the error.
          */
-        constructor(ready_callback, error_callback) {
-
-            // Preconditions
-            assert(ready_callback);
-            assert(error_callback);
+        constructor(ready_callback: ()=>void, error_callback: (e: Error)=>void) {
 
             // Compute base URL
             this.base_url = document.URL;
@@ -144,7 +140,7 @@ module Exposition {
             this.base_url = this.base_url.substr(0, this.base_url.lastIndexOf('/')+1);
 
             // Compute this.thumnbail_title_height
-            this.thumnbail_title_height = (function() {
+            this.thumnbail_title_height = ( () => {
                 // Compute dynamically by reading CSS property of div class '.item .title'
                 var item = $('<div>').addClass('item').hide();
                 var title = $('<div>').addClass('title');
@@ -161,7 +157,7 @@ module Exposition {
                 .done( (json) => {
                     try {
                         // Check string parameters
-                        var checkStringAttribute = function(name) {
+                        var checkStringAttribute = (name) => {
                             if (! json[name]) {
                                 throw new Error('Missing '+name+' attribute in JSON.');
                             }
@@ -174,7 +170,7 @@ module Exposition {
                         checkStringAttribute('gallery_name');
 
                         // Check array of sizes
-                        var checkSizeArray = function(name) {
+                        var checkSizeArray = (name) => {
                             var array = json[name];
                             if (! array) {
                                 throw new Error('Missing '+name+' attribute in JSON.');
