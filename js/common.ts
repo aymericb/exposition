@@ -17,12 +17,12 @@
 module Exposition {
 
     // Debugging
-    var debug = false;
+    export var debug = false;
 
     /**
      * Assert that throws.
      *
-     * @param cond boolean expression. Throws if false. Trigger debugger if ph.barthe.debug is true,
+     * @param cond boolean expression. Throws if false. Trigger debugger if Exposition.debug is true,
      * @message optional. A string, or exception object. Used for logging. Otherwise 'assertion failed'.
      *
      * Remark. There is a console.assert() but it does not throw, it just log errors.
@@ -82,6 +82,13 @@ module Exposition {
             this.list.splice(index, 1);
         };
 
+        public fire(...args: any[]) {
+            for (var i=0; i<this.list.length; ++i) {
+                assert(arguments.length<=this.list[i].length);
+                this.list[i].apply(/*this object*/null , arguments);
+            }
+        }
+
         /**
          * Fire the signal. It is possible to provide optional arguments to pass to the
          * listener functions, using the regular function syntax.
@@ -111,7 +118,7 @@ module Exposition {
      * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
      * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
      */
-    export var loadImage = function(url, on_success, on_fail, alt_text, user_data) {
+    export var loadImage = function(url, on_success, on_fail, alt_text, user_data?) {
         // Precondition
         assert(url);
         assert(on_success);

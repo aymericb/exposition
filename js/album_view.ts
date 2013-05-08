@@ -8,6 +8,8 @@
 //
 
 /// <reference path="common.ts" />
+/// <reference path="item.ts" />
+/// <reference path="config.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -26,7 +28,7 @@ module Exposition {
         // Public API 
         public getPhotoPath(item) {
             // Precondition
-            ph.barthe.assert(item.isAlbum());
+            assert(item.isAlbum());
 
             // Handle empty album case
             var children = item.children();
@@ -93,10 +95,6 @@ module Exposition {
      * Any methods (including constructor) may throw in case of error, unless otherwise
      * specified.
      *
-     * Constructor parameters
-     * - config                     -> A ph.barthe.Config object
-     * - main_div                   -> display area for the album
-     * - item                       -> A ph.barthe.Item representing the album to display
      */
     export class AlbumView {
 
@@ -108,7 +106,7 @@ module Exposition {
         // Data Model
         private config: Config;
         private item: Item;                     // Root item of the album
-        private children = [];                  // Array. idx => {photo_path: 'str', div: 'jQuery obj', item: 'ph.barthe.Item'}
+        private children = [];                  // Array. idx => {photo_path: 'str', div: 'jQuery obj', item: 'Item'}
             // CAUTION: this.item.children() may have holes but not this.children. In that case indices do not match.
         private selected_index: number = null;  // Int. Index (of this.children) of currently selected item. Null if none.
 
@@ -132,7 +130,7 @@ module Exposition {
         private THUMBNAIL_TITLE_HEIGHT: number;
 
         /**
-         * Constructor
+         * Constructor 
          * No side effect on Main View. Use load()
          */
         constructor(config: Config, main_div: JQuery, item: Item) {
@@ -151,11 +149,14 @@ module Exposition {
             this.THUMBNAIL_SIZE = config.thumbnailSize();
             this.THUMBNAIL_TITLE_MARGIN = config.thumbnailTitleMargin();
             this.THUMBNAIL_TITLE_HEIGHT = config.thumbnailTitleHeight();
+            this.onLoadPath = new Signal();
+            this.onPageUpdate = new Signal();
+            this.onReady = new Signal();       
 
             // Fill children elements with the following properties
             // - photo-path: path to a random sub-photo in the album (or sub album)
             // - div:        HTML div of class 'thumbnail'
-            // - item:       underlying ph.barthe.Item object from this.item.children()
+            // - item:       underlying Item object from this.item.children()
             var children = this.item.children();
             for (var i=0; i<children.length; ++i) {
 
@@ -322,7 +323,7 @@ module Exposition {
                     on_fail(img);
                 }
             };
-            ph.barthe.loadImage(url, on_success, on_fail, div_title.text());
+            Exposition.loadImage(url, on_success, on_fail, div_title.text());
 
             // Return containing div
             return div_item;
@@ -337,7 +338,7 @@ module Exposition {
         private setCurrentPage(page_index: number)
         {
             // Preconditions
-            if (ph.barthe.debug)
+            if (Exposition.debug)
                 console.log("Showing page "+(page_index+1));
             assert(page_index >= 0);
             assert(page_index < this.page_count);
@@ -490,7 +491,7 @@ module Exposition {
                 V_MARGIN = this.THUMBNAIL_MARGIN;
             if (COL_COUNT >= this.children.length)
                 H_MARGIN = this.THUMBNAIL_MARGIN;
-            if (ph.barthe.debug) {
+            if (Exposition.debug) {
                 console.log('Resizing album. Items: '+this.children.length+' COL_COUNT: '+COL_COUNT+' ROW_COUNT: '+ROW_COUNT);
             }
 
@@ -617,7 +618,7 @@ module Exposition {
         };
 
         /** onLoadPath(path)    -> path {string} the path to load. */
-        public onLoadPath = new ph.barthe.Signal();
+        public onLoadPath: Signal;
 
         /**
          * onPageUpdate(show, current_page, total_page)
@@ -625,10 +626,10 @@ module Exposition {
          * current_page {int}   -> current page, index 0
          * total_page {int}     -> number of pages in total >= 1
          */
-        public onPageUpdate = new ph.barthe.Signal();
+        public onPageUpdate: Signal;
 
         /** onReady()            -> View is ready to show. */
-        public onReady = new ph.barthe.Signal();
+        public onReady: Signal;
     };
 }
 

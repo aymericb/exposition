@@ -10,6 +10,7 @@
 /// <reference path="../lib/jquery.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
+/// <reference path="item.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -98,11 +99,11 @@ module Exposition {
          * @param {bool} push_state       Optional. Default true. Whether the state should be
          *   be pushed to the browser history. Typically false when handling popstate event.
          * 
-         * @return A callback function({ph.barthe.Item} path)
+         * @return A callback function({Item} path)
          *
          * Does not throw
          */
-        private onPathLoaded(path: string, push_state: bool) {
+        private onPathLoaded(path: string, push_state: bool) : (item: Item) => void {
             // Precondition
             assert(path);
 
@@ -195,7 +196,7 @@ module Exposition {
          * Calls onFatalError on errors.
          */
         private loadPath(path: string, push_state: bool, delayed_loading?: bool) {
-            if (ph.barthe.debug)
+            if (Exposition.debug)
                 console.log("Loading: "+path);
             this.main_div.empty();
             this.page_handler.hide();

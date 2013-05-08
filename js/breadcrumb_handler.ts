@@ -34,8 +34,8 @@ module Exposition {
 
         /** 
          * Constructor
-         * @param div    {jQuery}            Breadcrumb div
-         * @param config {ph.barthe.Config}  Config object used to read the gallery name        
+         * @param div       Breadcrumb div
+         * @param config    Config object used to read the gallery name        
          */
         constructor(div: JQuery, config: Config) {
     		// Preconditions

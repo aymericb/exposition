@@ -69,9 +69,6 @@ module Exposition {
         /**
          * Constructor
          * No side effect on Main View. Use load()
-         * - config                     -> A ph.barthe.Config object
-         * - main_div                   -> The display area for the photo
-         * - item                       -> A ph.barthe.Item representing the item to display
          */
         constructor(config: Config, main_div: JQuery, item: Item) {
 
@@ -122,10 +119,10 @@ module Exposition {
             ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
 
             // Signals temporary ### FIXME
-            this.onLoadPath = new ph.barthe.Signal(this.on_load_path);
-            this.onPathChanged = new ph.barthe.Signal(this.on_path_changed);
-            this.onPageUpdate = new ph.barthe.Signal(this.on_page_update);
-            this.onReady = new ph.barthe.Signal(this.m_on_ready);
+            this.onLoadPath = new Signal(this.on_load_path);
+            this.onPathChanged = new Signal(this.on_path_changed);
+            this.onPageUpdate = new Signal(this.on_page_update);
+            this.onReady = new Signal(this.m_on_ready);
 
         }
 
@@ -263,7 +260,7 @@ module Exposition {
                     this.m_on_ready.fire();
                 }
             };
-            var img = ph.barthe.loadImage(url, on_success, on_fail, this.item.title());
+            var img = Exposition.loadImage(url, on_success, on_fail, this.item.title());
             this.setImage(this.images_loading, path, size, img);
             img.hide();
             this.main_div.append(img);

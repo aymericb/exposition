@@ -12,9 +12,6 @@
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 
-// Namespace declarations
-// var ph = ph || {};
-// ph.barthe = ph.barthe || {};
 
 module Exposition {
 
@@ -132,7 +129,7 @@ module Exposition {
                 .fail( on_fail )
                 .done( function(data) {
                     try {
-                        var item = new ph.barthe.Item(data);
+                        var item = new Item(data);
                         cache[path] = item;
                         on_success(item);
                     } catch(e) {
