@@ -8,6 +8,7 @@
 //
 
 /// <reference path="../lib/jquery.d.ts" />
+/// <reference path="../lib/spin.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
@@ -233,7 +234,7 @@ module Exposition {
                 var loading_title = $('<p>').text('Loading...');
                 loading_div.append(loading_title);
                 this.main_div.append(loading_div);
-                this.loading_spinner = new ph.barthe.Spinner({
+                this.loading_spinner = new Spinner({
                     color:'#fff',
                     length: 4,
                     width: 3,

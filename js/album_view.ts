@@ -10,6 +10,7 @@
 /// <reference path="common.ts" />
 /// <reference path="item.ts" />
 /// <reference path="config.ts" />
+/// <reference path="../lib/spin.d.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -263,7 +264,7 @@ module Exposition {
             };
 
             // Setup load spinner
-            var spinner = new ph.barthe.Spinner({
+            var spinner = new Spinner({
                 color:  '#fff',
                 lines:  11,
                 length: 3,

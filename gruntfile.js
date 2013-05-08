@@ -44,7 +44,7 @@ module.exports = function(grunt) {
                 separator: ';'
             },
             release: {
-                src: ['js/*.js', 'build/js/*.js'],
+                src: ['js/*.js', 'lib/*.js', 'build/js/*.js'],
                 dest: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
@@ -71,7 +71,8 @@ module.exports = function(grunt) {
         copy: {
             build: {
                 files: [
-                    {src: ['js/*.js'], dest: 'build/'}
+                    {src: ['js/*.js'], dest: 'build/'},
+                    {src: ['*.js'], dest: 'build/js/', cwd:'lib', flatten: true, expand: true}
                 ]
             },
             release: {
@@ -89,7 +90,7 @@ module.exports = function(grunt) {
             build: ['build/**', '!build', 'release']
         },
         watch: {
-            files: ['js/*.js', 'js/*.ts', 'php/**/*.php', '*.html', 'css/**'],
+            files: ['js/*.js', 'js/*.ts', 'php/**/*.php', '*.html', 'css/**', 'lib/*.js'],
             tasks: ['default']
         },
         compress: {
