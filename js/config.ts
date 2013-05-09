@@ -208,6 +208,3 @@ module Exposition {
         }
     }
 }
-
-// Javascript compatibility
-ph.barthe.Config = Exposition.Config;

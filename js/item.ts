@@ -141,8 +141,3 @@ module Exposition {
     };
 
 }
-
-// Javascript compatibility
-ph.barthe.Item = Exposition.Item;
-ph.barthe.Item.Load = Exposition.Item.Load;
-

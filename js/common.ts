@@ -155,12 +155,3 @@ module Exposition {
 
 }
 
-// Javascript compatibility
-//var ph = ph || {};
-//ph.barthe = ph.barthe || {};
-ph.barthe.assert = Exposition.assert;
-ph.barthe.Signal = Exposition.Signal;
-ph.barthe.loadImage = Exposition.loadImage;
-
-
-

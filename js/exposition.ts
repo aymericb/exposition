@@ -361,6 +361,3 @@ module Exposition {
     };
 } // module Exposition
 
-// JavaScript compatibility
-ph.barthe.Exposition = Exposition.Application;
-

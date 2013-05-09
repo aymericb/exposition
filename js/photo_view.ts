@@ -116,7 +116,7 @@ module Exposition {
                 // Postcondition
                 assert(this.item_index !== undefined);
             };
-            ph.barthe.Item.Load(config, album_path, on_album_success, on_album_error);
+            Exposition.Item.Load(config, album_path, on_album_success, on_album_error);
 
             // Signals temporary ### FIXME
             this.onLoadPath = new Signal(this.on_load_path);
@@ -504,7 +504,4 @@ module Exposition {
     };
 
 }
-
-// JavaScript compatibility
-ph.barthe.PhotoView = Exposition.PhotoView;
 

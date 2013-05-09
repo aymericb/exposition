@@ -174,6 +174,3 @@ module Exposition {
     };
 
 } // module Exposition
-
-// JavaScript compatibility
-ph.barthe.UpdateCache = Exposition.UpdateCache;

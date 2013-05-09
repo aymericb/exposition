@@ -97,6 +97,3 @@ module Exposition {
     };
 
 } // module Exposition
-
-// JavaScript compatibility
-ph.barthe.PageHandler = Exposition.PageHandler;

@@ -633,8 +633,3 @@ module Exposition {
         public onReady: Signal;
     };
 }
-
-// JavaScript compatibility
-var ph = ph || {};
-ph.barthe = ph.barthe || {};
-ph.barthe.AlbumView = Exposition.AlbumView;

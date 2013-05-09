@@ -117,5 +117,3 @@ module Exposition {
 
 } // module Exposition
 
-// JavasScript compatibility
-ph.barthe.BreadcrumbHandler = Exposition.BreadcrumbHandler;
