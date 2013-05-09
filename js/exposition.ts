@@ -12,6 +12,8 @@
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
+/// <reference path="photo_view.ts" />
+/// <reference path="album_view.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/

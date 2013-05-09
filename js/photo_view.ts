@@ -11,6 +11,7 @@
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
+/// <reference path="view.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -35,7 +36,7 @@ module Exposition {
      * album and provide paging information (next/previous photo).
      *
      */
-    export class PhotoView  {
+    export class PhotoView implements View {
 
 
 
