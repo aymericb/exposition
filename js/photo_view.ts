@@ -81,7 +81,7 @@ module Exposition {
             this.config = config;
             this.main_div = main_div;
             this.item = item;
-            this.IMAGE_SIZES = config.photoSizes().sort(function(a,b){return a-b;});
+            this.IMAGE_SIZES = config.photoSizes().sort((a,b) => {return a-b;});
 
             // Load parent album (for photo navigation prev/next)
             var album_path = this.item.parentPath();
@@ -237,7 +237,7 @@ module Exposition {
                 img.attr('src', this.config.getCautionImageUrl());
                 img.attr('alt', path);
                 img.attr('title', 'Image '+path+' failed to load');
-                var show_error = function() {
+                var show_error = () => {
                     //removeLoadingImage(path, size);
                     this.setImage(this.images_ready, path, size, img);
                     console.log('path: '+path+'    size: '+size+'    img:'+img);
