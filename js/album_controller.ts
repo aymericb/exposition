@@ -10,7 +10,7 @@
 /// <reference path="common.ts" />
 /// <reference path="item.ts" />
 /// <reference path="config.ts" />
-/// <reference path="view.ts" />
+/// <reference path="controller.ts" />
 /// <reference path="../lib/spin.d.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
@@ -98,7 +98,7 @@ module Exposition {
      * specified.
      *
      */
-    export class AlbumView implements View {
+    export class AlbumController implements View {
 
 
         //

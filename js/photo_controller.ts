@@ -11,7 +11,7 @@
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
-/// <reference path="view.ts" />
+/// <reference path="controller.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -29,14 +29,14 @@ module Exposition {
     }
 
     /**
-     * PhotoView class
+     * PhotoController class
      *
      * The photo view provides the mechanism for loading and displaying a photo
      * into the browser view, at the most appropriate size. It also loads the parent
      * album and provide paging information (next/previous photo).
      *
      */
-    export class PhotoView implements View {
+    export class PhotoController implements View {
 
 
 

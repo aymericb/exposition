@@ -12,8 +12,8 @@
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
-/// <reference path="photo_view.ts" />
-/// <reference path="album_view.ts" />
+/// <reference path="photo_controller.ts" />
+/// <reference path="album_controller.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -133,7 +133,7 @@ module Exposition {
 
                     // Create view and update page handler
                     if (this.item.isAlbum()) {
-                        this.view = new AlbumView(this.config, this.main_div, this.item);
+                        this.view = new AlbumController(this.config, this.main_div, this.item);
                         this.view.onPageUpdate.on( (show: bool, current_page: number, total_page: number) => {
                             if (!show) {
                                 this.page_handler.hide();
@@ -145,7 +145,7 @@ module Exposition {
                     } else {
                         assert(this.item.isPhoto());
                         this.page_handler.hide();
-                        this.view = new PhotoView(this.config, this.main_div, this.item);
+                        this.view = new PhotoController(this.config, this.main_div, this.item);
                         this.view.onPageUpdate.on( (current_photo: number, total_photo: number) => {
                             this.page_handler.show();
                             this.page_handler.setPage("Photo", current_photo, total_photo);
