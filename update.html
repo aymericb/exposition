@@ -14,7 +14,7 @@
     <!-- Main -->
     <script>
         $(document).ready(function() {
-            new ph.barthe.UpdateCache($("#progressbar"), $("#progressbar .progress-label"), $("#errors"))
+            new Exposition.UpdateCache($("#progressbar"), $("#progressbar .progress-label"), $("#errors"))
         });        
     </script>
 
@@ -55,7 +55,11 @@
     </style>    
 </head>
 <body>
-    <div id="header"><p>Exposition Gallery: Updating Cache</p></div>
+    <div id="header">
+        <div id="breadcrumb">
+            <div class="title subpath">Exposition Gallery: Updating Cache</div>
+        </div>
+    </div>
     <div id="main">
         <div id="progressbar"><div class="progress-label">Loading...</div></div>
         <div id="errors">            

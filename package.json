@@ -32,6 +32,8 @@
     "grunt-contrib-watch": "~0.3.1",
     "grunt-contrib-compress": "~0.4.7",
     "grunt-contrib-cssmin": "~0.5.0",
-    "grunt-contrib-less": "~0.5.0"
+    "grunt-contrib-less": "~0.5.0",
+    "typescript": "~0.8.3",
+    "grunt-typescript": "~0.1.4"
   }
 }
