@@ -57,13 +57,6 @@ module Exposition {
         private images_ready: PathToSizeToImgElementMap = {};      // Fully loaded images.
         private images_loading: PathToSizeToImgElementMap = {};    // Images being loaded.
 
-
-        // Signal emitters
-        private on_path_changed: any = {};
-        private on_page_update: any = {};
-        private on_load_path: any = {};
-        private m_on_ready: any = {};
-
         // Constants
         private IMAGE_SIZES;
 
@@ -108,7 +101,7 @@ module Exposition {
                         break;
                     }
                 }
-                this.on_page_update.fire(this.item_index, children.length);
+                this.onPageUpdate.fire(this.item_index, children.length);
 
                 // Prefetch prev/next images
                 var size = this.chooseSize(this.IMAGE_SIZES);
@@ -119,12 +112,11 @@ module Exposition {
             };
             Exposition.Item.Load(config, album_path, on_album_success, on_album_error);
 
-            // Signals temporary ### FIXME
-            this.onLoadPath = new Signal(this.on_load_path);
-            this.onPathChanged = new Signal(this.on_path_changed);
-            this.onPageUpdate = new Signal(this.on_page_update);
-            this.onReady = new Signal(this.m_on_ready);
-
+            // Signals 
+            this.onLoadPath = new Signal();
+            this.onPathChanged = new Signal();
+            this.onPageUpdate = new Signal();
+            this.onReady = new Signal();
         }
 
         //
@@ -245,7 +237,7 @@ module Exposition {
                     this.updateLayout();
                     if (!this.is_loaded && this.item.path()===path) {
                         this.is_loaded = true;
-                        this.m_on_ready.fire();
+                        this.onReady.fire();
                     }
                 };
                 img.load(show_error);
@@ -258,7 +250,7 @@ module Exposition {
                 this.updateLayout();
                 if (!this.is_loaded && this.item.path()===path) {
                     this.is_loaded = true;
-                    this.m_on_ready.fire();
+                    this.onReady.fire();
                 }
             };
             var img = Exposition.loadImage(url, on_success, on_fail, this.item.title());
@@ -320,14 +312,14 @@ module Exposition {
 
             // Notify application
             var path = this.item.path();
-            this.on_page_update.fire(this.item_index, children.length);
-            this.on_path_changed.fire(path);
+            this.onPageUpdate.fire(this.item_index, children.length);
+            this.onPathChanged.fire(path);
             this.is_loaded = false;
 
             // Load best size
             var size = this.chooseSize(this.IMAGE_SIZES);
             if (size.toString() in this.getImages(this.images_ready, path)) {
-                this.m_on_ready.fire();
+                this.onReady.fire();
                 this.updateLayout();
             } else if (size.toString() in this.getImages(this.images_loading, path)) {
                 // Another loadImage() is in progress.
@@ -482,7 +474,7 @@ module Exposition {
                 this.gotoPage(+1);
                 return false;
             } else if ((ev.which === KEYCODE_UP || ev.which === KEYCODE_ESCAPE) && this.album) {
-                this.on_load_path.fire(this.album.path());
+                this.onLoadPath.fire(this.album.path());
                 return false;
             }
         };

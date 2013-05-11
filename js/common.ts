@@ -52,15 +52,13 @@ module Exposition {
     };
 
     /**
-     * Helps implementing the design pattern Observer.
+     * Implement design pattern Observer, via the signal and slots.
      *
-     * Usage.
+     * Signal instances should be added as public properties of classes. 
+     * Subscribers can use the on/off method, to connect their slots to the signal.
+     * Emitters should use the fire() method. 
      *
-     * The class that emits the signal creates the Signal object passing the emitter object
-     * to the constructor. A fire function is added to the emitter object, that can be
-     * used to send the signal optionally with parameters. TThe Signal object should be
-     * left accessible as a public property. Listeners can be added or removed with the
-     * public 'on' and 'off' methods.
+     * At the moment, because of the lack of generics, all type information is lost.
      *
      */
     export class Signal {
@@ -89,20 +87,7 @@ module Exposition {
             }
         }
 
-        /**
-         * Fire the signal. It is possible to provide optional arguments to pass to the
-         * listener functions, using the regular function syntax.
-         */
-        constructor(emitter?) {
-            var list = this.list;
-            var real_emitter = emitter || this;
-            real_emitter.fire = function() {
-                for (var i=0; i<list.length; ++i) {
-                    assert(arguments.length<=list[i].length);
-                    list[i].apply(/*this object*/null , arguments);
-                }
-            };
-        }
+
     };
 
     /**
