@@ -323,7 +323,7 @@ module Exposition {
             });
 
             // Initialize key shortcuts handler
-            $(document).keydown( (ev) => { this.onKeydown(ev); } );
+            $(document).keydown( (ev) => { return this.onKeydown(ev); } );
 
             // Initialize view
             this.loadPath(this.path, true, false);
