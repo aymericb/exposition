@@ -42,21 +42,21 @@ module Exposition {
         //
 
         // PHP Ajax Pages
-        public makeItemUrl(path: string) {
+        public makeItemUrl(path: string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             return this.base_url+Config.PAGE_ITEM+path;
         };
-        public makeImageUrl(size:number, path:string) {
+        public makeImageUrl(size:number, path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             assert(size>=0);
             return this.base_url+Config.PAGE_IMAGE+'/'+size+path;
         };
-        public makeCacheUrl(size:number, path:string) {
+        public makeCacheUrl(size:number, path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             assert(size>=0);
             return this.base_url+Config.PAGE_CACHE+'/'+size+path;
         };
-        public makeDownloadUrl(path:string) {
+        public makeDownloadUrl(path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             return this.base_url+Config.PAGE_DOWNLOAD+path;
         };

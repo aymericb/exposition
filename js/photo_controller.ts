@@ -36,7 +36,7 @@ module Exposition {
      * album and provide paging information (next/previous photo).
      *
      */
-    export class PhotoController implements View {
+    export class PhotoController implements Controller {
 
 
 
