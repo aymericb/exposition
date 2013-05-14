@@ -35,7 +35,6 @@ module Exposition {
         // 
 
         // Model
-        private album_item: Item;
         private items: AlbumViewData[];         // Contrary to item.children(), this is a contiguous array cannot have a hole
         private selected_index: number = null;  // Int. Index (of this.items) of currently selected item. Null if none.       
 
@@ -58,13 +57,12 @@ module Exposition {
         private THUMBNAIL_TITLE_HEIGHT: number;
 
         //
-        // Public API
+        // Model Update
         //
 
-        constructor(config: Config, main_div: JQuery, album_item: Item, items: AlbumViewData[]) {
+        constructor(config: Config, main_div: JQuery, items: AlbumViewData[]) {
             // Initialize members
             this.main_div = main_div;
-            this.album_item = album_item;
             this.items = items;
 
             // Initialize config
@@ -239,103 +237,82 @@ module Exposition {
             this.setCurrentPage(this.current_page_index);
         };
 
-        /** Go to next page */
-        public goToNext() {
-            this.setCurrentPage(this.current_page_index+1);
-        };
-
-        /** Go to previous page */
-        public goToPrev() {
-            this.setCurrentPage(this.current_page_index-1);
-        };
-
-        /** Keyboard handler */
-        public onKeydown(ev) {
-            assert(ev.which);
-            assert(this.col_count !== undefined && this.row_count !== undefined);
-
-            // Keycode constants
-            var KEYCODE_LEFT = 37;
-            var KEYCODE_RIGHT = 39;
-            var KEYCODE_UP = 38;
-            var KEYCODE_DOWN = 40;
-            var KEYCODE_ESCAPE = 27;
-            var KEYCODE_ENTER = 13;
-
-            // Handle ESC and ENTER
-            if (ev.which === KEYCODE_ESCAPE) {
-                if (this.selected_index === null) {
-                    if (this.album_item.path() !== '/') {
-                        this.onLoadPath.fire(this.album_item.parentPath());
-                        return false;
-                   }
-                } else {
-                    this.selectItem(null);
-                    return false;
-                }
-                return true;
-            } else if (ev.which === KEYCODE_ENTER && this.selected_index !== null) {
-                this.onLoadPath.fire(this.items[this.selected_index].item.path());
-                return false;
-            }
-
-            // Handle arrows when no selection exists
-            if (this.selected_index === null) {
-                if (ev.which === KEYCODE_LEFT || ev.which === KEYCODE_RIGHT || ev.which === KEYCODE_DOWN || ev.which === KEYCODE_ENTER) {
-                    this.selectItem(this.row_count*this.col_count*this.current_page_index);
-                    return false;
-                } else if (ev.which === KEYCODE_UP) {
-                    if (this.album_item.path() !== '/') {
-                        this.onLoadPath.fire(this.album_item.parentPath());
-                    }
-                }
-            }
-
-            // Handle arrows when a current selection exists
-            if (ev.which === KEYCODE_LEFT && this.selected_index>0) {
-                this.selectItem(this.selected_index-1);
-                return false;
-            } else if (ev.which === KEYCODE_RIGHT && this.selected_index+1<this.items.length) {
-                this.selectItem(this.selected_index+1);
-                return false;
-            } else if (ev.which === KEYCODE_DOWN && this.selected_index+this.col_count<this.items.length) {
-                this.selectItem(this.selected_index+this.col_count);
-                return false;
-            } else if (ev.which === KEYCODE_UP && this.selected_index-this.col_count>=0) {
-                this.selectItem(this.selected_index-this.col_count);
-                return false;
-            }
-
-        };
-
         //
-        // Signals
+        // Pages
         //
 
-        /** onLoadPath(path)    -> path {string} the path to load. */
-        public onLoadPath: Signal;
+        /** Return current page index */
+        public currentPage(): number {
+            return this.current_page_index;
+        }
 
         /**
-         * onPageUpdate(show, current_page, total_page)
-         * show {bool}          -> if false, hide ignore other parameters
-         * current_page {int}   -> current page, index 0
-         * total_page {int}     -> number of pages in total >= 1
+         * Set the current page of the album.
+         * Hides the current page and makes the page referenced by page_index visible.
+         * page_index is an integer that represent the page number. 0 <= page_index < this.page_count
+         * This method updates this.current_page_div and this.current_page_index when it succeeds.
          */
-        public onPageUpdate: Signal;
+        public setCurrentPage(page_index: number)
+        {
+            // Preconditions
+            if (Exposition.debug)
+                console.log("Showing page "+(page_index+1));
+            assert(page_index >= 0);
+            assert(page_index < this.page_count);
 
-        /** onReady()            -> View is ready to show. */
-        public onReady: Signal;
+            // Hide current page
+            this.onPageUpdate.fire(false);
+            if (this.current_page_div)
+                this.current_page_div.hide();
 
+            // Get page div
+            var id = 'album-page-'+(page_index+1);
+            var div_page = $('#'+id);
+            assert(div_page.length !== 0);
+
+            // Make new page visible
+            this.current_page_index = page_index;
+            this.current_page_div = div_page;
+            this.current_page_div.show();
+            this.onPageUpdate.fire(true, page_index, this.page_count);
+        };
 
         //
-        // Private Methods
-        // 
+        // Sizing information
+        //
+
+        /** Return number of columns in view */
+        public colCount(): number {
+            return this.col_count;
+        }    
+
+        /** Return number of rows in view */
+        public rowCount(): number {
+            return this.row_count;
+        }    
+
+        //
+        // Current Selection
+        //
+
+        /** Return selected index or null */
+        public selectedIndex(): number {
+            return this.selected_index;
+        }
+
+        /** Return selected item or null */
+        public selectedItem(): Item {
+            if (this.selected_index === null || this.selected_index === undefined)
+                return null;
+            else
+                return this.items[this.selected_index].item;
+        }
 
         /** 
          * Change current selection. The previously selected item is automatically un-selected.
          * @param {int} index of item to select, or null if deselecting the current item.
          */
-        private selectItem(index: number) {
+        public selectItem(index: number) {
             // Deselect current item
             var div;
             if (this.selected_index !== null) {
@@ -361,36 +338,29 @@ module Exposition {
             }
         };
 
+
+        //
+        // Signals
+        //
+
+        /** onLoadPath(path)    -> path {string} the path to load. */
+        public onLoadPath: Signal;
+
         /**
-         * Set the current page of the album.
-         * Hides the current page and makes the page referenced by page_index visible.
-         * page_index is an integer that represent the page number. 0 <= page_index < this.page_count
-         * This method updates this.current_page_div and this.current_page_index when it succeeds.
+         * onPageUpdate(show, current_page, total_page)
+         * show {bool}          -> if false, hide ignore other parameters
+         * current_page {int}   -> current page, index 0
+         * total_page {int}     -> number of pages in total >= 1
          */
-        private setCurrentPage(page_index: number)
-        {
-            // Preconditions
-            if (Exposition.debug)
-                console.log("Showing page "+(page_index+1));
-            assert(page_index >= 0);
-            assert(page_index < this.page_count);
+        public onPageUpdate: Signal;
 
-            // Hide current page
-            this.onPageUpdate.fire(false);
-            if (this.current_page_div)
-                this.current_page_div.hide();
+        /** onReady()            -> View is ready to show. */
+        public onReady: Signal;
 
-            // Get page div
-            var id = 'album-page-'+(page_index+1);
-            var div_page = $('#'+id);
-            assert(div_page.length !== 0);
 
-            // Make new page visible
-            this.current_page_index = page_index;
-            this.current_page_div = div_page;
-            this.current_page_div.show();
-            this.onPageUpdate.fire(true, page_index, this.page_count);
-        };
+        //
+        // Private Methods
+        // 
 
         /** 
          * Load thumbnail asynchronously

@@ -98,6 +98,10 @@ module Exposition {
         // Private members
         //
 
+        // Data
+        private item: Item;             // Album Item
+        private items_count: number;    // Number of album items with a photo
+
         // View
         private view: AlbumView;
 
@@ -111,10 +115,10 @@ module Exposition {
             // Preconditions
             assert(item.isAlbum());
 
-            // Fill children elements with the following properties
+            // Fill items elements with the following properties
             // - photo-path: path to a random sub-photo in the album (or sub album)
-            // - div:        HTML div of class 'thumbnail'
             // - item:       underlying Item object from this.item.children()
+            // - div:        HTML div of class 'thumbnail' (set by view)
             var children = item.children();
             var items: AlbumViewData[] = [];
             for (var i=0; i<children.length; ++i) {
@@ -136,7 +140,9 @@ module Exposition {
             }
 
             // Initialize view
-            this.view = new AlbumView(config, main_div, item, items);
+            this.item = item;
+            this.view = new AlbumView(config, main_div, items);
+            this.items_count = items.length;
 
             // Initialize signals
             this.onLoadPath = this.view.onLoadPath;
@@ -160,17 +166,73 @@ module Exposition {
 
         /** Go to next page */
         public goToNext(): void {
-            this.view.goToNext();
+            this.view.setCurrentPage(this.view.currentPage()+1);
         };
 
         /** Go to previous page */
         public goToPrev(): void {
-            this.view.goToPrev();
+            this.view.setCurrentPage(this.view.currentPage()-1);
         };
 
         /** Keyboard handler */
         public onKeydown(ev): bool {
-            return this.view.onKeydown(ev);
+            assert(ev.which);
+            assert(this.view.colCount() !== undefined && this.view.rowCount() !== undefined);
+
+            // Keycode constants
+            var KEYCODE_LEFT = 37;
+            var KEYCODE_RIGHT = 39;
+            var KEYCODE_UP = 38;
+            var KEYCODE_DOWN = 40;
+            var KEYCODE_ESCAPE = 27;
+            var KEYCODE_ENTER = 13;
+
+            // Handle ESC and ENTER
+            var selected_index = this.view.selectedIndex();
+            if (ev.which === KEYCODE_ESCAPE) {
+                if (selected_index === null) {
+                    if (this.item.path() !== '/') {
+                        this.onLoadPath.fire(this.item.parentPath());
+                        return false;
+                   }
+                } else {
+                    this.view.selectItem(null);
+                    return false;
+                }
+                return true;
+            } else if (ev.which === KEYCODE_ENTER && selected_index !== null) {
+                this.onLoadPath.fire(this.view.selectedItem().path());
+                return false;
+            }
+
+            // Handle arrows when no selection exists
+            if (selected_index === null) {
+                if (ev.which === KEYCODE_LEFT || ev.which === KEYCODE_RIGHT || ev.which === KEYCODE_DOWN || ev.which === KEYCODE_ENTER) {
+                    this.view.selectItem(this.view.rowCount()*this.view.colCount()*this.view.currentPage());
+                    return false;
+                } else if (ev.which === KEYCODE_UP) {
+                    if (this.item.path() !== '/') {
+                        this.onLoadPath.fire(this.item.parentPath());
+                    }
+                }
+            }
+
+            // Handle arrows when a current selection exists
+            var col_count = this.view.colCount();
+            if (ev.which === KEYCODE_LEFT && selected_index>0) {
+                this.view.selectItem(selected_index-1);
+                return false;
+            } else if (ev.which === KEYCODE_RIGHT && selected_index+1<this.items_count) {
+                this.view.selectItem(selected_index+1);
+                return false;
+            } else if (ev.which === KEYCODE_DOWN && selected_index+col_count<this.items_count) {
+                this.view.selectItem(selected_index+col_count);
+                return false;
+            } else if (ev.which === KEYCODE_UP && selected_index-col_count>=0) {
+                this.view.selectItem(selected_index-col_count);
+                return false;
+            }
+
         };
 
         /** onLoadPath(path)    -> path {string} the path to load. */
