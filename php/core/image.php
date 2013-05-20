@@ -69,7 +69,7 @@ class Image
 	private function cache($path, $size) {
 
 		// Erase existing file if necessary
-		if (file_exists($this->cachePath)) {
+		if (file_exists($this->cachePath) || is_link($this->cachePath)) {
 			if (! unlink($this->cachePath))
 				throw new \Exception("Cannot delete \"$path\" from cache");
 		}
@@ -93,9 +93,8 @@ class Image
 
 		// Check if original image is smaller than requested image
 		if ($cacheHeight*$cacheWidth > $width*$height) {
-			//if (! copy($path, $this->cachePath))
 			if (! symlink($path, $this->cachePath))
-				throw new \Exception("Cannot copy \"$path\" to cache");
+				throw new \Exception("Cannot link \"$path\" to cache");
 			return;
 		}
 
