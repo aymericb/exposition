@@ -318,7 +318,7 @@ module Exposition {
             // Initialize HTML5 history change event handler
             $(window).on('popstate', (ev) => {
                 var path = ev.originalEvent.state;
-                if (path && typeof path === 'string' && path.length>0);
+                if (path && typeof path === 'string' && path.length>0); 
                     this.loadPath(path, false);
             });
 

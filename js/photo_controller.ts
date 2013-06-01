@@ -22,15 +22,65 @@ module Exposition {
 
     export class PhotoController implements Controller {
 
-        private view;
+        // Model
+        private album_item: Item;
+        private item: Item;
+        private item_index: number;     // Current index of this.item within this.album_item
 
+        // View
+        private view: PhotoView;
+
+        //
+        // Public API
+        // 
         constructor(config: Config, main_div: JQuery, item: Item) {
-            this.view = new PhotoView(config, main_div, item);
 
-            this.onLoadPath = this.view.onLoadPath;
-            this.onPageUpdate = this.view.onPageUpdate;
+            // Preconditions
+            assert(item.isPhoto());
+
+            // Initialize view
+            this.view = new PhotoView(config, main_div, item);
             this.onReady = this.view.onReady;
-            this.onPathChanged = this.view.onPathChanged;
+            this.onPageUpdate = new Signal();
+            this.onLoadPath = new Signal();
+            this.onPathChanged = new Signal();
+            this.item = item;
+
+            // Initialize album item
+            var album_path = item.parentPath();
+            var on_album_error = (jqXHR, textStatus, error) => {
+                var msg = 'Cannot load parent album "'+album_path+'"';
+                if (textStatus)
+                    msg += '  '+textStatus;
+                if (error && error.message)
+                    msg += '  '+error.message;
+                console.error(msg);
+            };
+            var on_album_success = (item) => {
+                // Precondition
+                this.album_item = item;
+                assert(this.album_item.isAlbum());
+                assert(this.album_item.children().length > 0);
+
+                // Determine index of this.item within album
+                var children = this.album_item.children();
+                for (var i=0; i<children.length; ++i) {
+                    if (children[i].path() === this.item.path()) {
+                        this.item_index = i;
+                        break;
+                    }
+                }
+                this.onPageUpdate.fire(this.item_index, children.length);
+
+                // Prefetch prev/next images
+                // ### FIXME
+                //var size = this.chooseSize(this.IMAGE_SIZES);
+                //this.prefetchImages(size);
+
+                // Postcondition
+                assert(this.item_index !== undefined);
+            };
+            Exposition.Item.Load(config, album_path, on_album_success, on_album_error);            
         }
 
         public load(): void {
@@ -42,19 +92,57 @@ module Exposition {
         }
 
         public goToNext(): void {
-            this.view.goToNext();
+            this.gotoPage(this.item_index+1);
         }
 
         public goToPrev(): void {
-            this.view.goToPrev();
+            this.gotoPage(this.item_index-1);
+        }
+
+        private gotoPage(page: number) {
+            // Preconditions
+            assert(this.album_item && this.album_item.isAlbum());
+            assert(page>0 && page<this.album_item.children().length);
+
+            // Set status            
+            this.item_index = page;
+            this.item = this.album_item.children()[this.item_index];
+
+            // Notify application
+            var path = this.item.path();
+            this.onPageUpdate.fire(this.item_index, this.album_item.children().length);
+            this.onPathChanged.fire(path);
+
+            // Load
+            this.view.loadItem(this.item);
         }
 
         public onKeydown(ev): bool {
-            return this.view.onKeydown(ev);
+            // Check if event can be handled
+            assert(ev.which);
+            if (!this.album_item)
+                return true;
+
+            // Check for left right arrow
+            var KEYCODE_LEFT = 37;
+            var KEYCODE_RIGHT = 39;
+            var KEYCODE_UP = 38;
+            var KEYCODE_ESCAPE = 27;
+            if (ev.which === KEYCODE_LEFT && this.item_index>0) {
+                this.goToPrev();
+                return false;
+            } else if (ev.which === KEYCODE_RIGHT && this.item_index+1<this.album_item.children().length) {
+                this.goToNext();
+                return false;
+            } else if ((ev.which === KEYCODE_UP || ev.which === KEYCODE_ESCAPE) && this.album_item) {
+                this.onLoadPath.fire(this.album_item.path());
+                return false;
+            }
         }
 
-
-
+        //
+        // Signals
+        //
 
         /** onLoadPath(path)    -> path {string} the path to load. */
         onLoadPath: Signal;
@@ -72,6 +160,17 @@ module Exposition {
 
         /** onPathChanged(path) -> path changed within the view. */
         public onPathChanged: Signal;
+
+        //
+        // Album Management
+        //
+        private loadItem(item: Item) {
+            // Precondition
+            assert(item.isPhoto());
+
+            // 
+        }
+
     }
  
 }
