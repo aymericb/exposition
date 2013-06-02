@@ -48,9 +48,10 @@ module Exposition {
         private is_loaded: bool;                                // Flag to remember is first image was loaded (m_on_ready)
         private item: Item;                                     // Photo item to display
 
-        // HTML
-        private main_div: JQuery;                               // Root view
-        private current_img: JQuery;                            // Currently displayed IMG element
+        // HTML        
+        private main_div: JQuery;                                  // Root view
+        private cache_div: JQuery;                                 // Cache DIV (invisible)
+        private current_img: JQuery;                               // Currently displayed IMG element
         private images_ready: PathToSizeToImgElementMap = {};      // Fully loaded images.
         private images_loading: PathToSizeToImgElementMap = {};    // Images being loaded.
 
@@ -68,12 +69,15 @@ module Exposition {
             assert(item);
             assert(item.isPhoto());
 
+            // Create cache_div
+            this.main_div = main_div;
+            this.cache_div = $('<div>').attr('id', 'cache').hide();
+            this.cache_div.appendTo(this.main_div);
+
             // Prepare IMAGE_SIZES
             this.config = config;
-            this.main_div = main_div;
             this.item = item;
             this.IMAGE_SIZES = config.photoSizes().sort((a,b) => {return a-b;});
-
 
             // Signals 
             this.onReady = new Signal();
@@ -183,8 +187,8 @@ module Exposition {
                 // A better alternative would be to put this setting in a CSS and
                 // make sure all CSS assets are pre-loaded at startup.
                 // We should also display a regular div with text, rather than an image.
-                img = $('<img>').hide();
-                this.main_div.append(img);
+                img = $('<img>');
+                this.cache_div.append(img);
                 this.setImage(this.images_loading, path, size, img);
                 img.addClass('error');
                 img.attr('src', this.config.getCautionImageUrl());
@@ -200,8 +204,8 @@ module Exposition {
                         this.onReady.fire();
                     }
                 };
-                img.load(show_error);
-                img.error(show_error);
+                (<any>img).load(show_error);
+                (<any>img).error(show_error);
             };
             var on_success = () => {
                 this.removeLoadingImage(path, size);
@@ -213,10 +217,10 @@ module Exposition {
                     this.onReady.fire();
                 }
             };
-            var img = Exposition.loadImage(url, on_success, on_fail, this.item.title());
+            var img: JQuery = Exposition.loadImage(url, on_success, on_fail, this.item.title());
             this.setImage(this.images_loading, path, size, img);
-            img.hide();
-            this.main_div.append(img);
+            //img.hide();
+            this.cache_div.append(img);
         };
 
         /**
@@ -294,7 +298,7 @@ module Exposition {
             this.is_loaded = false;
             this.item = item;
             if (this.current_img)
-                this.current_img.hide();
+                this.current_img.appendTo(this.cache_div);
             this.current_img = null;
 
             // Load best size
@@ -357,8 +361,10 @@ module Exposition {
                 return;
 
             // Update current image
-            if (this.current_img)
-                this.current_img.hide();
+            if (this.current_img) {
+                //this.current_img.hide();
+                this.current_img.appendTo(this.cache_div);
+            }                
             this.current_img = img;
 
             // Get sizes
@@ -400,7 +406,8 @@ module Exposition {
             });
 
             // Make visible
-            img.show();
+            img.appendTo(this.main_div);
+            //img.show();
         };
 
 
