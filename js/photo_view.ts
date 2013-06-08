@@ -11,7 +11,7 @@
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
-/// <reference path="view.ts" />
+/// <reference path="controller.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -29,15 +29,14 @@ module Exposition {
     }
 
     /**
-     * PhotoView class
+     * PhotoController class
      *
      * The photo view provides the mechanism for loading and displaying a photo
      * into the browser view, at the most appropriate size. It also loads the parent
      * album and provide paging information (next/previous photo).
      *
      */
-    export class PhotoView implements View {
-
+    export class PhotoView {
 
 
         //
@@ -48,12 +47,11 @@ module Exposition {
         private config: Config;
         private is_loaded: bool;                                // Flag to remember is first image was loaded (m_on_ready)
         private item: Item;                                     // Photo item to display
-        private album: Item;                                    // Parent item
-        private item_index: number;                             // Current child index for this.item within this.album
 
-        // HTML
-        private main_div: JQuery;                               // Root view
-        private current_img: JQuery;                            // Currently displayed IMG element
+        // HTML        
+        private main_div: JQuery;                                  // Root view
+        private cache_div: JQuery;                                 // Cache DIV (invisible)
+        private current_img: JQuery;                               // Currently displayed IMG element
         private images_ready: PathToSizeToImgElementMap = {};      // Fully loaded images.
         private images_loading: PathToSizeToImgElementMap = {};    // Images being loaded.
 
@@ -64,58 +62,21 @@ module Exposition {
          * Constructor
          * No side effect on Main View. Use load()
          */
-        constructor(config: Config, main_div: JQuery, item: Item) {
+        constructor(config: Config, main_div: JQuery) {
 
             // Preconditions
             assert(main_div);
-            assert(item);
-            assert(item.isPhoto());
+
+            // Create cache_div
+            this.main_div = main_div;
+            this.cache_div = $('<div>').attr('id', 'cache').hide();
+            this.cache_div.appendTo(this.main_div);
 
             // Prepare IMAGE_SIZES
             this.config = config;
-            this.main_div = main_div;
-            this.item = item;
             this.IMAGE_SIZES = config.photoSizes().sort((a,b) => {return a-b;});
 
-            // Load parent album (for photo navigation prev/next)
-            var album_path = this.item.parentPath();
-            var on_album_error = (jqXHR, textStatus, error) => {
-                var msg = 'Cannot load parent album "'+album_path+'"';
-                if (textStatus)
-                    msg += '  '+textStatus;
-                if (error && error.message)
-                    msg += '  '+error.message;
-                console.error(msg);
-            };
-            var on_album_success = (item) => {
-                // Precondition
-                this.album = item;
-                assert(this.album);
-                assert(this.album.children().length > 0);
-
-                // Determine index of this.item within album
-                var children = this.album.children();
-                for (var i=0; i<children.length; ++i) {
-                    if (children[i].path() === this.item.path()) {
-                        this.item_index = i;
-                        break;
-                    }
-                }
-                this.onPageUpdate.fire(this.item_index, children.length);
-
-                // Prefetch prev/next images
-                var size = this.chooseSize(this.IMAGE_SIZES);
-                this.prefetchImages(size);
-
-                // Postcondition
-                assert(this.item_index !== undefined);
-            };
-            Exposition.Item.Load(config, album_path, on_album_success, on_album_error);
-
             // Signals 
-            this.onLoadPath = new Signal();
-            this.onPathChanged = new Signal();
-            this.onPageUpdate = new Signal();
             this.onReady = new Signal();
         }
 
@@ -171,6 +132,18 @@ module Exposition {
                 return {};
         };
 
+        /** Check if image exists in cache for given size */
+        private hasImage(cache: PathToSizeToImgElementMap, path: string, size: number): bool {
+            if (cache[path]) {
+                if (cache[path][size.toString()])
+                    return true;
+                else
+                    return false;
+            } else {
+                return false;
+            }
+        }
+
         //
         // Image Loading (private)
         //
@@ -180,7 +153,7 @@ module Exposition {
          * @param sizes {array} Integers sorted by increasing number
          * @return the chosen size
          */
-        private chooseSize(sizes: number[]) {
+        private chooseSize(sizes: number[]): number {
             // Precondition
             assert(Array.isArray(sizes) && sizes.length>0);
 
@@ -223,8 +196,8 @@ module Exposition {
                 // A better alternative would be to put this setting in a CSS and
                 // make sure all CSS assets are pre-loaded at startup.
                 // We should also display a regular div with text, rather than an image.
-                img = $('<img>').hide();
-                this.main_div.append(img);
+                img = $('<img>');
+                this.cache_div.append(img);
                 this.setImage(this.images_loading, path, size, img);
                 img.addClass('error');
                 img.attr('src', this.config.getCautionImageUrl());
@@ -240,12 +213,12 @@ module Exposition {
                         this.onReady.fire();
                     }
                 };
-                img.load(show_error);
-                img.error(show_error);
+                (<any>img).load(show_error);
+                (<any>img).error(show_error);
             };
             var on_success = () => {
                 this.removeLoadingImage(path, size);
-                this.prefetchImages(size);
+                // ### FIXME this.prefetchImages(size);
                 this.setImage(this.images_ready, path, size, img);
                 this.updateLayout();
                 if (!this.is_loaded && this.item.path()===path) {
@@ -253,83 +226,10 @@ module Exposition {
                     this.onReady.fire();
                 }
             };
-            var img = Exposition.loadImage(url, on_success, on_fail, this.item.title());
+            var img: JQuery = Exposition.loadImage(url, on_success, on_fail, this.item.title());
             this.setImage(this.images_loading, path, size, img);
-            img.hide();
-            this.main_div.append(img);
-        };
-
-        /**
-         * Prefetch the next and previous images at the current size
-         */
-        private prefetchImages(size: number) {
-            // Check if album is loaded
-            if (!this.album)
-                return;
-
-            // Check if no other image is loading
-            if (this.getCacheSize(this.images_loading) !== 0)
-                return;
-
-            // Helper function
-            var prefetch = (index) => {
-                var path = children[index].path();
-                if (!this.images_ready[path] && !this.images_loading[path]) {
-                    this.loadImage(path, size);
-                }
-            };
-
-            // Prefetch next/previous image
-            var children = this.album.children();
-            if (this.item_index>0)
-                prefetch(this.item_index-1);
-            if (this.item_index+1<children.length)
-                prefetch(this.item_index+1);
-        };
-
-        //
-        // Event Handling (private)
-        //
-
-        /** 
-         * Go to next or previous page. The PhotoView handles the internal navigation instead
-         * of emitting a onLoadPath signal. This is an optimization that makes it possible
-         * for the PhotoView to pre-fetch next or previous items. It also avoids reloading the
-         * previously seen photos. The app is notified of the navigation via the onPathChanged() signal.
-         * @param {int} offset. +1 go to next page. -1 go to previous page. Other values not allowed.
-         */
-        private gotoPage(offset: number) {
-            // Preconditions
-            assert(offset === 1 || offset === -1);
-
-            // Change current state
-            var children = this.album.children();
-            this.item_index = this.item_index+offset;
-            this.item = children[this.item_index];
-            if (this.current_img)
-                this.current_img.hide();
-            this.current_img = null;
-
-            // Notify application
-            var path = this.item.path();
-            this.onPageUpdate.fire(this.item_index, children.length);
-            this.onPathChanged.fire(path);
-            this.is_loaded = false;
-
-            // Load best size
-            var size = this.chooseSize(this.IMAGE_SIZES);
-            if (size.toString() in this.getImages(this.images_ready, path)) {
-                this.onReady.fire();
-                this.updateLayout();
-            } else if (size.toString() in this.getImages(this.images_loading, path)) {
-                // Another loadImage() is in progress.
-                // Wait for image to be loaded. updateLoayout() will be called to display the photo
-            } else {
-                this.loadImage(path, size);
-            }
-
-            // Prefetch prev/next images
-            this.prefetchImages(size);
+            //img.hide();
+            this.cache_div.append(img);
         };
 
         //
@@ -345,14 +245,57 @@ module Exposition {
          * internally as non critical errors, and displayed to the end-user.
          *
          */
-        public load() {
+        public load(item: Item) {
 
+            // Preconditions
+            assert(item && item.isPhoto());
+
+            // Set status
             this.is_loaded = false;
+            this.item = item;
+            if (this.current_img)
+                this.current_img.appendTo(this.cache_div);
+            this.current_img = null;
 
             // Load best size
+            var path = this.item.path();
             var size = this.chooseSize(this.IMAGE_SIZES);
-            this.loadImage(this.item.path(), size);
+            if (size.toString() in this.getImages(this.images_ready, path)) {
+                this.onReady.fire();
+                this.updateLayout();
+            } else if (size.toString() in this.getImages(this.images_loading, path)) {
+                // Another loadImage() is in progress.
+                // Wait for image to be loaded. updateLoayout() will be called to display the photo
+            } else {
+                this.loadImage(path, size);
+            }            
+
         };
+
+        /**
+         * Prefetch photo into view.
+         * 
+         * This method does not change the current photo, but it fetches the photo associated
+         * to the item at the most suitable resolution.
+         *
+         * May throw on error
+         */
+        public prefetch(item: Item) {
+
+            // Preconditions
+            assert(item && item.isPhoto());
+
+            // Get best size
+            var path = item.path();
+            var size = this.chooseSize(this.IMAGE_SIZES);
+
+            // Check if image is already loading or loaded
+            if (this.hasImage(this.images_ready, path, size) || 
+                this.hasImage(this.images_loading, path, size))
+                return;
+
+            this.loadImage(path, size);
+        }
 
         /**
          * Update layout of photo in the view
@@ -399,8 +342,10 @@ module Exposition {
                 return;
 
             // Update current image
-            if (this.current_img)
-                this.current_img.hide();
+            if (this.current_img) {
+                //this.current_img.hide();
+                this.current_img.appendTo(this.cache_div);
+            }                
             this.current_img = img;
 
             // Get sizes
@@ -442,59 +387,14 @@ module Exposition {
             });
 
             // Make visible
-            img.show();
+            img.appendTo(this.main_div);
+            //img.show();
         };
 
-        /** Go to next page */
-        public goToNext() {
-            this.gotoPage(+1);
-        };
-
-        /** Go to previous page */
-        public goToPrev() {
-            this.gotoPage(-1);
-        };
-
-        /** Keyboard handler */
-        public onKeydown(ev) {
-            // Check if event can be handled
-            assert(ev.which);
-            if (!this.album)
-                return true;
-
-            // Check for left right arrow
-            var KEYCODE_LEFT = 37;
-            var KEYCODE_RIGHT = 39;
-            var KEYCODE_UP = 38;
-            var KEYCODE_ESCAPE = 27;
-            if (ev.which === KEYCODE_LEFT && this.item_index>0) {
-                this.gotoPage(-1);
-                return false;
-            } else if (ev.which === KEYCODE_RIGHT && this.item_index+1<this.album.children().length) {
-                this.gotoPage(+1);
-                return false;
-            } else if ((ev.which === KEYCODE_UP || ev.which === KEYCODE_ESCAPE) && this.album) {
-                this.onLoadPath.fire(this.album.path());
-                return false;
-            }
-        };
-
-        /** onLoadPath(path) -> path is a string pointing to the path to load. */
-        public onLoadPath: Signal;
-
-        /** onPathChanged(path) -> path changed within the view. */
-        public onPathChanged: Signal;
-
-        /**
-         * onPageUpdate(show, current_page, total_page)
-         * current_page {int}   -> current page, index 0
-         * total_page {int}     -> number of pages in total >= 1
-         */
-        public onPageUpdate: Signal;
 
         /** onReady()            -> View is ready to show. */
         public onReady: Signal;
     };
 
-}
 
+} // module Exposition

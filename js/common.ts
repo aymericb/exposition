@@ -103,7 +103,7 @@ module Exposition {
      * - http://stackoverflow.com/questions/4285042/can-jquery-ajax-load-image
      * - http://stackoverflow.com/questions/5057990/how-can-i-check-if-a-background-image-is-loaded
      */
-    export var loadImage = function(url, on_success, on_fail, alt_text, user_data?) {
+    export var loadImage = function(url, on_success, on_fail, alt_text, user_data?) : JQuery {
         // Precondition
         assert(url);
         assert(on_success);

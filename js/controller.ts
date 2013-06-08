@@ -17,7 +17,7 @@
 
 module Exposition {
 
-    export interface View {
+    export interface Controller {
 
         //constructor(config: Config, main_div: JQuery, item: Item);
 
@@ -27,9 +27,20 @@ module Exposition {
         goToPrev(): void;
         onKeydown(ev): bool;
 
+        /** onLoadPath(path)    -> path {string} the path to load. */
         onLoadPath: Signal;
+
+        /**
+         * onPageUpdate(show, current_page, total_page)
+         * show {bool}          -> if false, hide ignore other parameters
+         * current_page {int}   -> current page, index 0
+         * total_page {int}     -> number of pages in total >= 1
+         */
         onPageUpdate: Signal;
+
+        /** onReady()            -> View is ready to show. */
         onReady: Signal;
+
         //onPathChanged: Signal;
 
     }
