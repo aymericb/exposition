@@ -132,6 +132,18 @@ module Exposition {
                 return {};
         };
 
+        /** Check if image exists in cache for given size */
+        private hasImage(cache: PathToSizeToImgElementMap, path: string, size: number): bool {
+            if (cache[path]) {
+                if (cache[path][size.toString()])
+                    return true;
+                else
+                    return false;
+            } else {
+                return false;
+            }
+        }
+
         //
         // Image Loading (private)
         //
@@ -141,7 +153,7 @@ module Exposition {
          * @param sizes {array} Integers sorted by increasing number
          * @return the chosen size
          */
-        private chooseSize(sizes: number[]) {
+        private chooseSize(sizes: number[]): number {
             // Precondition
             assert(Array.isArray(sizes) && sizes.length>0);
 
@@ -220,50 +232,6 @@ module Exposition {
             this.cache_div.append(img);
         };
 
-        /**
-         * Prefetch the next and previous images at the current size
-         */
-        /*
-        private prefetchImages(size: number) {
-            // Check if album is loaded
-            if (!this.album)
-                return;
-
-            // Check if no other image is loading
-            if (this.getCacheSize(this.images_loading) !== 0)
-                return;
-
-            // Helper function
-            var prefetch = (index) => {
-                var path = children[index].path();
-                if (!this.images_ready[path] && !this.images_loading[path]) {
-                    this.loadImage(path, size);
-                }
-            };
-
-            // Prefetch next/previous image
-            var children = this.album.children();
-            if (this.item_index>0)
-                prefetch(this.item_index-1);
-            if (this.item_index+1<children.length)
-                prefetch(this.item_index+1);
-        };
-
-        public prefetch(item: Item) {
-            // Preconditions
-            assert(item.isPhoto());
-
-            // Check if needs prefetch
-            var size = this.chooseSize(this.IMAGE_SIZES);
-            var path = item.path();
-            if (this.images_ready[path] || this.images_loading[path])
-                return;
-
-            // Load image
-            this.loadImage(path, size);
-        }
-        */
-
         //
         // Public API
         //
@@ -303,6 +271,31 @@ module Exposition {
             }            
 
         };
+
+        /**
+         * Prefetch photo into view.
+         * 
+         * This method does not change the current photo, but it fetches the photo associated
+         * to the item at the most suitable resolution.
+         *
+         * May throw on error
+         */
+        public prefetch(item: Item) {
+
+            // Preconditions
+            assert(item && item.isPhoto());
+
+            // Get best size
+            var path = item.path();
+            var size = this.chooseSize(this.IMAGE_SIZES);
+
+            // Check if image is already loading or loaded
+            if (this.hasImage(this.images_ready, path, size) || 
+                this.hasImage(this.images_loading, path, size))
+                return;
+
+            this.loadImage(path, size);
+        }
 
         /**
          * Update layout of photo in the view

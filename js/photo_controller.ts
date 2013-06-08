@@ -40,7 +40,8 @@ module Exposition {
 
             // Initialize view
             this.view = new PhotoView(config, main_div);
-            this.onReady = this.view.onReady;
+            this.view.onReady.on( () => { this.on_ready(); } );
+            this.onReady = new Signal();
             this.onPageUpdate = new Signal();
             this.onLoadPath = new Signal();
             this.onPathChanged = new Signal();
@@ -73,9 +74,7 @@ module Exposition {
                 this.onPageUpdate.fire(this.item_index, children.length);
 
                 // Prefetch prev/next images
-                // ### FIXME
-                //var size = this.chooseSize(this.IMAGE_SIZES);
-                //this.prefetchImages(size);
+                this.prefetch();
 
                 // Postcondition
                 assert(this.item_index !== undefined);
@@ -140,12 +139,27 @@ module Exposition {
             }
         }
 
+        private prefetch() {
+            if (!this.album_item)
+                return;
+            var children = this.album_item.children();
+            if (this.item_index>0)
+                this.view.prefetch(children[this.item_index-1]);
+            if (this.item_index+1<children.length)
+                this.view.prefetch(children[this.item_index+1]);
+        }
+
+        private on_ready() {
+            this.onReady.fire();
+            this.prefetch();
+        }
+
         //
         // Signals
         //
 
         /** onLoadPath(path)    -> path {string} the path to load. */
-        onLoadPath: Signal;
+        public onLoadPath: Signal;
 
         /**
          * onPageUpdate(show, current_page, total_page)
@@ -153,10 +167,10 @@ module Exposition {
          * current_page {int}   -> current page, index 0
          * total_page {int}     -> number of pages in total >= 1
          */
-        onPageUpdate: Signal;
+        public onPageUpdate: Signal;
 
         /** onReady()            -> View is ready to show. */
-        onReady: Signal;
+        public onReady: Signal;
 
         /** onPathChanged(path) -> path changed within the view. */
         public onPathChanged: Signal;
@@ -164,11 +178,10 @@ module Exposition {
         //
         // Album Management
         //
+        
         private loadItem(item: Item) {
             // Precondition
             assert(item.isPhoto());
-
-            // 
         }
 
     }
