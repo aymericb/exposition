@@ -62,12 +62,10 @@ module Exposition {
          * Constructor
          * No side effect on Main View. Use load()
          */
-        constructor(config: Config, main_div: JQuery, item: Item) {
+        constructor(config: Config, main_div: JQuery) {
 
             // Preconditions
             assert(main_div);
-            assert(item);
-            assert(item.isPhoto());
 
             // Create cache_div
             this.main_div = main_div;
@@ -76,7 +74,6 @@ module Exposition {
 
             // Prepare IMAGE_SIZES
             this.config = config;
-            this.item = item;
             this.IMAGE_SIZES = config.photoSizes().sort((a,b) => {return a-b;});
 
             // Signals 
@@ -280,16 +277,7 @@ module Exposition {
          * internally as non critical errors, and displayed to the end-user.
          *
          */
-        public load() {
-
-            this.is_loaded = false;
-
-            // Load best size
-            var size = this.chooseSize(this.IMAGE_SIZES);
-            this.loadImage(this.item.path(), size);
-        };
-
-        public loadItem(item: Item) {
+        public load(item: Item) {
 
             // Preconditions
             assert(item && item.isPhoto());

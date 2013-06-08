@@ -39,7 +39,7 @@ module Exposition {
             assert(item.isPhoto());
 
             // Initialize view
-            this.view = new PhotoView(config, main_div, item);
+            this.view = new PhotoView(config, main_div);
             this.onReady = this.view.onReady;
             this.onPageUpdate = new Signal();
             this.onLoadPath = new Signal();
@@ -84,7 +84,7 @@ module Exposition {
         }
 
         public load(): void {
-            this.view.load();
+            this.view.load(this.item);
         }
 
         public updateLayout(): void {
@@ -114,7 +114,7 @@ module Exposition {
             this.onPathChanged.fire(path);
 
             // Load
-            this.view.loadItem(this.item);
+            this.view.load(this.item);
         }
 
         public onKeydown(ev): bool {
