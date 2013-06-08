@@ -46,10 +46,11 @@ If you want to acquire the software under a proprietary license more suitable fo
 }
 ```
 * Navigate to the **index.html** page. Exposition should now be working and displaying your photos and albums.
-* Optionally,  you can navigate to **update.html** to force your web server to cache your photos at all configured sizes.
+* Optionally, you can navigate to **update.html** to force your web server to cache your photos at all configured sizes.
+
 
 ## Futher Information 
-* [Download Exposition 0.3.0](http://exposition.barthe.ph/download/exposition-0.3.0.tar.gz)
+* [Download Exposition 0.4.0](http://exposition.barthe.ph/download/exposition-0.4.0.tar.gz)
 * [License](doc/license.txt)
 * Live Demo. **TODO**
 * [Changelog](doc/changelog.md)
