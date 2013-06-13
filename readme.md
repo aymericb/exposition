@@ -47,7 +47,7 @@ If you want to acquire the software under a proprietary license more suitable fo
 ```
 * Navigate to the **index.html** page. Exposition should now be working and displaying your photos and albums.
 * Optionally, you can navigate to **update.html** to force your web server to cache your photos at all configured sizes.
-
+* You can also deploy Exposition with [NGINX](http://wiki.nginx.org/Main) and [PHP-FPM](http://php-fpm.org) instead of Apache. You will need to edit the site's rules based on the configuration given in the file ``nginx.conf`` inside the release package. This is how the demo site is deployed.
 
 ## Futher Information 
 * [Download Exposition 0.4.0](http://exposition.barthe.ph/download/exposition-0.4.0.tar.gz)
