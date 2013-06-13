@@ -52,6 +52,7 @@ module Exposition {
         // Config
         private makeImageUrl: (size:number, path:string) => string;
         private THUMBNAIL_MARGIN: number;
+        private THUMBNAIL_V_MARGIN: number;
         private THUMBNAIL_SIZE: number;
         private THUMBNAIL_TITLE_MARGIN: number;
         private THUMBNAIL_TITLE_HEIGHT: number;
@@ -68,6 +69,7 @@ module Exposition {
             // Initialize config
             this.makeImageUrl = (size:number, path:string) => { return config.makeImageUrl(size, path); };
             this.THUMBNAIL_MARGIN = config.thumbnailMargin();
+            this.THUMBNAIL_V_MARGIN = config.thumbnailVMargin();
             this.THUMBNAIL_SIZE = config.thumbnailSize();
             this.THUMBNAIL_TITLE_MARGIN = config.thumbnailTitleMargin();
             this.THUMBNAIL_TITLE_HEIGHT = config.thumbnailTitleHeight();
@@ -169,17 +171,14 @@ module Exposition {
             var WIDTH       = this.THUMBNAIL_MARGIN + this.THUMBNAIL_SIZE;
             var HEIGHT      = this.THUMBNAIL_MARGIN + this.THUMBNAIL_SIZE+this.THUMBNAIL_TITLE_MARGIN+this.THUMBNAIL_TITLE_HEIGHT;
             var COL_COUNT   = Math.floor( (VIEW_WIDTH-2*this.THUMBNAIL_MARGIN)/WIDTH );
-            var ROW_COUNT   = Math.floor( (VIEW_HEIGHT-2*this.THUMBNAIL_MARGIN)/HEIGHT );
+            var ROW_COUNT   = Math.floor( (VIEW_HEIGHT-this.THUMBNAIL_V_MARGIN)/HEIGHT );
             if (ROW_COUNT === 0) ROW_COUNT = 1;
             if (COL_COUNT === 0) COL_COUNT = 1;
             this.row_count = ROW_COUNT;
             this.col_count = COL_COUNT;
             var H_MARGIN    = Math.floor( (VIEW_WIDTH - COL_COUNT*WIDTH + this.THUMBNAIL_MARGIN)/2 );
             var V_MARGIN    = Math.floor( (VIEW_HEIGHT - ROW_COUNT*HEIGHT + this.THUMBNAIL_MARGIN)/2 );
-            if (COL_COUNT*ROW_COUNT > this.items.length)
-                V_MARGIN = this.THUMBNAIL_MARGIN;
-            if (COL_COUNT >= this.items.length)
-                H_MARGIN = this.THUMBNAIL_MARGIN;
+            var V_MARGIN = this.THUMBNAIL_V_MARGIN;
             if (Exposition.debug) {
                 console.log('Resizing album. Items: '+this.items.length+' COL_COUNT: '+COL_COUNT+' ROW_COUNT: '+ROW_COUNT);
             }

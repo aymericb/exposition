@@ -83,6 +83,9 @@ module Exposition {
         public thumbnailMargin() {
             return 30;
         };
+        public thumbnailVMargin() {
+            return 40;
+        };
         public thumbnailTitleMargin() {
             return 10;
         };
