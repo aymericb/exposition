@@ -206,7 +206,7 @@ module Exposition {
                 var show_error = () => {
                     //removeLoadingImage(path, size);
                     this.setImage(this.images_ready, path, size, img);
-                    console.log('path: '+path+'    size: '+size+'    img:'+img);
+                    //console.log('path: '+path+'    size: '+size+'    img:'+img);
                     this.updateLayout();
                     if (!this.is_loaded && this.item.path()===path) {
                         this.is_loaded = true;
