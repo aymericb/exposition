@@ -44,13 +44,14 @@ module.exports = function(grunt) {
                 separator: ';'
             },
             release: {
-                src: ['js/*.js', 'lib/*.js', 'build/js/*.js'],
+                src: ['js/*.js', 'build/js/*.js', 'lib/*.js'],
                 dest: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
         uglify: {
             options: {
-                banner: '<%= pkg.copyright_notice %>'
+                banner: '<%= pkg.copyright_notice %>',
+                preserveComments: 'some'
             },
             release: {
                 src: 'build/js/<%= pkg.name %>-<%= pkg.version %>.js',
