@@ -307,6 +307,10 @@ module Exposition {
          */
         public updateLayout() {
 
+            // Check if view has a current item
+            if (!this.item)
+                return;
+
             // Find the best loaded image for the current size of the view
             var sizes = [];         // size array
             var ready_imgs = this.getImages(this.images_ready, this.item.path());    // Map: size => jQuery element

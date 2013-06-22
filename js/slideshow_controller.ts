@@ -28,7 +28,10 @@ module Exposition {
         private album_paths_to_load: string[];  // Queue of album items to load (init)
         private item: Item;                     // Root item
         private photos: Item[];                 // Array of photos in display order
-        //private current_photo: number;          // Current photo shown
+
+        // Controller state
+        private is_running: bool;
+        private timer: number;
 
         // View
         private main_div: JQuery;
@@ -47,16 +50,34 @@ module Exposition {
             // Init state
             this.album_paths_to_load = [];
             this.photos = [];
-            //this.current_photo = 0;
             this.view = new PhotoView(config, main_div);            
+            this.is_running = false;
 
             // Create signals
             this.onLoadPath = new Signal();
             this.onPageUpdate = new Signal();
             this.onReady = new Signal();
+            this.onFinished = new Signal();
         }
 
         public load() {
+
+            // Fullscreen support
+            // This need to be done within the event handler, because of security concerns 
+            // We cannot wait for the image to be ready
+            if ($(document).fullScreen() != null) {
+                $(document).fullScreen(true);
+                $(document).on("fullscreenchange", () => {
+                    if ($(document).fullScreen() === false)
+                        this.stopSlideshow();
+                });
+            } else {
+                // ### TODO: Show message in view about ESC can be used to exit slideshow
+                // ### TODO: Implement tap/click to iPad
+            }
+
+            // Load resources
+            this.is_running = true;
             if (this.item.isPhoto()) {
                 this.album_paths_to_load.push(this.item.parentPath());
                 this.loadNextAlbum();
@@ -79,13 +100,29 @@ module Exposition {
         }
 
         public onKeydown(ev): bool {
-            // ### TODO
+            var KEYCODE_ESCAPE = 27;
+            if (ev.which === KEYCODE_ESCAPE) {
+                this.stopSlideshow();
+                return false;
+            }
             return true;
         }
 
         public onLoadPath: Signal;
         public onPageUpdate: Signal;
         public onReady: Signal;
+
+        // Only for slideshow
+        public onFinished: Signal;
+
+        //
+        // Failure
+        //
+
+        private onFail(err) {            
+            console.error(err);
+            // ### TODO: Show error in view. Check is_running
+        }
 
         //
         // Init
@@ -95,58 +132,75 @@ module Exposition {
             // Precondition
             assert(this.album_paths_to_load && this.album_paths_to_load.length>0);
 
+            // Check if slideshow is running
+            if (!this.is_running)
+                return;
+
             // Load next album
             var path = this.album_paths_to_load.pop();
             var on_fail = () => {
-                console.error("Failed to load album "+path);
-                // ### TODO show error in view              
+                this.onFail( new Error("Faileld to load album "+path));
             }
-            Item.Load(this.config, path, (item)=>this.onAlbumLoaded(item), on_fail); 
+            Item.Load(this.config, path, (item)=>this.onAlbumLoaded(item), ()=>on_fail); 
         }
 
         private onAlbumLoaded(item: Item) {
             // Precondition
             assert(item.isAlbum());
 
-            // Push sub albums to load
-            var children = item.children();
-            for (var i=0; i<children.length; ++i) {
-                var subitem = children[i];
-                if (subitem.isAlbum()) {
-                    this.album_paths_to_load.push(subitem.path());
-                } else {
-                    this.photos.push(subitem);
+            try {
+                // Push sub albums to load
+                var children = item.children();
+                for (var i=0; i<children.length; ++i) {
+                    var subitem = children[i];
+                    if (subitem.isAlbum()) {
+                        this.album_paths_to_load.push(subitem.path());
+                    } else {
+                        this.photos.push(subitem);
+                    }
                 }
+
+                // Check if all items are loaded
+                if (this.album_paths_to_load.length === 0) {
+                    this.photos = this.photos.reverse();
+                    this.showNextPhoto(0);
+                    this.onReady.fire();
+                    return;
+                }
+
+                // Load other sub_items
+                this.loadNextAlbum();                
+            } catch (err) {
+                this.onFail(err);
             }
 
-            // Check if all items are loaded
-            if (this.album_paths_to_load.length === 0) {
-                this.photos = this.photos.reverse();
-                // ### FIXME. Empty albums are not supported.
-                this.showPhoto(0);
-                this.onReady.fire();
-                return;
-            }
-
-            // Load other sub_items
-            this.loadNextAlbum();
         }
 
         //
         // Slideshow
         //
 
+        private stopSlideshow() {
+            clearTimeout(this.timer);
+            this.is_running = false;
+            this.onFinished.fire();
+        }
+
         // ### FIXME Wait until the photo is fetched
-        private showPhoto(photo_index: number) {
+        private showNextPhoto(photo_index: number) {
             // Precondition
             assert(photo_index>=0 && photo_index<this.photos.length);
+
+            // Check if slideshow is running
+            if (!this.is_running)
+                return;
 
             // Show the photo
             this.view.load(this.photos[photo_index])
 
             // Show next photo
-            setTimeout( () => { 
-                this.showPhoto( (photo_index+1)%this.photos.length ); 
+            this.timer = setTimeout( () => { 
+                this.showNextPhoto( (photo_index+1)%this.photos.length ); 
             }, this.SLIDE_TIMEOUT);
 
         }

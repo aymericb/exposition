@@ -8,6 +8,7 @@
 //
 
 /// <reference path="../lib/jquery.d.ts" />
+/// <reference path="../lib/jquery.fullscreen.d.ts" />
 /// <reference path="../lib/spin.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
@@ -24,12 +25,15 @@ module Exposition {
 
     export interface ApplicationDivs {
         main: JQuery;
+        header: JQuery;
+        footer: JQuery;
         breadcrumb: JQuery;
         page_handler: JQuery;
         page_handler_left: JQuery;
         page_handler_center: JQuery;
         page_handler_right: JQuery;
         btn_download: JQuery;
+        btn_slideshow: JQuery;
     }
 
     /**
@@ -57,7 +61,7 @@ module Exposition {
         private loading_timer;                          // Timer use to delay showing the loading box
         private loading_spinner;                        // ph.barthe.Spinner object
 
-        private divs;                                   // Divs used for display
+        private divs: ApplicationDivs;                  // Divs used for display
         private main_div;                               // Main div used for rendering
 
         private view;                                   // Current view
@@ -347,12 +351,16 @@ module Exposition {
 
             // Update GUI
             this.main_div.empty();
-            this.page_handler.hide();
+            //this.page_handler.hide();
             this.showDelayedLoading();
+            this.divs.header.hide();
+            this.divs.footer.hide();
+            this.main_div.addClass('fullscreen');
 
             // Create SlideshowController
             this.view = new SlideshowController(this.config, this.main_div, this.item);
-            this.view.onReady.on( () => {this.onSlideshowStarted();} );
+            this.view.onReady.on( () => this.onSlideshowStarted() );
+            this.view.onFinished.on( () => this.onSlideshowFinished() );
             this.view.load();
         }
 
@@ -360,8 +368,19 @@ module Exposition {
             this.hideLoading();
         }
 
-        private onStopSlideshow() {
+        private onSlideshowFinished() {
             // ### TODO
+            console.log("Stop slideshow");
+
+            // Update GUI
+            this.main_div.empty();
+            this.hideLoading();            
+            this.showDelayedLoading();
+            this.divs.header.show();
+            this.divs.footer.show();
+            this.main_div.removeClass('fullscreen');
+            //this.loadPath(this.path);
+            this.loadPath(this.path, false, false); // ### FIXME. Restore previous view instead, pages not remembered.
         }
 
         //
