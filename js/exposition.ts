@@ -14,6 +14,7 @@
 /// <reference path="item.ts" />
 /// <reference path="photo_controller.ts" />
 /// <reference path="album_controller.ts" />
+/// <reference path="slideshow_controller.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -201,6 +202,7 @@ module Exposition {
         private loadPath(path: string, push_state: bool, delayed_loading?: bool) {
             if (Exposition.debug)
                 console.log("Loading: "+path);
+            this.item = null;
             this.main_div.empty();
             this.page_handler.hide();
             this.breadcrumb_handler.setPath(path);
@@ -325,10 +327,42 @@ module Exposition {
             // Initialize key shortcuts handler
             $(document).keydown( (ev) => { return this.onKeydown(ev); } );
 
+            // Initialize slideshow
+            this.divs.btn_slideshow.show();
+            this.divs.btn_slideshow.click( () => { this.onStartSlideshow(); } )
+
             // Initialize view
             this.loadPath(this.path, true, false);
             $(window).resize( () => { this.onResize(); } );
         };
+
+        //
+        // Slideshow
+        //
+
+        private onStartSlideshow() {
+            // Item might be null in between loadPath() and onLoadPath()
+            if (!this.item)
+                return;
+
+            // Update GUI
+            this.main_div.empty();
+            this.page_handler.hide();
+            this.showDelayedLoading();
+
+            // Create SlideshowController
+            this.view = new SlideshowController(this.config, this.main_div, this.item);
+            this.view.onReady.on( () => {this.onSlideshowStarted();} );
+            this.view.load();
+        }
+
+        private onSlideshowStarted() {
+            this.hideLoading();
+        }
+
+        private onStopSlideshow() {
+            // ### TODO
+        }
 
         //
         // Constructor
