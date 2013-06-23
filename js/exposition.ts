@@ -368,9 +368,6 @@ module Exposition {
         }
 
         private onSlideshowFinished() {
-            // ### TODO
-            console.log("Stop slideshow");
-
             // Update GUI
             this.main_div.empty();
             this.hideLoading();            
