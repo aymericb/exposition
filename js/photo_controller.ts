@@ -83,7 +83,7 @@ module Exposition {
         }
 
         public load(): void {
-            this.view.load(this.item);
+            this.view.display(this.item);
         }
 
         public updateLayout(): void {
@@ -113,7 +113,7 @@ module Exposition {
             this.onPathChanged.fire(path);
 
             // Load
-            this.view.load(this.item);
+            this.view.display(this.item);
         }
 
         public onKeydown(ev): bool {
@@ -144,9 +144,9 @@ module Exposition {
                 return;
             var children = this.album_item.children();
             if (this.item_index>0)
-                this.view.prefetch(children[this.item_index-1]);
+                this.view.load(children[this.item_index-1]);
             if (this.item_index+1<children.length)
-                this.view.prefetch(children[this.item_index+1]);
+                this.view.load(children[this.item_index+1]);
         }
 
         private on_ready() {

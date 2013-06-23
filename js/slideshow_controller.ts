@@ -23,6 +23,7 @@ module Exposition {
         // Config
         private config: Config;
         private SLIDE_TIMEOUT: number = 2000;   // 2 seconds ### TODO: Add to config object
+        private MAX_PREFETCH_COUNT = 2;         // Max number of photos to load in advance
 
         // Model
         private album_paths_to_load: string[];  // Queue of album items to load (init)
@@ -30,7 +31,12 @@ module Exposition {
         private photos: Item[];                 // Array of photos in display order
 
         // Controller state
-        private is_running: bool;
+        private current_index: number;          // Index of currently displayed photo or -1
+        private next_index: number;             // Index of currently displayed photo
+        private is_running: bool;               // True if the slideshow is active
+        private has_tick_elapsed: bool;         // True if SLIDE_TIMEOUT has expired since last photo was shown
+        private is_ready: bool;                 // True if this.onReady has fired
+        private loading_status: bool[];         // Photo Index -> { true=loaded, false=failed, null=not-loaded}
         private timer: number;
 
         // View
@@ -52,6 +58,10 @@ module Exposition {
             this.photos = [];
             this.view = new PhotoView(config, main_div);            
             this.is_running = false;
+            this.is_ready = false;
+            this.loading_status = [];
+            this.current_index = -1;
+            this.next_index = 0;
 
             // Create signals
             this.onLoadPath = new Signal();
@@ -64,7 +74,7 @@ module Exposition {
 
             // Fullscreen support
             // This need to be done within the event handler, because of security concerns 
-            // We cannot wait for the image to be ready
+            // We cannot wait for the image to be ready            
             if ($(document).fullScreen() != null) {
                 $(document).fullScreen(true);
                 $(document).on("fullscreenchange", () => {
@@ -92,11 +102,11 @@ module Exposition {
         }
 
         public goToNext() {
-            // ### TODO
+            // ### TODO Not implemented
         }
 
         public goToPrev() {
-            // ### TODO
+            // ### TODO Not implemented
         }
 
         public onKeydown(ev): bool {
@@ -139,7 +149,7 @@ module Exposition {
             // Load next album
             var path = this.album_paths_to_load.pop();
             var on_fail = () => {
-                this.onFail( new Error("Faileld to load album "+path));
+                this.onFail( new Error("Failed to load album "+path));
             }
             Item.Load(this.config, path, (item)=>this.onAlbumLoaded(item), ()=>on_fail); 
         }
@@ -163,8 +173,9 @@ module Exposition {
                 // Check if all items are loaded
                 if (this.album_paths_to_load.length === 0) {
                     this.photos = this.photos.reverse();
-                    this.showNextPhoto(0);
-                    this.onReady.fire();
+                    //this.showNextPhoto(0);
+                    this.loadNextPhoto()
+                    this.setNextTimer();
                     return;
                 }
 
@@ -186,23 +197,67 @@ module Exposition {
             this.onFinished.fire();
         }
 
-        // ### FIXME Wait until the photo is fetched
-        private showNextPhoto(photo_index: number) {
-            // Precondition
-            assert(photo_index>=0 && photo_index<this.photos.length);
+        private loadNextPhoto() {
 
             // Check if slideshow is running
             if (!this.is_running)
                 return;
 
-            // Show the photo
-            this.view.load(this.photos[photo_index])
+            // Load next photo
+            var index = this.next_index;
+            this.next_index  = (this.next_index+1)%this.photos.length;
+            var callback = (success: bool) => {
+                if (!success)
+                    console.error('Failed to load '+this.photos[index].path());
+                this.loading_status[index] = success;
+                this.showNextPhoto();
+            }
+            if (this.loading_status[index] !== true)
+                this.view.load(this.photos[index], callback);
+        }
 
-            // Show next photo
-            this.timer = setTimeout( () => { 
-                this.showNextPhoto( (photo_index+1)%this.photos.length ); 
-            }, this.SLIDE_TIMEOUT);
+        private setNextTimer() {
+            this.has_tick_elapsed = false;
+            this.timer = setTimeout( () => {
+                this.has_tick_elapsed = true;
+                this.showNextPhoto();
+            }, this.SLIDE_TIMEOUT );
+        }
 
+        private showNextPhoto() {
+
+            // Check if slideshow is running
+            if (!this.is_running)
+                return;
+
+            // Compute index of next item to display, load more items
+            var next_index: number = -1;
+            var success_count: number = 0;
+            for (var i=(this.current_index+1)%this.photos.length; i<this.loading_status.length; ++i) {
+                if (this.loading_status[i] === true) {
+                    success_count += 1;
+                    if (next_index<0)                    
+                        next_index = i;
+                }
+
+            }
+            if (next_index < 0)
+                return;
+            if (success_count < this.MAX_PREFETCH_COUNT)
+                this.loadNextPhoto();
+
+            // Check if timer has elapsed
+            if (!this.has_tick_elapsed)
+                return;
+            this.setNextTimer();
+
+            // Change photo
+            this.current_index = next_index;
+            if (!this.is_ready) {
+                this.is_ready = true;
+                this.onReady.fire();
+            }
+            this.view.display(this.photos[this.current_index]);
         }
 
     }
