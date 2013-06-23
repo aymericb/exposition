@@ -8,6 +8,7 @@
 //
 
 /// <reference path="../lib/jquery.d.ts" />
+/// <reference path="../lib/modernizr.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
