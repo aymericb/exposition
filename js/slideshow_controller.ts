@@ -22,7 +22,8 @@ module Exposition {
 
         // Config
         private config: Config;
-        private SLIDE_TIMEOUT: number = 2000;   // 2 seconds ### TODO: Add to config object
+        private SLIDESHOW_TIMEOUT: number = 2000;       // 2 seconds ### TODO: Add to config object
+        private SLIDESHOW_FADE_DURATION: number = 500;  // 500ms ### TODO Add to config object
         private MAX_PREFETCH_COUNT = 2;         // Max number of photos to load in advance
 
         // Model
@@ -34,7 +35,7 @@ module Exposition {
         private current_index: number;          // Index of currently displayed photo or -1
         private next_index: number;             // Index of currently displayed photo
         private is_running: bool;               // True if the slideshow is active
-        private has_tick_elapsed: bool;         // True if SLIDE_TIMEOUT has expired since last photo was shown
+        private has_tick_elapsed: bool;         // True if SLIDESHOW_TIMEOUT has expired since last photo was shown
         private is_ready: bool;                 // True if this.onReady has fired
         private loading_status: bool[];         // Photo Index -> { true=loaded, false=failed, null=not-loaded}
         private timer: number;
@@ -222,7 +223,7 @@ module Exposition {
             this.timer = setTimeout( () => {
                 this.has_tick_elapsed = true;
                 this.showNextPhoto();
-            }, this.SLIDE_TIMEOUT );
+            }, this.SLIDESHOW_TIMEOUT );
         }
 
         private showNextPhoto() {
@@ -258,7 +259,7 @@ module Exposition {
                 this.is_ready = true;
                 this.onReady.fire();
             }
-            this.view.display(this.photos[this.current_index]);
+            this.view.fadeTo(this.photos[this.current_index], this.SLIDESHOW_FADE_DURATION);
         }
 
     }

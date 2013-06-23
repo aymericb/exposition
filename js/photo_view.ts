@@ -66,6 +66,7 @@ module Exposition {
         private images_ready: PathToSizeToImgElementMap = {};      // Fully loaded images.
         private images_loading: PathToSizeToImgElementMap = {};    // Images being loaded.
         private callbacks_loading: PathToPhotoLoadCallback = {};   // Callbacks of the images being loaded.
+        private fade_duration: number;                             // In ms. Set by fadeTo().
 
         // Constants
         private IMAGE_SIZES;
@@ -265,6 +266,38 @@ module Exposition {
         //
 
         /**
+         * Display photo into view. If the photo is already loaded then this method
+         * achieves a fadeIn/fadeOut effect. Otherwise it only does a fadeOut for the
+         * current image and behaves mostly like display().
+         * 
+         */
+        public fadeTo(item: Item, duration: number) {
+            // Preconditions
+            assert(item && item.isPhoto());
+            assert(duration>0);
+
+            // If no current image, no effect
+            if (!this.item) {
+                this.display(item);
+                return;
+            }
+
+            // If image is not loaded, do a normal load
+            // ### FIXME. Missing fadeOut.
+            var path = this.item.path();
+            var size = this.chooseSize(this.IMAGE_SIZES);            
+            if (!(size.toString() in this.getImages(this.images_ready, path))) {
+                this.display(item);
+                return;
+            }
+
+            // Fade effect
+            this.fade_duration = duration;
+            this.item = item;
+            this.updateLayout(true);
+        }
+
+        /**
          * Display photo into view. The photo is loaded if necessary.
          *
          * Throws on error. However the internal image loading errors are handled
@@ -339,7 +372,10 @@ module Exposition {
          * optionally triggers the download of a larger size photo.
          *
          */
-        public updateLayout() {
+        public updateLayout(fade?: bool) {
+
+            // Preconditions
+            assert(fade !== true || this.fade_duration>0);
 
             // Check if view has a current item
             if (!this.item)
@@ -381,8 +417,14 @@ module Exposition {
 
             // Update current image
             if (this.current_img) {
-                //this.current_img.hide();
-                this.current_img.appendTo(this.cache_div);
+                if (fade === true) {
+                    var current_img = this.current_img;
+                    this.current_img.fadeOut(this.fade_duration, () => {
+                        current_img.appendTo(this.cache_div);    
+                    });
+                } else {
+                    this.current_img.appendTo(this.cache_div);
+                }
             }                
             this.current_img = img;
 
@@ -425,8 +467,13 @@ module Exposition {
             });
 
             // Make visible
-            img.appendTo(this.main_div);
-            //img.show();
+            if (fade) {
+                img.hide();
+                img.prependTo(this.main_div);
+                img.fadeIn(this.fade_duration);
+            } else {
+                img.appendTo(this.main_div);
+            }
         };
 
 
