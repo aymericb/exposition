@@ -74,7 +74,8 @@ module Exposition {
 
             // Fullscreen support
             // This need to be done within the event handler, because of security concerns 
-            // We cannot wait for the image to be ready            
+            // We cannot wait for the image to be ready
+            this.main_div.addClass('fullscreen');
             if ($(document).fullScreen() != null) {
                 $(document).fullScreen(true);
                 $(document).on("fullscreenchange", () => {
@@ -192,6 +193,7 @@ module Exposition {
 
         private stopSlideshow() {
             clearTimeout(this.timer);
+            this.main_div.removeClass('fullscreen');
             this.is_running = false;
             this.onFinished.fire();
         }

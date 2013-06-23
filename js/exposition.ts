@@ -355,7 +355,6 @@ module Exposition {
             this.showDelayedLoading();
             this.divs.header.hide();
             this.divs.footer.hide();
-            this.main_div.addClass('fullscreen');
 
             // Create SlideshowController
             this.view = new SlideshowController(this.config, this.main_div, this.item);
@@ -378,8 +377,6 @@ module Exposition {
             this.showDelayedLoading();
             this.divs.header.show();
             this.divs.footer.show();
-            this.main_div.removeClass('fullscreen');
-            //this.loadPath(this.path);
             this.loadPath(this.path, false, false); // ### FIXME. Restore previous view instead, pages not remembered.
         }
 
