@@ -147,7 +147,8 @@ module Exposition {
                 return;
 
             // Load next album
-            var path = this.album_paths_to_load.pop();
+            var path = this.album_paths_to_load[0];
+            this.album_paths_to_load.splice(0, 1);
             var on_fail = () => {
                 this.onFail( new Error("Failed to load album "+path));
             }
@@ -172,8 +173,6 @@ module Exposition {
 
                 // Check if all items are loaded
                 if (this.album_paths_to_load.length === 0) {
-                    this.photos = this.photos.reverse();
-                    //this.showNextPhoto(0);
                     this.loadNextPhoto()
                     this.setNextTimer();
                     return;
