@@ -29,7 +29,7 @@ To produce an Exposition package from the source:
 
   Your local directory must be the root directory of the source package containing the **package.json** file.
 
-        sudo npm install
+        npm install
 
 5. Run Grunt.
 
