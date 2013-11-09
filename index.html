@@ -15,12 +15,15 @@
         $(document).ready(function() {
             var divs = {
                 main: $('#main'),
+                header: $('#header'),
+                footer: $('#footer'),
                 breadcrumb: $('#breadcrumb'),
                 page_handler: $('#page-handler'),
                 page_handler_center: $('#page-handler-center'),
                 page_handler_left: $('#page-handler-left'),
                 page_handler_right: $('#page-handler-right'),
-                btn_download: $('#btn-download')
+                btn_download: $('#btn-download'),
+                btn_slideshow: $('#btn-slideshow')
             };
             var expo = new Exposition.Application(divs);                
         });
@@ -38,6 +41,7 @@
     <div id="footer">
         <div id="toolbar">
             <a id="btn-download" class="button" style="display:none;">Download</a>
+            <a id="btn-slideshow" class="button" style="display:none;">Slideshow</a>
         </div>
         <div id="page-handler" style="display:none">
             <div id="page-handler-left"></div>

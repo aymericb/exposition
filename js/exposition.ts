@@ -8,12 +8,14 @@
 //
 
 /// <reference path="../lib/jquery.d.ts" />
+/// <reference path="../lib/jquery.fullscreen.d.ts" />
 /// <reference path="../lib/spin.d.ts" />
 /// <reference path="common.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
 /// <reference path="photo_controller.ts" />
 /// <reference path="album_controller.ts" />
+/// <reference path="slideshow_controller.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 /*global console:false*/
@@ -23,12 +25,15 @@ module Exposition {
 
     export interface ApplicationDivs {
         main: JQuery;
+        header: JQuery;
+        footer: JQuery;
         breadcrumb: JQuery;
         page_handler: JQuery;
         page_handler_left: JQuery;
         page_handler_center: JQuery;
         page_handler_right: JQuery;
         btn_download: JQuery;
+        btn_slideshow: JQuery;
     }
 
     /**
@@ -56,7 +61,7 @@ module Exposition {
         private loading_timer;                          // Timer use to delay showing the loading box
         private loading_spinner;                        // ph.barthe.Spinner object
 
-        private divs;                                   // Divs used for display
+        private divs: ApplicationDivs;                  // Divs used for display
         private main_div;                               // Main div used for rendering
 
         private view;                                   // Current view
@@ -201,6 +206,7 @@ module Exposition {
         private loadPath(path: string, push_state: bool, delayed_loading?: bool) {
             if (Exposition.debug)
                 console.log("Loading: "+path);
+            this.item = null;
             this.main_div.empty();
             this.page_handler.hide();
             this.breadcrumb_handler.setPath(path);
@@ -325,10 +331,51 @@ module Exposition {
             // Initialize key shortcuts handler
             $(document).keydown( (ev) => { return this.onKeydown(ev); } );
 
+            // Initialize slideshow
+            this.divs.btn_slideshow.show();
+            this.divs.btn_slideshow.click( () => { this.onStartSlideshow(); } )
+
             // Initialize view
             this.loadPath(this.path, true, false);
             $(window).resize( () => { this.onResize(); } );
         };
+
+        //
+        // Slideshow
+        //
+
+        private onStartSlideshow() {
+            // Item might be null in between loadPath() and onLoadPath()
+            if (!this.item)
+                return;
+
+            // Update GUI
+            this.main_div.empty();
+            //this.page_handler.hide();
+            this.showDelayedLoading();
+            this.divs.header.hide();
+            this.divs.footer.hide();
+
+            // Create SlideshowController
+            this.view = new SlideshowController(this.config, this.main_div, this.item);
+            this.view.onReady.on( () => this.onSlideshowStarted() );
+            this.view.onFinished.on( () => this.onSlideshowFinished() );
+            this.view.load();
+        }
+
+        private onSlideshowStarted() {
+            this.hideLoading();
+        }
+
+        private onSlideshowFinished() {
+            // Update GUI
+            this.main_div.empty();
+            this.hideLoading();            
+            this.showDelayedLoading();
+            this.divs.header.show();
+            this.divs.footer.show();
+            this.loadPath(this.path, false, false); // ### FIXME. Restore previous view instead, pages not remembered.
+        }
 
         //
         // Constructor
