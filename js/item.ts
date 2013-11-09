@@ -9,6 +9,7 @@
 
 /// <reference path="config.ts" />
 /// <reference path="common.ts" />
+/// <reference path="signal.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/
 

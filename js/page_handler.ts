@@ -8,6 +8,7 @@
 //
 
 /// <reference path="common.ts" />
+/// <reference path="signal.ts" />
 /// <reference path="../lib/jquery.d.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/

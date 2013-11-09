@@ -12,6 +12,7 @@
 /// <reference path="config.ts" />
 /// <reference path="controller.ts" />
 /// <reference path="album_view.ts" />
+/// <reference path="signal.ts" />
 /// <reference path="../lib/spin.d.ts" />
 
 /*jshint eqeqeq:true, browser:true, jquery:true*/

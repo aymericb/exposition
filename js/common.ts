@@ -52,45 +52,6 @@ module Exposition {
     };
 
     /**
-     * Implement design pattern Observer, via the signal and slots.
-     *
-     * Signal instances should be added as public properties of classes. 
-     * Subscribers can use the on/off method, to connect their slots to the signal.
-     * Emitters should use the fire() method. 
-     *
-     * At the moment, because of the lack of generics, all type information is lost.
-     *
-     */
-    export class Signal {
-        // Private
-        private list = [];
-
-        /** Add listener */
-        public on(listener) {
-            assert(this.list.indexOf(listener) === -1);
-            assert(typeof listener === 'function');
-            this.list.push(listener);
-        };
-
-        /** Remove listener */
-        public off(listener) {
-            assert(typeof listener === 'function');
-            var index = this.list.indexOf(listener);
-            assert(index !== -1);
-            this.list.splice(index, 1);
-        };
-
-        public fire(...args: any[]) {
-            for (var i=0; i<this.list.length; ++i) {
-                assert(arguments.length<=this.list[i].length);
-                this.list[i].apply(/*this object*/null , arguments);
-            }
-        }
-
-
-    };
-
-    /**
      * Load image asynchronously
      *
      * Creates an IMG element for the given URL and returns it (as a JQuery element).

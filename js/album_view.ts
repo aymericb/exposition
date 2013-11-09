@@ -11,6 +11,7 @@
 /// <reference path="item.ts" />
 /// <reference path="config.ts" />
 /// <reference path="controller.ts" />
+/// <reference path="signal.ts" />
 /// <reference path="../lib/spin.d.ts" />
 
 module Exposition {

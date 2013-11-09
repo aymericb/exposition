@@ -11,6 +11,7 @@
 /// <reference path="../lib/jquery.fullscreen.d.ts" />
 /// <reference path="../lib/spin.d.ts" />
 /// <reference path="common.ts" />
+/// <reference path="signal.ts" />
 /// <reference path="config.ts" />
 /// <reference path="item.ts" />
 /// <reference path="photo_controller.ts" />
