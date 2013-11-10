@@ -90,9 +90,6 @@ module Exposition {
             // Prepare IMAGE_SIZES
             this.config = config;
             this.IMAGE_SIZES = config.photoSizes().sort((a,b) => {return a-b;});
-
-            // Signals 
-            this.onReady = new Signal();
         }
 
         //
@@ -480,7 +477,7 @@ module Exposition {
 
 
         /** onReady()            -> View is ready to show. */
-        public onReady: Signal;
+        public onReady: Signal< ()=>void > = new Signal();
     }
 
 

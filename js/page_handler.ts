@@ -42,8 +42,6 @@ module Exposition {
         constructor(private divs: PageHandlerDivs) {
 
             // Connect signals
-            this.onGoToPrev = new Signal();
-            this.onGoToNext = new Signal();
             this.divs.page_handler_left.click(() => { this.onGoToPrev.fire(); } );
             this.divs.page_handler_right.click(() => { this.onGoToNext.fire(); } );
         }
@@ -90,10 +88,10 @@ module Exposition {
         //
 
         /** onGoToPrev() -> Go to previous page */
-        public onGoToPrev;
+        public onGoToPrev: Signal< ()=>void > = new Signal();
 
         /** onGoToNext() -> Go to next page */
-        public onGoToNext;
+        public onGoToNext: Signal< ()=>void > = new Signal();
 
     }
 

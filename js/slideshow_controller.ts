@@ -63,12 +63,6 @@ module Exposition {
             this.loading_status = [];
             this.current_index = -1;
             this.next_index = 0;
-
-            // Create signals
-            this.onLoadPath = new Signal();
-            this.onPageUpdate = new Signal();
-            this.onReady = new Signal();
-            this.onFinished = new Signal();
         }
 
         public load() {
@@ -120,12 +114,22 @@ module Exposition {
             return true;
         }
 
-        public onLoadPath: Signal;
-        public onPageUpdate: Signal;
-        public onReady: Signal;
+        /** onLoadPath(path)    -> path {string} the path to load. */
+        onLoadPath: Signal< (path: string) => void > = new Signal();
+
+        /**
+         * onPageUpdate(show, current_page, total_page)
+         * show {bool}          -> if false, hide ignore other parameters
+         * current_page {int}   -> current page, index 0
+         * total_page {int}     -> number of pages in total >= 1
+         */
+        onPageUpdate: Signal< (show:boolean, current_page?: number, total_page?: number) => void > = new Signal();
+
+        /** onReady()            -> View is ready to show. */
+        onReady: Signal< ()=>void > = new Signal();
 
         // Only for slideshow
-        public onFinished: Signal;
+        public onFinished: Signal< ()=>void > = new Signal;
 
         //
         // Failure
@@ -261,6 +265,7 @@ module Exposition {
             }
             this.view.fadeTo(this.photos[this.current_index], this.SLIDESHOW_FADE_DURATION);
         }
+
 
     }
 

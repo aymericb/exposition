@@ -21,30 +21,35 @@ module Exposition {
      * At the moment, because of the lack of generics, all type information is lost.
      *
      */
-    export class Signal {
+    export class Signal<CallbackType> {
         // Private
         private list = [];
 
         /** Add listener */
-        public on(listener) {
+        public on(listener: CallbackType) {
             assert(this.list.indexOf(listener) === -1);
             assert(typeof listener === 'function');
             this.list.push(listener);
         }
 
         /** Remove listener */
-        public off(listener) {
+        public off(listener: CallbackType) {
             assert(typeof listener === 'function');
             var index = this.list.indexOf(listener);
             assert(index !== -1);
             this.list.splice(index, 1);
         }
 
-        public fire(...args: any[]) {
-            for (var i=0; i<this.list.length; ++i) {
-                assert(arguments.length<=this.list[i].length);
-                this.list[i].apply(/*this object*/null , arguments);
+        /** Fire the signal */
+        public fire: CallbackType;
+
+        constructor() {
+            var fire = () => {
+                for (var i=0; i<this.list.length; ++i) {
+                    this.list[i].apply(/*this object*/null , arguments);
+                }
             }
+            this.fire = <any>fire;
         }
     };    
 

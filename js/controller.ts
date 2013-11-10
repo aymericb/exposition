@@ -29,7 +29,7 @@ module Exposition {
         onKeydown(ev): boolean;
 
         /** onLoadPath(path)    -> path {string} the path to load. */
-        onLoadPath: Signal;
+        onLoadPath: Signal< (path: string) => void >;
 
         /**
          * onPageUpdate(show, current_page, total_page)
@@ -37,10 +37,10 @@ module Exposition {
          * current_page {int}   -> current page, index 0
          * total_page {int}     -> number of pages in total >= 1
          */
-        onPageUpdate: Signal;
+        onPageUpdate: Signal< (show:boolean, current_page: number, total_page: number) => void >;
 
         /** onReady()            -> View is ready to show. */
-        onReady: Signal;
+        onReady: Signal< ()=>void >;
 
         //onPathChanged: Signal;
 

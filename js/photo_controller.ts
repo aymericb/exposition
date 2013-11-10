@@ -42,10 +42,6 @@ module Exposition {
             // Initialize view
             this.view = new PhotoView(config, main_div);
             this.view.onReady.on( () => { this.on_ready(); } );
-            this.onReady = new Signal();
-            this.onPageUpdate = new Signal();
-            this.onLoadPath = new Signal();
-            this.onPathChanged = new Signal();
             this.item = item;
 
             // Initialize album item
@@ -72,7 +68,7 @@ module Exposition {
                         break;
                     }
                 }
-                this.onPageUpdate.fire(this.item_index, children.length);
+                this.onPageUpdate.fire(true,this.item_index, children.length);
 
                 // Prefetch prev/next images
                 this.prefetch();
@@ -110,7 +106,7 @@ module Exposition {
 
             // Notify application
             var path = this.item.path();
-            this.onPageUpdate.fire(this.item_index, this.album_item.children().length);
+            this.onPageUpdate.fire(true, this.item_index, this.album_item.children().length);
             this.onPathChanged.fire(path);
 
             // Load
@@ -160,21 +156,21 @@ module Exposition {
         //
 
         /** onLoadPath(path)    -> path {string} the path to load. */
-        public onLoadPath: Signal;
+        onLoadPath: Signal< (path: string) => void > = new Signal();
 
         /**
          * onPageUpdate(show, current_page, total_page)
-         * show {boolean}          -> if false, hide ignore other parameters
+         * show {bool}          -> if false, hide ignore other parameters
          * current_page {int}   -> current page, index 0
          * total_page {int}     -> number of pages in total >= 1
          */
-        public onPageUpdate: Signal;
+        onPageUpdate: Signal< (show:boolean, current_page?: number, total_page?: number) => void > = new Signal();
 
         /** onReady()            -> View is ready to show. */
-        public onReady: Signal;
+        onReady: Signal< ()=>void > = new Signal();
 
         /** onPathChanged(path) -> path changed within the view. */
-        public onPathChanged: Signal;
+        public onPathChanged: Signal< (path: string) => void > = new Signal();
 
         //
         // Album Management

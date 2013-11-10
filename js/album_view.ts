@@ -79,11 +79,6 @@ module Exposition {
             for (var i=0; i<this.items.length; ++i) {
                 this.items[i].div = $('<div>').addClass('item').hide();
             }
-
-            // Initialize signals
-            this.onLoadPath = new Signal();
-            this.onPageUpdate = new Signal();
-            this.onReady = new Signal();
         }
 
         /**
@@ -344,7 +339,7 @@ module Exposition {
         //
 
         /** onLoadPath(path)    -> path {string} the path to load. */
-        public onLoadPath: Signal;
+        onLoadPath: Signal< (path: string) => void > = new Signal();
 
         /**
          * onPageUpdate(show, current_page, total_page)
@@ -352,10 +347,10 @@ module Exposition {
          * current_page {int}   -> current page, index 0
          * total_page {int}     -> number of pages in total >= 1
          */
-        public onPageUpdate: Signal;
+        onPageUpdate: Signal< (show:boolean, current_page?: number, total_page?: number) => void > = new Signal();
 
         /** onReady()            -> View is ready to show. */
-        public onReady: Signal;
+        onReady: Signal< ()=>void > = new Signal();
 
 
         //

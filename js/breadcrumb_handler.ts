@@ -45,8 +45,6 @@ module Exposition {
             this.TITLE = config.galleryName();
             this.div = div;
             this.config = config;
-
-            this.onLoadPath = new Signal();
         }
 
         //
@@ -110,7 +108,7 @@ module Exposition {
         //
 
         /** onLoadPath(path)    -> path {string} the path to load. */
-        public onLoadPath;
+        public onLoadPath: Signal< (path: string)=>void > = new Signal();
 
     }
 
