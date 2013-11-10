@@ -26,7 +26,7 @@ module Exposition {
         updateLayout(): void;
         goToNext(): void;
         goToPrev(): void;
-        onKeydown(ev): bool;
+        onKeydown(ev): boolean;
 
         /** onLoadPath(path)    -> path {string} the path to load. */
         onLoadPath: Signal;

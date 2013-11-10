@@ -73,8 +73,8 @@ module Exposition {
                 this.photo_cache[item_key] = photo_path;
                 return photo_path;
             }
-        };
-    };
+        }
+    }
 
     // Global instance
     var g_photo_cache = new PhotoCache();
@@ -159,24 +159,24 @@ module Exposition {
         /** Load item */
         public load(): void {
             this.view.load();
-        };
+        }
 
         public updateLayout(): void {
             this.view.updateLayout();
-        };
+        }
 
         /** Go to next page */
         public goToNext(): void {
             this.view.setCurrentPage(this.view.currentPage()+1);
-        };
+        }
 
         /** Go to previous page */
         public goToPrev(): void {
             this.view.setCurrentPage(this.view.currentPage()-1);
-        };
+        }
 
         /** Keyboard handler */
-        public onKeydown(ev): bool {
+        public onKeydown(ev): boolean {
             assert(ev.which);
             assert(this.view.colCount() !== undefined && this.view.rowCount() !== undefined);
 
@@ -234,7 +234,7 @@ module Exposition {
                 return false;
             }
 
-        };
+        }
 
         /** onLoadPath(path)    -> path {string} the path to load. */
         public onLoadPath: Signal;
@@ -249,5 +249,5 @@ module Exposition {
 
         /** onReady()            -> View is ready to show. */
         public onReady: Signal;
-    };
+    }
 }

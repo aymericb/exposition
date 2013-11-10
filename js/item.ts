@@ -31,7 +31,7 @@ module Exposition {
         // Private members
         private m_children:Item[] = [];
         private json;
-        static private cache = {};
+        private static cache = {};
 
         // Public methods
         parentPath() : string {
@@ -39,23 +39,23 @@ module Exposition {
             if (parent_path === '')
                 parent_path = '/';
             return parent_path;
-        };
-        isPhoto() : bool {
+        }
+        isPhoto() : boolean {
             return (this.json.type === 'photo');
-        };
-        isAlbum() : bool {
+        }
+        isAlbum() : boolean {
             return (this.json.type === 'album');
-        };
+        }
         title() : string {
             return this.json.title;
-        };
+        }
         path() : string {
             return this.json.path;
-        };
+        }
         children() : Item[] {
             assert(this.isAlbum());
             return this.m_children;
-        };
+        }
 
         // Constructor: validate data
         constructor(json) {
@@ -98,8 +98,8 @@ module Exposition {
             };
 
             // Check cache for same item
-            if (cache[path]) {
-                immediate_success(cache[path]);
+            if (Item.cache[path]) {
+                immediate_success(Item.cache[path]);
                 return;
             }
 
@@ -107,7 +107,7 @@ module Exposition {
             // If item is a photo in parent item, no need to contact the server.
             if (path.length>1) {
                 var album_path  = path.substring(0, path.lastIndexOf('/'));
-                var album_item = cache[album_path];
+                var album_item = Item.cache[album_path];
                 if (album_item) {
                     var children = album_item.children();
                     for (var i=0; i<children.length; ++i) {
@@ -131,7 +131,7 @@ module Exposition {
                 .done( function(data) {
                     try {
                         var item = new Item(data);
-                        cache[path] = item;
+                        Item.cache[path] = item;
                         on_success(item);
                     } catch(e) {
                         on_fail(undefined, undefined, e);
@@ -139,6 +139,6 @@ module Exposition {
             });
 
         }
-    };
+    }
 
 }

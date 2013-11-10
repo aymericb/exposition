@@ -79,7 +79,7 @@ module Exposition {
                         this.onFailed(e);
                     }
                 });
-        };
+        }
 
         private onFailed(err: Error) {
             debugger;
@@ -91,7 +91,7 @@ module Exposition {
             if (err && err.message) {
                 console.error("Error: "+err.message);
             }
-        };
+        }
 
         private updateDownloadProgress(download) {
             this.count += 1;
@@ -101,7 +101,7 @@ module Exposition {
             } else {
                 this.el_progress_label.text(download.title + '@' + download.size + 'px');
             }
-        };
+        }
 
         private popDownload() {
             if (this.download_queue.length === 0)
@@ -114,12 +114,12 @@ module Exposition {
                 .done( () => {
                     this.onDownloadSuccess(download);
                 });
-        };
+        }
 
         private onDownloadSuccess(download) {
             this.updateDownloadProgress(download);
             this.popDownload();
-        };
+        }
 
         private onDownloadFailed(msg, download) {
             this.updateDownloadProgress(download);
@@ -127,7 +127,7 @@ module Exposition {
             html += '<p>' + 'Failed ' + download.url + ' ' + msg + '</p>';
             this.el_errors.html(html);
             this.popDownload();
-        };
+        }
 
         private cacheItem(item) {
             // Precondition
@@ -156,7 +156,7 @@ module Exposition {
                 }));
             }
 
-        };
+        }
 
         //
         // Constructor

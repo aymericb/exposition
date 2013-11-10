@@ -96,7 +96,7 @@ module Exposition {
                 this.main_div.append(error_div);
             }
             error_div.html('<p>Error</p><p>'+_friendly_message+'</p>');
-        };
+        }
 
         /** 
          * Create a success callback for loadPath().
@@ -112,7 +112,7 @@ module Exposition {
          *
          * Does not throw
          */
-        private onPathLoaded(path: string, push_state: bool) : (item: Item) => void {
+        private onPathLoaded(path: string, push_state: boolean) : (item: Item) => void {
             // Precondition
             assert(path);
 
@@ -140,7 +140,7 @@ module Exposition {
                     // Create view and update page handler
                     if (this.item.isAlbum()) {
                         this.view = new AlbumController(this.config, this.main_div, this.item);
-                        this.view.onPageUpdate.on( (show: bool, current_page: number, total_page: number) => {
+                        this.view.onPageUpdate.on( (show: boolean, current_page: number, total_page: number) => {
                             if (!show) {
                                 this.page_handler.hide();
                                 return;
@@ -194,7 +194,7 @@ module Exposition {
                     this.onFatalError("Cannot navigate to page "+path, e);
                 }
             };
-        };
+        }
 
         /**
          * Load photo or album at path
@@ -204,7 +204,7 @@ module Exposition {
          * @param {bool} delayed_loading  Optional. Default true. Whether the showDelayedLoading() is called
          * Calls onFatalError on errors.
          */
-        private loadPath(path: string, push_state: bool, delayed_loading?: bool) {
+        private loadPath(path: string, push_state: boolean, delayed_loading?: boolean) {
             if (Exposition.debug)
                 console.log("Loading: "+path);
             this.item = null;
@@ -223,7 +223,7 @@ module Exposition {
                 this.onFatalError("Cannot navigate to page "+path, error);
             };
             Item.Load(this.config, path, this.onPathLoaded(path, push_state), on_error);
-        };
+        }
 
         /** 
          * Show loading box in main view.
@@ -255,7 +255,7 @@ module Exposition {
 
             // Postcondition
             assert(this.loading_timer);
-        };
+        }
 
         /** Hide the loading box, or make sure it will not show (if it has not shown yet) */
         private hideLoading() {
@@ -266,7 +266,7 @@ module Exposition {
                 clearTimeout(this.loading_timer);
                 this.loading_timer = null;
             }
-        };
+        }
 
         /**
          * Resize current view
@@ -281,23 +281,23 @@ module Exposition {
             } catch(e) {
                 this.onFatalError("Resized failed.", e);
             }
-        };
+        }
 
         /** Global keyboard events */
         private onKeydown(ev) {
             if (this.view)
                 return this.view.onKeydown(ev);
-        };
+        }
 
         /** Event handler for this.divs.page_handler_left */
         private onGoToPrev() {
             this.view.goToPrev();
-        };
+        }
 
         /** Event handler for this.divs.page_handler_right */
         private onGoToNext() {
             this.view.goToNext();
-        };
+        }
 
         /** Configuration loaded. Initialize object. Called by constructor */
         private init() {
@@ -339,7 +339,7 @@ module Exposition {
             // Initialize view
             this.loadPath(this.path, true, false);
             $(window).resize( () => { this.onResize(); } );
-        };
+        }
 
         //
         // Slideshow
@@ -408,6 +408,6 @@ module Exposition {
             }
         }
 
-    };
+    }
 } // module Exposition
 

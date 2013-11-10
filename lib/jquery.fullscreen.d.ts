@@ -14,6 +14,6 @@
 /// <reference path="jquery.d.ts" />
 
 interface JQuery {
-	fullScreen(): bool;
-	fullScreen(enable: bool): void;
+	fullScreen(): boolean;
+	fullScreen(enable: boolean): void;
 }

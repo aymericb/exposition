@@ -117,7 +117,7 @@ module Exposition {
             this.view.display(this.item);
         }
 
-        public onKeydown(ev): bool {
+        public onKeydown(ev): boolean {
             // Check if event can be handled
             assert(ev.which);
             if (!this.album_item)
@@ -164,7 +164,7 @@ module Exposition {
 
         /**
          * onPageUpdate(show, current_page, total_page)
-         * show {bool}          -> if false, hide ignore other parameters
+         * show {boolean}          -> if false, hide ignore other parameters
          * current_page {int}   -> current page, index 0
          * total_page {int}     -> number of pages in total >= 1
          */

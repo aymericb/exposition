@@ -30,7 +30,7 @@ module Exposition {
             assert(this.list.indexOf(listener) === -1);
             assert(typeof listener === 'function');
             this.list.push(listener);
-        };
+        }
 
         /** Remove listener */
         public off(listener) {
@@ -38,7 +38,7 @@ module Exposition {
             var index = this.list.indexOf(listener);
             assert(index !== -1);
             this.list.splice(index, 1);
-        };
+        }
 
         public fire(...args: any[]) {
             for (var i=0; i<this.list.length; ++i) {

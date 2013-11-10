@@ -55,11 +55,11 @@ module Exposition {
 
         public hide() {
     		this.divs.page_handler.hide();
-        };
+        }
 
         public show() {
     		this.divs.page_handler.show();
-        };
+        }
 
         /**
          * Set the current page
@@ -83,7 +83,7 @@ module Exposition {
                 this.divs.page_handler_right.show();
             else
                 this.divs.page_handler_right.hide();
-        };
+        }
 
         //
         // Public signals
@@ -95,6 +95,6 @@ module Exposition {
         /** onGoToNext() -> Go to next page */
         public onGoToNext;
 
-    };
+    }
 
 } // module Exposition

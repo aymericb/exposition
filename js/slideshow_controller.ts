@@ -1,4 +1,4 @@
-//
+/`/
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
 // The Exposition code base is licensed under the GNU Affero General Public 
 // License 3 (GNU AGPL 3) with the following additional terms. This copyright
@@ -34,10 +34,10 @@ module Exposition {
         // Controller state
         private current_index: number;          // Index of currently displayed photo or -1
         private next_index: number;             // Index of currently displayed photo
-        private is_running: bool;               // True if the slideshow is active
-        private has_tick_elapsed: bool;         // True if SLIDESHOW_TIMEOUT has expired since last photo was shown
-        private is_ready: bool;                 // True if this.onReady has fired
-        private loading_status: bool[];         // Photo Index -> { true=loaded, false=failed, null=not-loaded}
+        private is_running: boolean;               // True if the slideshow is active
+        private has_tick_elapsed: boolean;         // True if SLIDESHOW_TIMEOUT has expired since last photo was shown
+        private is_ready: boolean;                 // True if this.onReady has fired
+        private loading_status: boolean[];         // Photo Index -> { true=loaded, false=failed, null=not-loaded}
         private timer: number;
 
         // View
@@ -111,7 +111,7 @@ module Exposition {
             // ### TODO Not implemented
         }
 
-        public onKeydown(ev): bool {
+        public onKeydown(ev): boolean {
             var KEYCODE_ESCAPE = 27;
             if (ev.which === KEYCODE_ESCAPE) {
                 this.stopSlideshow();
@@ -208,7 +208,7 @@ module Exposition {
             // Load next photo
             var index = this.next_index;
             this.next_index  = (this.next_index+1)%this.photos.length;
-            var callback = (success: bool) => {
+            var callback = (success: boolean) => {
                 if (!success)
                     console.error('Failed to load '+this.photos[index].path());
                 this.loading_status[index] = success;

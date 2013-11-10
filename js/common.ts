@@ -49,7 +49,7 @@ module Exposition {
             else
                 throw new Error(str_msg);
         }
-    };
+    }
 
     /**
      * Load image asynchronously
@@ -91,13 +91,13 @@ module Exposition {
             // http://stackoverflow.com/questions/8108636/how-to-get-http-status-code-of-img-tags
             // ### FIXME: As a workaround we could make an AJAX request on the URL and see what happens
             if (on_fail)
-                on_fail(img, error.message, user_data);
+                on_fail(img, error, user_data);
         });
         img.attr('src', url);
 
         // Return jQuery IMG element
         return img;
-    };
+    }
 
 }
 

@@ -103,9 +103,7 @@ module Exposition {
                 this.div.append(el_separator);
                 this.div.append(el_component);
             }
-
-
-        };
+        }
 
         //
         // Public signals
@@ -114,7 +112,7 @@ module Exposition {
         /** onLoadPath(path)    -> path {string} the path to load. */
         public onLoadPath;
 
-    };
+    }
 
 } // module Exposition
 

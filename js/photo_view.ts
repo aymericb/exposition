@@ -32,7 +32,7 @@ module Exposition {
 
     // Load callback
     export interface PhotoLoadCallback {
-        (success: bool): void;
+        (success: boolean): void;
     }
 
     // Map path -> array of load callbacks
@@ -58,7 +58,7 @@ module Exposition {
 
         // Data Model
         private config: Config;
-        private is_loaded: bool;                                // Flag to remember is first image was loaded (m_on_ready)
+        private is_loaded: boolean;                                // Flag to remember is first image was loaded (m_on_ready)
         private item: Item;                                     // Photo item to display
 
         // HTML        
@@ -110,7 +110,7 @@ module Exposition {
             if (!cache[path])
                 cache[path] = {};
             cache[path][size.toString()] = img;
-        };
+        }
 
         private getCacheSize(hash_map) {
             var count = 0;
@@ -120,7 +120,7 @@ module Exposition {
                 }
             }
             return count;
-        };
+        }
 
         /**
          * Remove image from this.images_loading cache
@@ -132,7 +132,7 @@ module Exposition {
             delete this.images_loading[path][size.toString()];               // Remove path+size
             if (this.getCacheSize(this.images_loading[path]) === 0)    // Remove path if empty
                 delete this.images_loading[path];
-        };
+        }
 
         /**
          * Get images from cache
@@ -145,10 +145,10 @@ module Exposition {
                 return cache[path];
             else
                 return {};
-        };
+        }
 
         /** Check if image exists in cache for given size */
-        private hasImage(cache: PathToSizeToImgElementMap, path: string, size: number): bool {
+        private hasImage(cache: PathToSizeToImgElementMap, path: string, size: number): boolean {
             if (cache[path]) {
                 if (cache[path][size.toString()])
                     return true;
@@ -194,7 +194,7 @@ module Exposition {
             // Postcondition
             assert(size !== undefined);
             return size;
-        };
+        }
 
         /**
          * Load the image for path and size given
@@ -207,7 +207,7 @@ module Exposition {
             assert(!(size.toString() in this.getImages(this.images_loading, path)), 'Image '+path+'@'+size+'px is already being loaded');
 
             var url = this.config.makeImageUrl(size, path);
-            var trigger_callbacks = (success: bool) => {
+            var trigger_callbacks = (success: boolean) => {
                 if (path in this.callbacks_loading) {
                     var callbacks = this.callbacks_loading[path]
                     for (var i=0; i<callbacks.length; ++i)
@@ -261,7 +261,7 @@ module Exposition {
             this.setImage(this.images_loading, path, size, img);
             //img.hide();
             this.cache_div.append(img);
-        };
+        }
 
         //
         // Public API
@@ -331,7 +331,7 @@ module Exposition {
                 this.loadImage(path, size);
             }            
 
-        };
+        }
 
         /**
          * Load into view, but does not immediately show it.
@@ -374,7 +374,7 @@ module Exposition {
          * optionally triggers the download of a larger size photo.
          *
          */
-        public updateLayout(fade?: bool) {
+        public updateLayout(fade?: boolean) {
 
             // Preconditions
             assert(fade !== true || this.fade_duration>0);
@@ -476,12 +476,12 @@ module Exposition {
             } else {
                 img.appendTo(this.main_div);
             }
-        };
+        }
 
 
         /** onReady()            -> View is ready to show. */
         public onReady: Signal;
-    };
+    }
 
 
 } // module Exposition

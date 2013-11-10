@@ -28,15 +28,15 @@ module Exposition {
         // Private members
         //
         private json;                             // Ajax values
-        private thumnbail_title_height:number;    // Computed from CSS
-        private base_url:string;                  // The base URL is rewritten with HTML history
+        private thumnbail_title_height: number;   // Computed from CSS
+        private base_url: string;                 // The base URL is rewritten with HTML history
 
         // REST API
-        static private PAGE_CONFIG = 'api/config';
-        static private PAGE_ITEM = 'api/item';
-        static private PAGE_IMAGE = 'api/image';
-        static private PAGE_CACHE = 'api/cache';
-        static private PAGE_DOWNLOAD = 'api/download';
+        private static PAGE_CONFIG = 'api/config';
+        private static PAGE_ITEM = 'api/item';
+        private static PAGE_IMAGE = 'api/image';
+        private static PAGE_CACHE = 'api/cache';
+        private static PAGE_DOWNLOAD = 'api/download';
 
         //
         // Public members
@@ -46,64 +46,64 @@ module Exposition {
         public makeItemUrl(path: string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             return this.base_url+Config.PAGE_ITEM+path;
-        };
+        }
         public makeImageUrl(size:number, path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             assert(size>=0);
             return this.base_url+Config.PAGE_IMAGE+'/'+size+path;
-        };
+        }
         public makeCacheUrl(size:number, path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             assert(size>=0);
             return this.base_url+Config.PAGE_CACHE+'/'+size+path;
-        };
+        }
         public makeDownloadUrl(path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             return this.base_url+Config.PAGE_DOWNLOAD+path;
-        };
+        }
         public getCautionImageUrl() {
             return this.base_url+'/css/caution.png';
-        };
+        }
 
         // Server info
         public info() {
             return this.json.info;
-        };
+        }
         public version() {
             return this.json.version;
-        };
+        }
         public galleryName() {
             return this.json.gallery_name;
-        };
+        }
 
         // Thumnails
         public thumbnailSize() {
             // ### TODO: Take Retina screens into account
             return this.json.thumnail_sizes[0];
-        };
+        }
         public thumbnailMargin() {
             return 30;
-        };
+        }
         public thumbnailVMargin() {
             return 40;
-        };
+        }
         public thumbnailTitleMargin() {
             return 10;
-        };
+        }
         public thumbnailTitleHeight() {
             return this.thumnbail_title_height;
-        };
+        }
         public thumbnailHeight() {
             return this.thumbnailSize() + this.thumbnailTitleHeight();
-        };
+        }
         public thumbnailWidth() {
             return this.thumbnailSize();
-        };
+        }
 
         // Photo
         public photoSizes() {
             return this.json.photo_sizes;
-        };
+        }
 
         // Raw size info
         public allImageSizes(): number[] {
@@ -119,12 +119,12 @@ module Exposition {
                 return a;
             };
             return arrayUnique(this.json.photo_sizes.concat(this.json.thumnail_sizes));
-        };
+        }
 
         // Behaviors
         public isDownloadAllowed() {
             return this.json.is_download_allowed && ($.inArray(0, this.json.photo_sizes)>=0);
-        };
+        }
 
         /**
          * Constructor

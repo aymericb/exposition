@@ -149,7 +149,7 @@ module Exposition {
 
             // ### FIXME:
             this.onReady.fire();
-        };
+        }
 
         /**
          * Layout album into the view
@@ -235,7 +235,7 @@ module Exposition {
             if (this.current_page_index>=this.page_count)
                 this.current_page_index = this.page_count-1;
             this.setCurrentPage(this.current_page_index);
-        };
+        }
 
         //
         // Pages
@@ -275,7 +275,7 @@ module Exposition {
             this.current_page_div = div_page;
             this.current_page_div.show();
             this.onPageUpdate.fire(true, page_index, this.page_count);
-        };
+        }
 
         //
         // Sizing information
@@ -336,7 +336,7 @@ module Exposition {
                 if (this.current_page_index !== page_index)
                     this.setCurrentPage(page_index);
             }
-        };
+        }
 
 
         //
@@ -511,7 +511,7 @@ module Exposition {
 
             // Return containing div
             return div_item;
-        };
+        }
 
     }
 
