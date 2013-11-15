@@ -138,24 +138,24 @@ module Exposition {
                     }
 
                     // Create view and update page handler
-                    if (this.item.isAlbum()) {
-                        this.view = new AlbumController(this.config, this.main_div, this.item);
-                        this.view.onPageUpdate.on( (show: boolean, current_page: number, total_page: number) => {
+                    var create_set_page_handler = (text: string) => {
+                        return (text: string show: boolean, current_page: number, total_page: number) => {
                             if (!show) {
                                 this.page_handler.hide();
                                 return;
                             }
                             this.page_handler.show();
                             this.page_handler.setPage("Page", current_page, total_page);
-                        });
+                        };
+                    };
+                    if (this.item.isAlbum()) {
+                        this.view = new AlbumController(this.config, this.main_div, this.item);
+                        this.view.onPageUpdate.on( create_set_page_handler('Page') );
                     } else {
                         assert(this.item.isPhoto());
                         this.page_handler.hide();
                         this.view = new PhotoController(this.config, this.main_div, this.item);
-                        this.view.onPageUpdate.on( (current_photo: number, total_photo: number) => {
-                            this.page_handler.show();
-                            this.page_handler.setPage("Photo", current_photo, total_photo);
-                        });
+                        this.view.onPageUpdate.on( create_set_page_handler('Photo') );
                         this.view.onPathChanged.on( (path: string) => {
                             this.path = path;
                             this.hideLoading();
