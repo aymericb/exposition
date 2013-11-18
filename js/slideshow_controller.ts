@@ -1,4 +1,4 @@
-/`/
+//
 // Exposition. Copyright (c) 2013 Aymeric Barthe.
 // The Exposition code base is licensed under the GNU Affero General Public 
 // License 3 (GNU AGPL 3) with the following additional terms. This copyright

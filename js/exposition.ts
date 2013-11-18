@@ -139,7 +139,7 @@ module Exposition {
 
                     // Create view and update page handler
                     var create_set_page_handler = (text: string) => {
-                        return (text: string show: boolean, current_page: number, total_page: number) => {
+                        return (show: boolean, current_page: number, total_page: number) => {
                             if (!show) {
                                 this.page_handler.hide();
                                 return;
