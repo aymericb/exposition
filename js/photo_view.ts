@@ -260,55 +260,93 @@ module Exposition {
             this.cache_div.append(img);
         }
 
+        //
+        // Fading (private)
+        //
+
+        private static are_keyframes_loaded: boolean = false;
+
+        private static loadKeyframes() {
+            
+            // Check if not loaded
+            if (PhotoView.are_keyframes_loaded)
+                return;                
+
+            // Compute @keyframes in prefixed form
+            var hyphen_style = (style) => {
+                return style.replace(/([A-Z])/g, function(str,m1){ return '-' + m1.toLowerCase(); }).replace(/^ms-/,'-ms-');
+            };
+            var hyphen_mp = (style) => {
+                return hyphen_style(Modernizr.prefixed(style));
+            };
+            var keyframesPrefixed = hyphen_mp('animationName').replace('animation-name', 'keyframes');
+
+            // Add <style> element to head
+            var fadein = '@'+keyframesPrefixed+' fadein { 0% { opacity: 0; } 100% { opacity: 1; } }';
+            var fadeout = '@'+keyframesPrefixed+' fadeout { 0% { opacity: 1; } 100% { opacity: 0; } }';
+            $('head').append($('style').text(fadein+' '+fadeout));
+
+            // Make sure this fn is called only once
+            PhotoView.are_keyframes_loaded = true;
+        }
+
         /**
-         * Fade in/out effect. Used CSS transforms if available.
+         * Fade in/out effect. Uses CSS transforms if available, or JQuery as a fallback.
          */
         private fade(img_fadeout: JQuery, img_fadein: JQuery, on_complete: ()=>void ) {
 
-            if (Modernizr.csstransitions) {
-                //console.log('fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
+            if (Modernizr.cssanimations) {
+
+                // Add keyframes to DOM if needed
+                PhotoView.loadKeyframes();
 
                 // Constants
-                var prefixed_transition: string = <any>Modernizr.prefixed('transition');
-                var transEndEventNames = {
-                    'WebkitTransition' : 'webkitTransitionEnd',
-                    'MozTransition'    : 'transitionend',
-                    'OTransition'      : 'oTransitionEnd',
-                    'msTransition'     : 'MSTransitionEnd',
-                    'transition'       : 'transitionend'
-                },
-                transEndEventName = transEndEventNames[prefixed_transition];
-
+                var prefixed_animation: string = <any>Modernizr.prefixed('animation');
+                var animationEndNames = {
+                    'WebkitAnimation' : 'webkitAnimationEnd',
+                    'MozAnimation'    : 'animationend',
+                    'OAnimation'      : 'oAnimationEnd',
+                    'msAnimation'     : 'MSAnimationEnd',
+                    'animation'       : 'animationend'
+                };
+                var animationEndName = animationEndNames[prefixed_animation];
+                
                 // Prepare fade-in
-                //img_fadein.show();
-                img_fadein.css('opacity', 0.01);
+                //img_fadein.css('opacity', 0);
                 img_fadein.prependTo(this.main_div);
 
                 // Completion handler
+                var has_fade_in = false;
+                var has_fade_out = img_fadeout ? false : true;
                 var on_fade = () => {
+                    if (!has_fade_in || !has_fade_out)
+                        return;
                     //console.log('completion fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
-                    img_fadein[0].style[prefixed_transition] = 'none';
-                    img_fadein.css('opacity', null);
+                    //img_fadein.css('opacity', 1);
+                    img_fadein[0].style[prefixed_animation] = 'none';
+                    img_fadein.off(animationEndName, on_fade_in);
                     if (img_fadeout) {
-                        img_fadeout[0].style[prefixed_transition] = 'none';
-                        img_fadeout.css('opacity', null);
+                        img_fadeout[0].style[prefixed_animation] = 'none';
+                        img_fadeout.off(animationEndName, on_fade_out);
                     }
-                    img_fadein.off(transEndEventName, on_fade);
-                    on_complete();                    
+                    on_complete();
                 }
-                img_fadein.on(transEndEventName, on_fade);
+                var on_fade_in = () => {
+                    has_fade_in = true;
+                    on_fade();                    
+                };
+                var on_fade_out = () => {
+                    has_fade_out = true;
+                    on_fade();
+                }
+                img_fadein.on(animationEndName, on_fade_in);
+                if (img_fadeout)
+                    img_fadeout.on(animationEndName, on_fade_out);
 
                 // Play transition
                 if (img_fadeout)
-                    img_fadeout.css(prefixed_transition, 'opacity '+this.fade_duration+'ms linear');
-                img_fadein.css(prefixed_transition, 'opacity '+this.fade_duration+'ms linear');
-
-                setTimeout(() => {
-                    if (img_fadeout)
-                        img_fadeout.css('opacity', 0);
-                    img_fadein.css('opacity', 1);
-                    //console.log(img_fadein[0].style);
-                }, 100 /* ### FIXME*/);
+                    img_fadeout.css(prefixed_animation, 'fadeout '+this.fade_duration+'ms');
+                img_fadein.css(prefixed_animation, 'fadein '+this.fade_duration+'ms');
             } else {
                 //console.log('JQuery');// fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
                 img_fadein.prependTo(this.main_div);
@@ -524,9 +562,6 @@ module Exposition {
 
             // Make visible
             if (fade) {
-                //img.hide();
-                //img.prependTo(this.main_div);
-                //img.fadeIn(this.fade_duration);
                 this.fade(fade_out_img, img, () => {
                     if (fade_out_img)
                         fade_out_img.appendTo(this.cache_div);
