@@ -227,7 +227,7 @@ module Exposition {
             this.timer = setTimeout( () => {
                 this.has_tick_elapsed = true;
                 this.showNextPhoto();
-            }, this.SLIDESHOW_TIMEOUT );
+            }, this.SLIDESHOW_TIMEOUT+this.SLIDESHOW_FADE_DURATION );
         }
 
         private showNextPhoto() {

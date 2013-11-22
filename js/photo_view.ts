@@ -260,6 +260,65 @@ module Exposition {
             this.cache_div.append(img);
         }
 
+        /**
+         * Fade in/out effect. Used CSS transforms if available.
+         */
+        private fade(img_fadeout: JQuery, img_fadein: JQuery, on_complete: ()=>void ) {
+
+            if (Modernizr.csstransitions) {
+                //console.log('fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
+
+                // Constants
+                var prefixed_transition: string = <any>Modernizr.prefixed('transition');
+                var transEndEventNames = {
+                    'WebkitTransition' : 'webkitTransitionEnd',
+                    'MozTransition'    : 'transitionend',
+                    'OTransition'      : 'oTransitionEnd',
+                    'msTransition'     : 'MSTransitionEnd',
+                    'transition'       : 'transitionend'
+                },
+                transEndEventName = transEndEventNames[prefixed_transition];
+
+                // Prepare fade-in
+                //img_fadein.show();
+                img_fadein.css('opacity', 0.01);
+                img_fadein.prependTo(this.main_div);
+
+                // Completion handler
+                var on_fade = () => {
+                    //console.log('completion fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
+                    img_fadein[0].style[prefixed_transition] = 'none';
+                    img_fadein.css('opacity', null);
+                    if (img_fadeout) {
+                        img_fadeout[0].style[prefixed_transition] = 'none';
+                        img_fadeout.css('opacity', null);
+                    }
+                    img_fadein.off(transEndEventName, on_fade);
+                    on_complete();                    
+                }
+                img_fadein.on(transEndEventName, on_fade);
+
+                // Play transition
+                if (img_fadeout)
+                    img_fadeout.css(prefixed_transition, 'opacity '+this.fade_duration+'ms linear');
+                img_fadein.css(prefixed_transition, 'opacity '+this.fade_duration+'ms linear');
+
+                setTimeout(() => {
+                    if (img_fadeout)
+                        img_fadeout.css('opacity', 0);
+                    img_fadein.css('opacity', 1);
+                    //console.log(img_fadein[0].style);
+                }, 100 /* ### FIXME*/);
+            } else {
+                //console.log('JQuery');// fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
+                img_fadein.prependTo(this.main_div);
+                img_fadein.hide();
+                img_fadeout.fadeOut(this.fade_duration);
+                img_fadein.fadeIn(this.fade_duration, on_complete);
+            }
+        }
+
+
         //
         // Public API
         //
@@ -415,12 +474,10 @@ module Exposition {
                 return;
 
             // Update current image
+            var fade_out_img;
             if (this.current_img) {
                 if (fade === true) {
-                    var current_img = this.current_img;
-                    this.current_img.fadeOut(this.fade_duration, () => {
-                        current_img.appendTo(this.cache_div);    
-                    });
+                    fade_out_img = this.current_img;
                 } else {
                     this.current_img.appendTo(this.cache_div);
                 }
@@ -446,7 +503,7 @@ module Exposition {
                 img.height(Math.floor(view_height-2*v_margin));
                 img.width(Math.floor(img_ratio*img.height()));
             } else {
-                // The view is heigher. Maximize img width.
+                // The view is higher. Maximize img width.
                 img.width(Math.floor(view_width-2*h_margin));
                 img.height(Math.floor(img.width()/img_ratio));
             }
@@ -467,9 +524,13 @@ module Exposition {
 
             // Make visible
             if (fade) {
-                img.hide();
-                img.prependTo(this.main_div);
-                img.fadeIn(this.fade_duration);
+                //img.hide();
+                //img.prependTo(this.main_div);
+                //img.fadeIn(this.fade_duration);
+                this.fade(fade_out_img, img, () => {
+                    if (fade_out_img)
+                        fade_out_img.appendTo(this.cache_div);
+                });                
             } else {
                 img.appendTo(this.main_div);
             }
