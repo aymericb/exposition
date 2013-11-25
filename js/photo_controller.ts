@@ -98,7 +98,7 @@ module Exposition {
         private gotoPage(page: number) {
             // Preconditions
             assert(this.album_item && this.album_item.isAlbum());
-            assert(page>0 && page<this.album_item.children().length);
+            assert(page>=0 && page<this.album_item.children().length);
 
             // Set status            
             this.item_index = page;
