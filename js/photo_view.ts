@@ -294,6 +294,7 @@ module Exposition {
          * Fade in/out effect. Uses CSS transforms if available, or JQuery as a fallback.
          */
         private fade(img_fadeout: JQuery, img_fadein: JQuery, on_complete: ()=>void ) {
+            //console.log('fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
 
             if (Modernizr.cssanimations) {
 
@@ -312,7 +313,6 @@ module Exposition {
                 var animationEndName = animationEndNames[prefixed_animation];
                 
                 // Prepare fade-in
-                //img_fadein.css('opacity', 0);
                 img_fadein.prependTo(this.main_div);
 
                 // Completion handler
@@ -321,15 +321,13 @@ module Exposition {
                 var on_fade = () => {
                     if (!has_fade_in || !has_fade_out)
                         return;
-                    //console.log('completion fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
-                    //img_fadein.css('opacity', 1);
-                    img_fadein[0].style[prefixed_animation] = 'none';
+                    //console.log('end. completion fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
                     img_fadein.off(animationEndName, on_fade_in);
-                    if (img_fadeout) {
-                        img_fadeout[0].style[prefixed_animation] = 'none';
+                    if (img_fadeout)
                         img_fadeout.off(animationEndName, on_fade_out);
-                    }
-                    on_complete();
+                    on_complete();                      // Hides the image
+                    if (img_fadeout)
+                        img_fadeout.css('opacity', 1);  // Restore opacity to what it used to be, for next round
                 }
                 var on_fade_in = () => {
                     has_fade_in = true;
@@ -344,11 +342,12 @@ module Exposition {
                     img_fadeout.on(animationEndName, on_fade_out);
 
                 // Play transition
-                if (img_fadeout)
-                    img_fadeout.css(prefixed_animation, 'fadeout '+this.fade_duration+'ms');
-                img_fadein.css(prefixed_animation, 'fadein '+this.fade_duration+'ms');
+                if (img_fadeout) {
+                    img_fadeout.css('opacity', 0);  // Make sure img stays hidden when animation finishes
+                    img_fadeout.css(prefixed_animation, 'fadeout '+this.fade_duration+'ms linear');
+                }
+                img_fadein.css(prefixed_animation, 'fadein '+this.fade_duration+'ms linear');
             } else {
-                //console.log('JQuery');// fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
                 img_fadein.prependTo(this.main_div);
                 img_fadein.hide();
                 img_fadeout.fadeOut(this.fade_duration);
