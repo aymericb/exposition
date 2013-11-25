@@ -23,7 +23,7 @@ module Exposition {
         // Config
         private config: Config;
         private SLIDESHOW_TIMEOUT: number = 2000;       // 2 seconds ### TODO: Add to config object
-        private SLIDESHOW_FADE_DURATION: number = 500;  // 500ms ### TODO Add to config object
+        private SLIDESHOW_FADE_DURATION: number = 1500;  // 1.5 seconds ### TODO Add to config object
         private MAX_PREFETCH_COUNT = 2;         // Max number of photos to load in advance
 
         // Model
@@ -227,7 +227,7 @@ module Exposition {
             this.timer = setTimeout( () => {
                 this.has_tick_elapsed = true;
                 this.showNextPhoto();
-            }, this.SLIDESHOW_TIMEOUT+this.SLIDESHOW_FADE_DURATION );
+            }, this.SLIDESHOW_TIMEOUT+this.SLIDESHOW_FADE_DURATION);
         }
 
         private showNextPhoto() {
