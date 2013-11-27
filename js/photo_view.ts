@@ -68,7 +68,10 @@ module Exposition {
         private images_ready: PathToSizeToImgElementMap = {};      // Fully loaded images.
         private images_loading: PathToSizeToImgElementMap = {};    // Images being loaded.
         private callbacks_loading: PathToPhotoLoadCallback = {};   // Callbacks of the images being loaded.
-        private fade_duration: number;                             // In ms. Set by fadeTo().
+
+        // Slideshow mode
+        private fade_out_img: JQuery;
+        private fade_in_img: JQuery;
 
         // Constants
         private IMAGE_SIZES;
@@ -293,7 +296,9 @@ module Exposition {
         /**
          * Fade in/out effect. Uses CSS transforms if available, or JQuery as a fallback.
          */
-        private fade(img_fadeout: JQuery, img_fadein: JQuery, on_complete: ()=>void ) {
+        private crossfade(fade_duration: number /*ms*/, on_complete: ()=>void ) {
+            var img_fadeout = this.fade_out_img;
+            var img_fadein = this.fade_in_img;
             //console.log('fadein='+ (<HTMLImageElement>img_fadein[0]).src + '  fadeout='+(<HTMLImageElement>img_fadeout[0]).src);
 
             if (Modernizr.cssanimations) {
@@ -344,15 +349,111 @@ module Exposition {
                 // Play transition
                 if (img_fadeout) {
                     img_fadeout.css('opacity', 0);  // Make sure img stays hidden when animation finishes
-                    img_fadeout.css(prefixed_animation, 'fadeout '+this.fade_duration+'ms linear');
+                    img_fadeout.css(prefixed_animation, 'fadeout '+fade_duration+'ms linear');
                 }
-                img_fadein.css(prefixed_animation, 'fadein '+this.fade_duration+'ms linear');
+                img_fadein.css(prefixed_animation, 'fadein '+fade_duration+'ms linear');
             } else {
                 img_fadein.prependTo(this.main_div);
                 img_fadein.hide();
-                img_fadeout.fadeOut(this.fade_duration);
-                img_fadein.fadeIn(this.fade_duration, on_complete);
+                img_fadeout.fadeOut(fade_duration);
+                img_fadein.fadeIn(fade_duration, on_complete);
             }
+        }
+
+        //
+        // Private. Resize management
+        //
+
+        private getBestAvailableImage(item: Item, can_load_better_image: boolean = false): { img: JQuery; is_natural_size: boolean; } {
+            // Check if view has a current item
+            if (!item)
+                return { img: null, is_natural_size: null };
+
+            // Find the best loaded image for the current size of the view
+            var sizes = [];         // size array
+            var ready_imgs = this.getImages(this.images_ready, item.path());    // Map: size => jQuery element
+            for (var key in ready_imgs)
+                sizes.push(parseInt(key, 10));
+            var size, img;
+            if (sizes.length !== 0)
+            {
+                size = this.chooseSize(sizes);
+                img = ready_imgs[size];
+                //console.log('sizes: '+ sizes + '  size: '+size+'  ready_imgs: '+ready_imgs);
+                assert(img && img.length === 1);
+            }
+
+            // Request a better image if necessary
+            if (can_load_better_image) {
+                var best_size = this.chooseSize(this.IMAGE_SIZES);
+                var is_best_size = !(size === undefined ||
+                    (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
+                if (! is_best_size) {
+                    var already_loading = false;
+                    for (key in this.getImages(this.images_loading, item.path())) {
+                        if (parseInt(key, 10) === best_size) {
+                            already_loading = true;
+                            break;
+                        }
+                    }
+                    if (!already_loading) {
+                        //console.log('load '+best_size);
+                        this.loadImage(item.path(), best_size);
+                    }
+                }
+            }
+
+            return { img: img, is_natural_size: is_best_size };
+        }
+
+        /**
+         * Center image within main_div. Used to handle resize.
+         * is_natural_size is true when upscaling of the image is disabled.
+         */
+        private centerPhoto(img: JQuery, is_natural_size: boolean) {
+
+            // Preconditions
+            assert(img && img.length === 1, 'centerPhoto passed invalid image');
+
+            // Get sizes
+            var img_width = (<HTMLImageElement>img[0]).naturalWidth;
+            var img_height = (<HTMLImageElement>img[0]).naturalHeight;
+            var img_ratio = img_width/img_height;
+            var view_width = this.main_div.innerWidth();
+            var view_height = this.main_div.innerHeight();
+            var view_ratio = view_width/view_height;
+
+            // Read margins from CSS
+            img.addClass('photo');
+            var h_margin = (img.outerWidth(true) - img.innerWidth())/2;
+            var v_margin = (img.outerHeight(true) - img.innerHeight())/2;
+
+            // Adjust IMG to center of view
+            if (view_ratio > img_ratio) {
+                // The view is wider. Maximize img height.
+                img.height(Math.floor(view_height-2*v_margin));
+                img.width(Math.floor(img_ratio*img.height()));
+            } else {
+                // The view is higher. Maximize img width.
+                img.width(Math.floor(view_width-2*h_margin));
+                img.height(Math.floor(img.width()/img_ratio));
+            }
+
+            // Make sure the image is not scaled up ... 
+            // ... unless a larger is being downloaded.
+            if (is_natural_size) {
+                if (img.width()>img_width)
+                    img.width(img_width);
+                if (img.height()>img_height)
+                    img.height(img_height);
+            }
+
+            // Apply position
+            img.css({
+                top:Math.floor((view_height-img.outerHeight(true))/2),
+                left:Math.floor((view_width-img.outerWidth(true))/2)
+            });
+
         }
 
 
@@ -387,9 +488,20 @@ module Exposition {
             }
 
             // Fade effect
-            this.fade_duration = duration;
+            this.fade_out_img = this.current_img;
+            this.current_img = null;
             this.item = item;
-            this.updateLayout(true);
+            var fade_in_img = this.getBestAvailableImage(this.item, false);
+            assert(fade_in_img, 'Did not find suitable image for fade_in');
+            this.centerPhoto(fade_in_img.img, fade_in_img.is_natural_size);
+            this.fade_in_img = fade_in_img.img;
+            this.crossfade(duration, () => {
+                if (this.fade_out_img)
+                    this.fade_out_img.appendTo(this.cache_div);
+                this.fade_out_img = null;
+                this.current_img = this.fade_in_img;
+                this.fade_in_img = null;
+            })
         }
 
         /**
@@ -467,107 +579,39 @@ module Exposition {
          * optionally triggers the download of a larger size photo.
          *
          */
-        public updateLayout(fade?: boolean) {
+        public updateLayout() {
 
-            // Preconditions
-            assert(fade !== true || this.fade_duration>0);
+            //
+            // Fade mode
+            //
 
-            // Check if view has a current item
-            if (!this.item)
+            if (this.fade_in_img) {
+                this.centerPhoto(this.fade_in_img, true);    // ### FIXME. Store natural size
+                if (this.fade_out_img)
+                    this.centerPhoto(this.fade_out_img, true);    // ### FIXME. Store natural size
                 return;
-
-            // Find the best loaded image for the current size of the view
-            var sizes = [];         // size array
-            var ready_imgs = this.getImages(this.images_ready, this.item.path());    // Map: size => jQuery element
-            for (var key in ready_imgs)
-                sizes.push(parseInt(key, 10));
-            var size, img;
-            if (sizes.length !== 0)
-            {
-                size = this.chooseSize(sizes);
-                img = ready_imgs[size];
-                //console.log('sizes: '+ sizes + '  size: '+size+'  ready_imgs: '+ready_imgs);
-                assert(img && img.length === 1);
             }
 
-            // Request a better image if necessary
-            var best_size = this.chooseSize(this.IMAGE_SIZES);
-            var is_best_size = !(size === undefined ||
-                (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
-            if (! is_best_size) {
-                var already_loading = false;
-                for (key in this.getImages(this.images_loading, this.item.path())) {
-                    if (parseInt(key, 10) === best_size) {
-                        already_loading = true;
-                        break;
-                    }
-                }
-                if (!already_loading) {
-                    //console.log('load '+best_size);
-                    this.loadImage(this.item.path(), best_size);
-                }
-            }
-            if (!img)
-                return;
+            //
+            // Regular mode
+            //
+
+            // Get best image
+            var best_img = this.getBestAvailableImage(this.item);
 
             // Update current image
-            var fade_out_img;
             if (this.current_img) {
-                if (fade === true) {
-                    fade_out_img = this.current_img;
-                } else {
-                    this.current_img.appendTo(this.cache_div);
-                }
+                this.current_img.appendTo(this.cache_div);
             }                
-            this.current_img = img;
+            this.current_img = best_img.img;
+            if (!this.current_img)
+                return;
 
-            // Get sizes
-            var img_width = img[0].naturalWidth;
-            var img_height = img[0].naturalHeight;
-            var img_ratio = img_width/img_height;
-            var view_width = this.main_div.innerWidth();
-            var view_height = this.main_div.innerHeight();
-            var view_ratio = view_width/view_height;
-
-            // Read margins from CSS
-            img.addClass('photo');
-            var h_margin = (img.outerWidth(true) - img.innerWidth())/2;
-            var v_margin = (img.outerHeight(true) - img.innerHeight())/2;
-
-            // Adjust IMG to center of view
-            if (view_ratio > img_ratio) {
-                // The view is wider. Maximize img height.
-                img.height(Math.floor(view_height-2*v_margin));
-                img.width(Math.floor(img_ratio*img.height()));
-            } else {
-                // The view is higher. Maximize img width.
-                img.width(Math.floor(view_width-2*h_margin));
-                img.height(Math.floor(img.width()/img_ratio));
-            }
-
-            // Make sure the image is not scaled up ... 
-            // ... unless a larger is being downloaded.
-            if (is_best_size) {
-                if (img.width()>img[0].naturalWidth)
-                    img.width(img[0].naturalWidth);
-                if (img.height()>img[0].naturalHeight)
-                    img.height(img[0].naturalHeight);
-            }
-
-            img.css({
-                top:Math.floor((view_height-img.outerHeight(true))/2),
-                left:Math.floor((view_width-img.outerWidth(true))/2)
-            });
+            // Center photo
+            this.centerPhoto(this.current_img, best_img.is_natural_size);
 
             // Make visible
-            if (fade) {
-                this.fade(fade_out_img, img, () => {
-                    if (fade_out_img)
-                        fade_out_img.appendTo(this.cache_div);
-                });                
-            } else {
-                img.appendTo(this.main_div);
-            }
+            this.current_img.appendTo(this.main_div);
         }
 
 
