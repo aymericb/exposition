@@ -364,7 +364,7 @@ module Exposition {
         // Private. Resize management
         //
 
-        private getBestAvailableImage(item: Item, can_load_better_image: boolean = false): { img: JQuery; is_natural_size: boolean; } {
+        private getBestAvailableImage(item: Item, can_load_better_image): { img: JQuery; is_natural_size: boolean; } {
             // Check if view has a current item
             if (!item)
                 return { img: null, is_natural_size: null };
@@ -384,10 +384,10 @@ module Exposition {
             }
 
             // Request a better image if necessary
+            var best_size = this.chooseSize(this.IMAGE_SIZES);
+            var is_best_size = !(size === undefined ||
+                (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
             if (can_load_better_image) {
-                var best_size = this.chooseSize(this.IMAGE_SIZES);
-                var is_best_size = !(size === undefined ||
-                    (best_size !== 0 && best_size > size) || (size !== 0 && best_size === 0));
                 if (! is_best_size) {
                     var already_loading = false;
                     for (key in this.getImages(this.images_loading, item.path())) {
@@ -597,7 +597,7 @@ module Exposition {
             //
 
             // Get best image
-            var best_img = this.getBestAvailableImage(this.item);
+            var best_img = this.getBestAvailableImage(this.item, true);
 
             // Update current image
             if (this.current_img) {
