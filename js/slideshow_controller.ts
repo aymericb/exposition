@@ -179,13 +179,14 @@ module Exposition {
 
                 // Check if all items are loaded
                 if (this.album_paths_to_load.length === 0) {
-                    this.loadNextPhoto()
-                    this.setNextTimer();
+                    this.loadNextPhoto();
+                    //this.setNextTimer();                    
+                    this.has_tick_elapsed = true;
                     return;
                 }
 
                 // Load other sub_items
-                this.loadNextAlbum();                
+                this.loadNextAlbum();
             } catch (err) {
                 this.onFail(err);
             }
