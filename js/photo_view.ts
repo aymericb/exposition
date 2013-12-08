@@ -355,7 +355,8 @@ module Exposition {
             } else {
                 img_fadein.prependTo(this.main_div);
                 img_fadein.hide();
-                img_fadeout.fadeOut(fade_duration);
+                if (img_fadeout)
+                    img_fadeout.fadeOut(fade_duration);
                 img_fadein.fadeIn(fade_duration, on_complete);
             }
         }
@@ -473,14 +474,14 @@ module Exposition {
             assert(duration>0);
 
             // If no current image, no effect
-            if (!this.item) {
+            /*if (!this.item) {
                 this.display(item);
                 return;
-            }
+            }*/
 
             // If image is not loaded, do a normal load
             // ### FIXME. Missing fadeOut.
-            var path = this.item.path();
+            var path = item.path();
             var size = this.chooseSize(this.IMAGE_SIZES);            
             if (!(size.toString() in this.getImages(this.images_ready, path))) {
                 this.display(item);
