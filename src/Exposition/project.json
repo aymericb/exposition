@@ -9,7 +9,8 @@
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
     "Microsoft.Extensions.Logging.Console": "1.0.0",
     "Microsoft.AspNetCore.Mvc.Core": "1.0.1",
-    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.1"
+    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.1",
+    "Microsoft.AspNetCore.Mvc": "1.0.1"
   },
 
   "tools": {

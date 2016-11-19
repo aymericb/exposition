@@ -11,10 +11,9 @@ namespace Exposition
     public class HomeController : Controller
     {
         // GET: /<controller>/
-        public /*IActionResult*/ ContentResult Index()
+        public IActionResult Index()
         {
-            // return View();
-            return Content("Index page");
+            return View();
         }
     }
 }   
