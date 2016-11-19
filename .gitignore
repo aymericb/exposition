@@ -1,0 +1,7 @@
+._.DS_Store
+._.gitignore
+node_modules
+src/.vs
+src/Exposition/bin
+src/Exposition/obj
+src/Exposition/project.lock.json
