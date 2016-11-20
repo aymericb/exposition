@@ -1,5 +1,5 @@
-﻿@{
-
+﻿@model Exposition.Models.Config
+@{
 }
 <!DOCTYPE html>
 <html>
@@ -15,5 +15,8 @@
     <![endif]-->
 
     <p>Index View</p>
+    <p>AlbumDir: @Model.AlbumDir</p>
+    <p>CacheDir: @Model.CacheDir</p>
+    <p>Allow Downloads: @Model.AllowDownload</p>
 </body>
 </html>
