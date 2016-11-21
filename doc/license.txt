@@ -1,5 +1,5 @@
 Exposition 
-Copyright (c) 2013 Aymeric Barthe. 
+Copyright (c) 2013-2016 Aymeric Barthe. 
 Email:   aymeric@barthe.ph
 Website: http://exposition.barthe.ph
 
@@ -21,14 +21,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 
 This program is covered by the following restriction, permitted under section 7 
 of the GNU Affero General Public License, version 3. All source files, including
-javascript, CSS and PHP files must retain the Exposition Copyright Notice
+javascript, CSS and C# files must retain the Exposition Copyright Notice
 given below. This notice must be preserved in all files, even if they been 
 transformed and processed automatically. In particular javascript files which are
 minified must retain the Exposition Copyright Notice. The notice must be shown 
 near the beginning of the file, and may be modified by the author in future versions 
 of this program. 
 
-The Exposition Copyright Notice in Exposition v0.2 is as follow
+The Exposition Copyright Notice in Exposition v0.4 is as follow
 
 //
 // Exposition. Copyright (c) 2013 Aymeric Barthe.

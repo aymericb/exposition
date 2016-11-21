@@ -1,9 +1,7 @@
 ._.DS_Store
 ._.gitignore
-build
 node_modules
-exposition.sublime-workspace
-exposition.sublime-project
-mount.sh
-.SyncID
-.SyncIgnore
+src/.vs
+src/Exposition/bin
+src/Exposition/obj
+src/Exposition/project.lock.json

@@ -1,0 +1,12 @@
+Nice photos
+https://unsplash.com
+
+== Docker Links ==
+
+Building Optimized Docker Images with ASP.NET Core
+https://blogs.msdn.microsoft.com/stevelasker/2016/09/29/building-optimized-docker-images-with-asp-net-core/
+
+HOSTING .NET CORE ON LINUX WITH DOCKER - A NOOB'S GUIDE
+http://blog.scottlogic.com/2016/09/05/hosting-netcore-on-linux-with-docker.html
+
+
