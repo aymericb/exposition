@@ -10,3 +10,14 @@ HOSTING .NET CORE ON LINUX WITH DOCKER - A NOOB'S GUIDE
 http://blog.scottlogic.com/2016/09/05/hosting-netcore-on-linux-with-docker.html
 
 
+== Swagger Links ==
+
+JSON Schema Draft 3
+https://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.29
+
+Swagger Specs
+http://swagger.io/specification
+
+Online Editor
+http://editor.swagger.io/
+
