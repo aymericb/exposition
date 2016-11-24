@@ -50,7 +50,7 @@ namespace Exposition
         };
 
         /** Indicates whether photos can be downloaded */
-        public bool AllowDownload { get; set; } = true;
+        public bool IsDownloadAllowed { get; set; } = true;
 
         //
         // Helper Methods
