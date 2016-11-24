@@ -12,18 +12,18 @@ namespace Exposition
 {
     public class HomeController : Controller
     {
-        private readonly IOptions<Models.Config> config;
+        private readonly IOptions<AppSettings> settings;
 
-        public HomeController(IOptions<Models.Config> config)
+        public HomeController(IOptions<AppSettings> settings)
         {
-            Contract.Requires(config != null);
-            this.config = config;
+            Contract.Requires(settings != null);
+            this.settings = settings;
         }
 
         // GET: /<controller>/
         public IActionResult Index()
         {
-            return View(this.config.Value);
+            return View(this.settings.Value);
         }
     }
 }   

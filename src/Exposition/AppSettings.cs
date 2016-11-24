@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Exposition.Models
+namespace Exposition
 {
     /** 
      * Main configuration of Exposition
      * Typically done by editing appsettings.json
      */
-    public class Config
+    public class AppSettings
     {
         //
         // Configuration values that must be provided by user

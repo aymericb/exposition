@@ -13,19 +13,19 @@ namespace Exposition.Controllers
     [Route("api/v1/[controller]")]
     public class ConfigController : Controller
     {
-        private readonly Models.Config config;
+        private readonly AppSettings settings;
 
-        public ConfigController(IOptions<Models.Config> config)
+        public ConfigController(IOptions<AppSettings> settings)
         {
-            Contract.Requires(config != null && config.Value != null);
-            this.config = config.Value;
+            Contract.Requires(settings != null && settings.Value != null);
+            this.settings = settings.Value;
         }
 
         // GET: api/v1/config
         [HttpGet]
-        public Models.Config Get()
+        public AppSettings Get()
         {
-            return this.config;
+            return this.settings;
         }
     }
 }
