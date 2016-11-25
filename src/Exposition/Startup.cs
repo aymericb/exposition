@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 
 namespace Exposition
 {
@@ -31,11 +32,16 @@ namespace Exposition
         public void ConfigureServices(IServiceCollection services)
         {
             // Framework Services
-            services.AddMvc();
+            services.AddMvc()
+                    .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new Utilities.SnakeCasePropertyNamesContractResolver());
+
             services.AddOptions();
 
             // Configuration
             services.Configure<AppSettings>(this.Configuration.GetSection("AppSettings"));
+
+            // Application services
+            services.AddSingleton<Services.IFileProvider, Services.FileProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
