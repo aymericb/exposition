@@ -5,3 +5,6 @@ src/.vs
 src/Exposition/bin
 src/Exposition/obj
 src/Exposition/project.lock.json
+src/Exposition.Tests/bin
+src/Exposition.Tests/obj
+src/Exposition.Tests/project.lock.json
