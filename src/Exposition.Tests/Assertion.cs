@@ -10,16 +10,27 @@ namespace Exposition.Tests
     /** Additional helpers missing in Assert type */ 
     public static class Assertion
     {
-        public static void Throws(Action task)
+        public static void Throws(Action task, Type exception_type=null)
         {
             try
             {
                 task();
             }
-            catch (Exception)
+            catch (Exception err)
             {
                 // Good
-                return;
+                if (exception_type == null)
+                {
+                    return;
+                }
+                else
+                {
+                    if (exception_type == err.GetType())
+                        return;
+                    else
+                        throw new Exception("Exception of wrong type");
+                }
+                    
             }
 
             throw new Exception("No exception thrown");

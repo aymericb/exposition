@@ -21,3 +21,17 @@ http://swagger.io/specification
 Online Editor
 http://editor.swagger.io/
 
+
+== Exception Handling ==
+
+ASP.NET 5 / MVC 6 equivalent of HttpException
+http://stackoverflow.com/questions/31054012/asp-net-5-mvc-6-equivalent-of-httpexception
+
+Error handling in ASP.NET Core 1.0 Web API (Sending ex.Message to the client)
+http://stackoverflow.com/questions/38014379/error-handling-in-asp-net-core-1-0-web-api-sending-ex-message-to-the-client
+
+Error handling
+https://docs.microsoft.com/en-us/aspnet/core/fundamentals/error-handling#
+
+Model Validation
+https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation
