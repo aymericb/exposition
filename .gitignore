@@ -1,7 +1,10 @@
 ._.DS_Store
 ._.gitignore
 node_modules
-src/.vs
 src/Exposition/bin
 src/Exposition/obj
 src/Exposition/project.lock.json
+test/Exposition.Tests/bin/
+test/Exposition.Tests/obj/
+.vs/
+test/Exposition.Tests/project.lock.json
