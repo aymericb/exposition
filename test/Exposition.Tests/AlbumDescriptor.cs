@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
 using Xunit;
 
 namespace Exposition.Tests
@@ -90,6 +91,19 @@ namespace Exposition.Tests
             Assert.Equal(descriptor.Children.ToList()[0].Title, "title_2014");
             Assert.Equal(descriptor.Children.ToList()[1].Title, "title_2013");
             Assert.Equal(descriptor.Children.ToList()[2].Title, null);
+        }
+
+        [Fact]
+        public void ParseFixtures()
+        {
+            var descriptors = Directory.EnumerateFiles(FileProvider.FIXTURE_DIR, "*.json", SearchOption.AllDirectories).Where(x => x.EndsWith("album.json"));
+            Assert.NotEmpty(descriptors);
+
+            foreach (var path in descriptors)
+            {
+                var json = File.ReadAllText(path);
+                Models.AlbumDescriptor.Parse(json);
+            }
         }
     }
 }

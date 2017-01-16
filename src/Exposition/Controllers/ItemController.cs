@@ -16,6 +16,8 @@ namespace Exposition.Controllers
     {
         private readonly IFileProvider fileProvider;
 
+
+        #region Public Interface 
         public ItemController(IFileProvider fileProvider)
         {
             Contract.Requires(fileProvider != null);
@@ -33,6 +35,9 @@ namespace Exposition.Controllers
         {
             return CreateItem("");
         }
+        #endregion
+
+        #region Implementation
 
         private Models.Item CreateItem(string path)
         {
@@ -72,5 +77,24 @@ namespace Exposition.Controllers
 
             throw new Exception("Unreachable Statement");
         }
+
+        private Models.AlbumDescriptor LoadAlbumDescriptor(string path)
+        {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
+            using (var stream = this.fileProvider.GetAlbumDescriptor(path))
+            {
+                if (stream == null)
+                    return null;
+
+                using (var reader = new StreamReader(stream))
+                {
+                    var json = reader.ReadToEnd();
+                    return Models.AlbumDescriptor.Parse(json);
+                }
+            }
+        }
+
+        #endregion
     }
 }
