@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace Exposition.Models
 {
-    public class Item
+    abstract public class Item
     {
+        public const string TYPE_ALBUM = "album";
+        public const string TYPE_PHOTO = "photo";
+
         public string Title { get; }
         public string Path { get; }
+        public abstract string Type { get; }
 
         public Item(string path, string title)
         {

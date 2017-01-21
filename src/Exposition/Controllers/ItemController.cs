@@ -16,7 +16,6 @@ namespace Exposition.Controllers
     {
         private readonly IFileProvider fileProvider;
 
-
         #region Public Interface 
         public ItemController(IFileProvider fileProvider)
         {
@@ -27,6 +26,8 @@ namespace Exposition.Controllers
         [HttpGet("{*path}")]
         public Models.Item Get(string path)
         {
+            Contract.Requires(path.StartsWith("/"));
+            path = path == "/" ? "" : path.Substring(1);
             return CreateItem(path);
         }
 
@@ -35,6 +36,7 @@ namespace Exposition.Controllers
         {
             return CreateItem("");
         }
+
         #endregion
 
         #region Implementation
@@ -50,7 +52,7 @@ namespace Exposition.Controllers
 
             if (type == FileProvider.ItemType.Photo)
             {
-                return new Models.Item(path, title);
+                return new Models.Photo("/"+path, title);
             }
             else if (type == FileProvider.ItemType.Album)
             {
