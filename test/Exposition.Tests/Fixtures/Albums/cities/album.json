@@ -2,7 +2,8 @@
 	"version": 1,
 	"children": [
 		{
-			"filename": "dubai"
+			"filename": "dubai",
+			"title": "Dubai"
 		},
 		{
 			"filename": "europe"
@@ -13,6 +14,13 @@
 		{
 			"filename": "qqwxu7njwti-jindong-h.jpg",
 			"title": "interchange"
+		},
+		{
+			"filename": "non-existing-file1.jpg"
+		},
+		{
+			"filename": "non-existing-file2.jpg",
+			"title": "non existing file 2"
 		}
 	]
 }

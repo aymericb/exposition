@@ -19,17 +19,20 @@ namespace Exposition.Tests
 
         private static readonly string[] UNAUTHORIZED_PATHS = new[] { ALBUM_DIR, "C:\\", "/", "..", "/..", "../item", "/../item", "..\\item", "\\..\\item" };
 
-
-        public FileProvider()
+        static public Services.IFileProvider CreateMockFileProvider()
         {
             var settings = new AppSettings
             {
                 AlbumDir = ALBUM_DIR,
                 CacheDir = CACHE_DIR
             };
-            this.provider = new Services.FileProvider(Options.Create(settings));
+            return new Services.FileProvider(Options.Create(settings));
         }
 
+        public FileProvider()
+        {
+            this.provider = CreateMockFileProvider();
+        }
 
         #region GetItemType
 

@@ -2,12 +2,12 @@
 	"version": 1,
 	"children": [
 		{
-			"filename": "animals",
-			"title": "Animals"
-		},
-		{
 			"filename": "cities",
 			"title": "Cities"
+		},
+		{
+			"filename": "animals",
+			"title": "Animals"
 		}
 	]
 }
