@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Exposition.Services;
-using System.Diagnostics.Contracts;
 using System.IO;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -19,14 +18,14 @@ namespace Exposition.Controllers
         #region Public Interface 
         public ItemController(IFileProvider fileProvider)
         {
-            Contract.Requires(fileProvider != null);
+            Contract.RequireNotNull(fileProvider);
             this.fileProvider = fileProvider;
         }
 
         [HttpGet("{*path}")]
         public Models.Item Get(string path)
         {
-            Contract.Requires(path.StartsWith("/"));
+            Contract.Require(path.StartsWith("/"));
             path = path == "/" ? "" : path.Substring(1);
             return CreateItem(path);
         }
@@ -43,7 +42,7 @@ namespace Exposition.Controllers
 
         private Models.Item CreateItem(string path, string title=null)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
+            Contract.RequireNotNull(path);
 
             // Set title of root item
             if (title == null)
@@ -110,7 +109,7 @@ namespace Exposition.Controllers
 
         private Models.AlbumDescriptor LoadAlbumDescriptor(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
+            Contract.RequireNotNull(path);
 
             using (var stream = this.fileProvider.GetAlbumDescriptor(path))
             {

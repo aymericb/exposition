@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,8 +22,8 @@ namespace Exposition.Services
 
         public FileProvider(IOptions<AppSettings> settings)
         {
-            Contract.Requires(settings.Value != null);
-            Contract.Requires(settings.Value.IsValid());
+            Contract.RequireNotNull(settings.Value);
+            Contract.Require(settings.Value.IsValid());
 
             this.PhotoExtensions = settings.Value.PhotoExtensions;
             this.AlbumDir = settings.Value.AlbumDir;

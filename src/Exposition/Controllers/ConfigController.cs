@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.Contracts;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,7 +16,8 @@ namespace Exposition.Controllers
 
         public ConfigController(IOptions<AppSettings> settings)
         {
-            Contract.Requires(settings != null && settings.Value != null);
+            Contract.RequireNotNull(settings);
+            Contract.Require(settings.Value != null);
             this.config = new Models.Config(settings.Value);
         }
 

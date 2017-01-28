@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,7 +17,8 @@ namespace Exposition.Models
 
         public Config(AppSettings settings)
         {
-            Contract.Requires(settings != null && settings.IsValid());
+            Contract.RequireNotNull(settings);
+            Contract.Require(settings.IsValid());
 
             // ### FIXME: Hardcoded
             this.Version = "0.5";
