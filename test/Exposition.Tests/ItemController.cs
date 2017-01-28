@@ -44,7 +44,7 @@ namespace Exposition.Tests
         public void GetAlbumWithDescriptor()
         {
             var path = "/cities";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
 
             Assert.Equal("Cities", item.Title);
             Assert.Equal(path, item.Path);
@@ -76,7 +76,7 @@ namespace Exposition.Tests
         public void GetAlbumWithParentDescriptor()
         {
             var path = "/cities/dubai";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
 
             // Title set from parent album descriptor
             Assert.Equal("Dubai", item.Title);
@@ -104,7 +104,7 @@ namespace Exposition.Tests
         public void GetAlbumWithoutDescriptor()
         {
             var path = "/cities/europe/london";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
 
             Assert.Equal("london", item.Title);
             Assert.Equal(path, item.Path);
@@ -137,7 +137,7 @@ namespace Exposition.Tests
         public void GetAlbumWithHiddenFile()
         {
             var path = "/cities/europe/paris";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
 
             Assert.Equal("paris", item.Title);
             Assert.Equal(path, item.Path);
@@ -153,7 +153,7 @@ namespace Exposition.Tests
         public void GetPhotoWithDescriptorTitle()
         {
             var path = "/cities/qqwxu7njwti-jindong-h.jpg";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
             Assert.Equal("interchange", item.Title);
             Assert.Equal(path, item.Path);
             Assert.Equal(Models.Item.TYPE_PHOTO, item.Type);
@@ -164,7 +164,7 @@ namespace Exposition.Tests
         public void GetPhotoWithDescriptorInvisible()
         {
             var path = "/cities/europe/paris/moognyoq1ne-felipe-dolce.jpg";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
             Assert.Equal("moognyoq1ne-felipe-dolce", item.Title);
             Assert.Equal(path, item.Path);
             Assert.Equal(Models.Item.TYPE_PHOTO, item.Type);
@@ -175,7 +175,7 @@ namespace Exposition.Tests
         public void GetPhotoWithDescriptorNoTitle()
         {
             var path = "/cities/europe/paris/tjff7c7bqjy-lucas-gallone.jpg";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
             Assert.Equal("tjff7c7bqjy-lucas-gallone", item.Title);
             Assert.Equal(path, item.Path);
             Assert.Equal(Models.Item.TYPE_PHOTO, item.Type);
@@ -186,7 +186,7 @@ namespace Exposition.Tests
         public void GetPhotoWithoutDescriptor()
         {
             var path = "/cities/europe/london/hakd2yx3xyo-david-east.jpg";
-            var item = this.controller.Get(path);
+            var item = this.controller.Get(path.Substring(1));
             Assert.Equal("hakd2yx3xyo-david-east", item.Title);
             Assert.Equal(path, item.Path);
             Assert.Equal(Models.Item.TYPE_PHOTO, item.Type);

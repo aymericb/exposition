@@ -25,8 +25,6 @@ namespace Exposition.Controllers
         [HttpGet("{*path}")]
         public Models.Item Get(string path)
         {
-            Contract.Require(path.StartsWith("/"));
-            path = path == "/" ? "" : path.Substring(1);
             return CreateItem(path);
         }
 
