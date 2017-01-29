@@ -1,0 +1,106 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Exposition API v1",
+		"_postman_id": "4dfb3905-197f-a8f7-c3ce-d945ed507d62",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Configuration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var json = JSON.parse(responseBody);",
+							"",
+							"function checkField(name, type, test)",
+							"{",
+							"    tests[`${name} is ${type}`] = test(json[name]);",
+							"}",
+							"",
+							"function checkSizeArray(name)",
+							"{",
+							"    tests[`${name} contains positive numbers`] = json[name].filter(x => !_.isNumber(x) || x<0).length === 0;",
+							"}",
+							"",
+							"[\"version\", \"info\", \"gallery_name\"].map(x => checkField(x, \"string\", _.isString));",
+							"[\"photo_sizes\", \"thumbnail_sizes\"].map(x => checkField(x, \"array\", _.isArray));",
+							"[\"is_download_allowed\"].map(x => checkField(x, \"boolean\", _.isBoolean));",
+							"[\"photo_sizes\", \"thumbnail_sizes\"].map(x => checkSizeArray(x));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{domain}}/api/v1/config",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Root Path",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var json = JSON.parse(responseBody);",
+							"",
+							"tests[\"type is album\"] = json.type === \"album\";",
+							"tests[\"children is array\"] = _.isArray(json.children);",
+							"tests[\"children is not empty\"] = json.children.length > 0;",
+							"tests[\"title is string\"] = _.isString(json.title);",
+							"tests[\"path is string\"] = _.isString(json.path);",
+							"tests[\"path starts with /\"] = json.path[0] === \"/\";"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{domain}}/api/v1/item",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Photo (IMG_6693.jpg)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var json = JSON.parse(responseBody);",
+							"",
+							"tests[\"type is photo\"] = json.type === \"photo\";",
+							"tests[\"children is not defined\"] = _.isUndefined(json.children);",
+							"tests[\"title is string\"] = _.isString(json.title);",
+							"tests[\"path is string\"] = _.isString(json.path);",
+							"tests[\"path starts with /\"] = json.path[0] === \"/\";"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{domain}}/api/v1/item/2014/france_august_2014/motorbike_race/IMG_6693.jpg",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

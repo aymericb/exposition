@@ -168,5 +168,8 @@ namespace Exposition.Tests
 
         #endregion
 
+        #region GetPhoto
+        #endregion
+
     }
 }

@@ -112,6 +112,16 @@ namespace Exposition.Services
             }
         }
 
+        Stream GetPhoto(string album_path)
+        {
+            var type = GetItemType(album_path);
+            if (type != ItemType.Photo)
+                throw new Exception("Not a photo");
+            var fs_path = GetFileSystemPath(album_path);
+
+            return new FileStream(fs_path, FileMode.Open);
+        }
+
         #endregion
 
         #region Implementation

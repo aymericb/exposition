@@ -12,5 +12,6 @@ namespace Exposition.Services
         ItemType GetItemType(string album_path);
         IEnumerable<string> GetAlbumChildren(string album_path);
         Stream GetAlbumDescriptor(string album_path);
+        Stream GetPhoto(string album_path);
     }
 }
