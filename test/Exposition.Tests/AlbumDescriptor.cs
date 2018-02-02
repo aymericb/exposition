@@ -9,47 +9,36 @@ namespace Exposition.Tests
 {
     public class AlbumDescriptor
     {
-        [Fact]
-        public void InvalidJson()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("asdasd")]
+        [InlineData("{\"version\": 1,")]
+        public void InvalidJson(string data)
         {
-            var exception = Record.Exception(() => Models.AlbumDescriptor.Parse(null));
-            Assert.NotNull(exception);
-
-            exception = Record.Exception(() => Models.AlbumDescriptor.Parse(""));
-            Assert.NotNull(exception);
-
-            exception = Record.Exception(() => Models.AlbumDescriptor.Parse("asdasd"));
-            Assert.NotNull(exception);
-
-            exception = Record.Exception(() => Models.AlbumDescriptor.Parse("{\"version\": 1,"));
+            var exception = Record.Exception(() => Models.AlbumDescriptor.Parse(data));
             Assert.NotNull(exception);
         }
 
-        [Fact]
-        public void InvalidVersion()
+        [Theory]
+        [InlineData("{\"version\": 2, \"children\":  [ { \"filename\": \"2014\"}, { \"filename\": \"2013\" }, { \"filename\": \"2007\"} ] }")]
+        [InlineData("{\"version\": \"xxx\", \"children\":  [ { \"filename\": \"2014\"}, { \"filename\": \"2013\" }, { \"filename\": \"2007\"} ] }")]
+        public void InvalidVersion(string json)
         {
-            var json = "{\"version\": 2, \"children\":  [ { \"filename\": \"2014\"}, { \"filename\": \"2013\" }, { \"filename\": \"2007\"} ] }";
             var exception = Record.Exception(() => Models.AlbumDescriptor.Parse(json));
             Assert.NotNull(exception);
-            
-            json = "{\"version\": \"xxx\", \"children\":  [ { \"filename\": \"2014\"}, { \"filename\": \"2013\" }, { \"filename\": \"2007\"} ] }";
-            exception = Record.Exception(() => Models.AlbumDescriptor.Parse(json));
-            Assert.NotNull(exception);
         }
 
-        [Fact]
-        public void InvalidChildren()
+        [Theory]
+        [InlineData("{\"version\": 1 }")]
+        [InlineData("{\"version\": 1, \"children\":  [ ] }")]
+        [InlineData("{\"version\": 1, \"children\":  [ { \"x\": \"2014\"} ] }")]
+        [InlineData("{\"version\": 1, \"children\":  [ [ { \"filename\": \"2014\"}, { \"filename\": \"2013\" }, { } ] }")]
+        [InlineData("{\"version\": 1, \"children\":  [ [ { \"title\": \"2014\"} ] }")]
+        public void InvalidChildren(string data)
         {
-            var actions = new Action[] {
-                () => Models.AlbumDescriptor.Parse("{\"version\": 1 }"),
-                () => Models.AlbumDescriptor.Parse("{\"version\": 1, \"children\":  [ ] }"),
-                () => Models.AlbumDescriptor.Parse("{\"version\": 1, \"children\":  [ { \"x\": \"2014\"} ] }"),
-                () => Models.AlbumDescriptor.Parse("{\"version\": 1, \"children\":  [ [ { \"filename\": \"2014\"}, { \"filename\": \"2013\" }, { } ] }"),
-                () => Models.AlbumDescriptor.Parse("{\"version\": 1, \"children\":  [ [ { \"title\": \"2014\"} ] }")
-            };
-
-            var exceptions = actions.Select(x => Record.Exception(x)).ToArray();
-            Assert.Equal(0, exceptions.Where(x => x == null).Count());
+            var exception = Record.Exception(() => Models.AlbumDescriptor.Parse(data));
+            Assert.NotNull(exception);
         }
 
         [Fact]
@@ -68,12 +57,12 @@ namespace Exposition.Tests
             Assert.Equal(1, descriptor.Version);
             Assert.NotNull(descriptor.Children);
             Assert.Equal(3, descriptor.Children.Count());
-            Assert.Equal(descriptor.Children.ToList()[0].Filename, "2014");
-            Assert.Equal(descriptor.Children.ToList()[1].Filename, "2013");
-            Assert.Equal(descriptor.Children.ToList()[2].Filename, "2007");
-            Assert.Equal(descriptor.Children.ToList()[0].Title, null);
-            Assert.Equal(descriptor.Children.ToList()[1].Title, null);
-            Assert.Equal(descriptor.Children.ToList()[2].Title, null);
+            Assert.Equal("2014", descriptor.Children.ToList()[0].Filename);
+            Assert.Equal("2013", descriptor.Children.ToList()[1].Filename);
+            Assert.Equal("2007", descriptor.Children.ToList()[2].Filename);
+            Assert.Null(descriptor.Children.ToList()[0].Title);
+            Assert.Null(descriptor.Children.ToList()[1].Title);
+            Assert.Null(descriptor.Children.ToList()[2].Title);
         }
 
         [Fact]
@@ -85,12 +74,12 @@ namespace Exposition.Tests
             Assert.Equal(1, descriptor.Version);
             Assert.NotNull(descriptor.Children);
             Assert.Equal(3, descriptor.Children.Count());
-            Assert.Equal(descriptor.Children.ToList()[0].Filename, "2014");
-            Assert.Equal(descriptor.Children.ToList()[1].Filename, "2013");
-            Assert.Equal(descriptor.Children.ToList()[2].Filename, "2007");
-            Assert.Equal(descriptor.Children.ToList()[0].Title, "title_2014");
-            Assert.Equal(descriptor.Children.ToList()[1].Title, "title_2013");
-            Assert.Equal(descriptor.Children.ToList()[2].Title, null);
+            Assert.Equal("2014", descriptor.Children.ToList()[0].Filename);
+            Assert.Equal("2013", descriptor.Children.ToList()[1].Filename);
+            Assert.Equal("2007", descriptor.Children.ToList()[2].Filename);
+            Assert.Equal("title_2014", descriptor.Children.ToList()[0].Title);
+            Assert.Equal("title_2013", descriptor.Children.ToList()[1].Title);
+            Assert.Null(descriptor.Children.ToList()[2].Title);
         }
 
         [Fact]
