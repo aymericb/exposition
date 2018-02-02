@@ -8,3 +8,5 @@ test/Exposition.Tests/bin/
 test/Exposition.Tests/obj/
 .vs/
 test/Exposition.Tests/project.lock.json
+src/Exposition.Tests/bin/
+src/Exposition.Tests/obj/
