@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Exposition.Models
+namespace Exposition.Validation
 {
     public class NonEmptyEnumerableAttribute : ValidationAttribute
     {
