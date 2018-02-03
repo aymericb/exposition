@@ -13,11 +13,24 @@ namespace Exposition.Tests
     {
         private Services.IFileProvider provider;
 
-        public static readonly string FIXTURE_DIR = Path.Combine(Path.GetDirectoryName(typeof(FileProvider).GetTypeInfo().Assembly.Location), "..\\..\\..\\Fixtures");
+        public static readonly string FIXTURE_DIR = Path.Combine(Path.GetDirectoryName(typeof(FileProvider).GetTypeInfo().Assembly.Location), "../../../Fixtures");
         public static readonly string ALBUM_DIR = Path.Combine(FIXTURE_DIR, "Albums");
         public static readonly string CACHE_DIR = Path.Combine(FIXTURE_DIR, "Cache");
 
-        private static readonly string[] UNAUTHORIZED_PATHS = new[] { ALBUM_DIR, "C:\\", "/", "..", "/..", "../item", "/../item", "..\\item", "\\..\\item" };
+        public static IEnumerable<object[]> UNAUTHORIZED_PATHS() {
+            yield return new[] { ALBUM_DIR };
+            yield return new[] { "/" };
+            yield return new[] { ".." };
+            yield return new[] { "/.." };
+            yield return new[] { "../item" };
+            yield return new[] { "/../item" };
+            if (Path.DirectorySeparatorChar == '\\')
+            {
+                yield return new[] { "C:\\" };
+                yield return new[] { $"..\\item" };
+                yield return new[] { $"\\..\\item" };
+            }
+        }
 
         static public Services.IFileProvider CreateMockFileProvider()
         {
@@ -36,12 +49,13 @@ namespace Exposition.Tests
 
         #region GetItemType
 
-        [Fact]
-        public void GetItemType_UnauthorizedPath()
+        [Theory]
+        [MemberData(nameof(UNAUTHORIZED_PATHS))]
+        public void GetItemType_UnauthorizedPath(string path)
         {
-            var exceptions = UNAUTHORIZED_PATHS.Select(x => Record.Exception(() => this.provider.GetItemType(x)));
-            Assert.Empty(exceptions.Where(x => x == null));
-            Assert.Empty(exceptions.Where(x => x.GetType() != typeof(UnauthorizedAccessException)));
+            var exception = Record.Exception(() => this.provider.GetItemType(path));
+            Assert.NotNull(exception);
+            Assert.IsType<UnauthorizedAccessException>(exception);
         }
 
         [Fact]
@@ -82,12 +96,13 @@ namespace Exposition.Tests
 
         #region GetAlbumChildren
 
-        [Fact]
-        public void GetAlbumChildren_UnauthorizedPath()
+        [Theory]
+        [MemberData(nameof(UNAUTHORIZED_PATHS))]
+        public void GetAlbumChildren_UnauthorizedPath(string path)
         {
-            var exceptions = UNAUTHORIZED_PATHS.Select(x => Record.Exception(() => this.provider.GetAlbumChildren(x)));
-            Assert.Empty(exceptions.Where(x => x == null));
-            Assert.Empty(exceptions.Where(x => x.GetType() != typeof(UnauthorizedAccessException)));
+            var exception = Record.Exception(() => this.provider.GetAlbumChildren(path));
+            Assert.NotNull(exception);
+            Assert.IsType<UnauthorizedAccessException>(exception);
         }
 
         [Fact]
@@ -126,12 +141,13 @@ namespace Exposition.Tests
 
         #region GetAlbumDescriptor
 
-        [Fact]
-        public void GetAlbumDescriptor_UnauthorizedPath()
+        [Theory]
+        [MemberData(nameof(UNAUTHORIZED_PATHS))]
+        public void GetAlbumDescriptor_UnauthorizedPath(string path)
         {
-            var exceptions = UNAUTHORIZED_PATHS.Select(x => Record.Exception(() => this.provider.GetAlbumDescriptor(x)));
-            Assert.Empty(exceptions.Where(x => x == null));
-            Assert.Empty(exceptions.Where(x => x.GetType() != typeof(UnauthorizedAccessException)));
+            var exception = Record.Exception(() => this.provider.GetAlbumDescriptor(path));
+            Assert.NotNull(exception);
+            Assert.IsType<UnauthorizedAccessException>(exception);
         }
 
         [Fact]
@@ -153,13 +169,13 @@ namespace Exposition.Tests
         [Fact]
         public void GetAlbumDescriptor()
         {
-            var text = File.ReadAllText(Path.Combine(FIXTURE_DIR, "Albums\\album.json"));
+            var text = File.ReadAllText(Path.Combine(FIXTURE_DIR, "Albums/album.json"));
             using (var reader = new StreamReader(this.provider.GetAlbumDescriptor("")))
             {
                 Assert.Equal(text, reader.ReadToEnd());
             }
 
-            text = File.ReadAllText(Path.Combine(FIXTURE_DIR, "Albums\\cities\\album.json"));
+            text = File.ReadAllText(Path.Combine(FIXTURE_DIR, "Albums/cities/album.json"));
             using (var reader = new StreamReader(this.provider.GetAlbumDescriptor("cities")))
             {
                 Assert.Equal(text, reader.ReadToEnd());
