@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Diagnostics;
+using Newtonsoft.Json;
 
 namespace Exposition
 {
@@ -49,10 +51,37 @@ namespace Exposition
         {
             loggerFactory.AddConsole();
 
+#if DEVELOPER_EXCEPTIONS
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+#endif 
+
+            app.UseExceptionHandler(action =>
+            {
+                action.Run(async context => {
+                    context.Response.ContentType = "application/json";
+                    var feature = context.Features.Get<IExceptionHandlerFeature>();
+                    if (feature != null)
+                    {
+                        // Capture error
+                        var error = Models.Error.Unknown;
+                        var exception = feature.Error as ServerException;
+                        if (exception != null)
+                            error = exception.Error;
+
+#if DEBUG
+                        // Add debug info
+                        error.Data = exception.Data;
+#endif
+
+                        // Write response
+                        context.Response.StatusCode = (int)error.Status;
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(error)).ConfigureAwait(false);
+                    }
+                });
+            });
 
             app.UseMvc(routes =>
             {
