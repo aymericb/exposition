@@ -62,8 +62,9 @@ module Exposition {
         // Model Update
         //
 
-        constructor(config: Config, main_div: JQuery, items: AlbumViewData[]) {
+        constructor(config: Config, main_div: JQuery, page: number, items: AlbumViewData[]) {
             // Initialize members
+            this.current_page_index = page;
             this.main_div = main_div;
             this.items = items;
 

@@ -58,6 +58,7 @@ module Exposition {
         private config: Config;
 
         private path: string;                           // Current album or item path
+        private page: number;                           // Current page of album
         private item: Item;                             // Current item (class Item)
         private loading_timer;                          // Timer use to delay showing the loading box
         private loading_spinner;                        // ph.barthe.Spinner object
@@ -105,6 +106,7 @@ module Exposition {
          * the page handler, breadcrumb and toolbar.
          *
          * @param {string} path           The virtual path of the item to display (album or photo)
+         * @param {number} page           Current number of album page to display
          * @param {bool} push_state       Optional. Default true. Whether the state should be
          *   be pushed to the browser history. Typically false when handling popstate event.
          * 
@@ -112,7 +114,7 @@ module Exposition {
          *
          * Does not throw
          */
-        private onPathLoaded(path: string, push_state: boolean) : (item: Item) => void {
+        private onPathLoaded(path: string, page: number, push_state: boolean) : (item: Item) => void {
             // Precondition
             assert(path);
 
@@ -126,14 +128,16 @@ module Exposition {
                     // Set internal status
                     this.item = item;
                     this.path = path;
+                    this.page = page;
 
                     // Update HTML5 History
                     if (push_state === true || push_state === undefined) {
+                        var hState = { path: this.path, page: this.page };
                         if (this.first_push_state) {
                             this.first_push_state = false;
-                            history.replaceState(this.path, this.item.title(), this.path);
+                            history.replaceState(hState, this.item.title(), this.config.makeHistoryUrl(this.path));
                         } else {
-                            history.pushState(this.path, this.item.title(), this.path);
+                            history.pushState(hState, this.item.title(), this.config.makeHistoryUrl(this.path));
                         }
                     }
 
@@ -145,11 +149,19 @@ module Exposition {
                                 return;
                             }
                             this.page_handler.show();
-                            this.page_handler.setPage("Page", current_page, total_page);
+                            this.page_handler.setPage(text, current_page, total_page);
+
+                            if (this.page != current_page) {
+                                this.page = current_page;
+                                if (text == 'Page') {
+                                    var hState = { path: this.path, page: this.page };
+                                    history.replaceState(hState, this.item.title(), this.config.makeHistoryUrl(this.path));
+                                }
+                            }
                         };
                     };
                     if (this.item.isAlbum()) {
-                        this.view = new AlbumController(this.config, this.main_div, this.item);
+                        this.view = new AlbumController(this.config, this.main_div, this.page, this.item);
                         this.view.onPageUpdate.on( create_set_page_handler('Page') );
                     } else {
                         assert(this.item.isPhoto());
@@ -161,12 +173,15 @@ module Exposition {
                             this.hideLoading();
                             this.showDelayedLoading();
                             this.breadcrumb_handler.setPath(this.path);
-                            history.pushState(this.path, this.item.title(), this.path);
+                            var hState = { path: this.path, page: this.page };
+                            history.replaceState(hState, this.item.title(), this.config.makeHistoryUrl(this.path));
+                            if (this.config.isDownloadAllowed())
+                                this.divs.btn_download.attr('href', this.config.makeDownloadUrl(this.path));
                         });
                     }
 
                     // Connect view callbacks and load item
-                    this.view.onLoadPath.on((path: string) => { this.loadPath(path, true); }); // ### FIXME. See goToNext/goToPrev in PhotoView
+                    this.view.onLoadPath.on((path: string) => { this.loadPath(path, 0, true); }); // ### FIXME. See goToNext/goToPrev in PhotoView
                     this.view.onReady.on(() => { this.hideLoading(); });
                     this.view.load();
 
@@ -199,12 +214,13 @@ module Exposition {
         /**
          * Load photo or album at path
          * @param {string} path           The virtual path of the item to display (album or photo)
+         * @param {number} page           Current number of album page to display
          * @param {bool} push_state       Optional. Default true. Whether the state should be
          *   be pushed to the browser history. Typically false when handling popstate event.
          * @param {bool} delayed_loading  Optional. Default true. Whether the showDelayedLoading() is called
          * Calls onFatalError on errors.
          */
-        private loadPath(path: string, push_state: boolean, delayed_loading?: boolean) {
+        private loadPath(path: string, page: number, push_state: boolean, delayed_loading?: boolean) {
             if (Exposition.debug)
                 console.log("Loading: "+path);
             this.item = null;
@@ -222,7 +238,7 @@ module Exposition {
             var on_error = (jqXHR, textStatus, error) => {
                 this.onFatalError("Cannot navigate to page "+path, error);
             };
-            Item.Load(this.config, path, this.onPathLoaded(path, push_state), on_error);
+            Item.Load(this.config, path, this.onPathLoaded(path, page, push_state), on_error);
         }
 
         /** 
@@ -309,7 +325,7 @@ module Exposition {
 
             // Initialize breadcrumb handler
             this.breadcrumb_handler = new BreadcrumbHandler(this.divs.breadcrumb, this.config);
-            this.breadcrumb_handler.onLoadPath.on( (path: string) => { this.loadPath(path, true); });
+            this.breadcrumb_handler.onLoadPath.on( (path: string) => { this.loadPath(path, 0, true); });
 
             // Set default path
             this.path = '/';
@@ -324,9 +340,9 @@ module Exposition {
 
             // Initialize HTML5 history change event handler
             $(window).on('popstate', (ev) => {
-                var path = ev.originalEvent.state;
-                if (path && typeof path === 'string' && path.length>0); 
-                    this.loadPath(path, false);
+                var hState = ev.originalEvent.state;
+                if (hState.path && typeof hState.path === 'string' && hState.path.length>0); 
+                    this.loadPath(hState.path, hState.page, false);
             });
 
             // Initialize key shortcuts handler
@@ -337,7 +353,7 @@ module Exposition {
             this.divs.btn_slideshow.click( () => { this.onStartSlideshow(); } )
 
             // Initialize view
-            this.loadPath(this.path, true, false);
+            this.loadPath(this.path, 0, true, false);
             $(window).resize( () => { this.onResize(); } );
         }
 
@@ -375,7 +391,7 @@ module Exposition {
             this.showDelayedLoading();
             this.divs.header.show();
             this.divs.footer.show();
-            this.loadPath(this.path, false, false); // ### FIXME. Restore previous view instead, pages not remembered.
+            this.loadPath(this.path, this.page, false, false);
         }
 
         //

@@ -57,12 +57,16 @@ module Exposition {
             assert(size>=0);
             return this.base_url+Config.PAGE_CACHE+'/'+size+path;
         }
+        public makeHistoryUrl(path:string): string {
+            assert(path.length>0 && path.substring(0, 1) === '/');
+            return this.base_url+path.substring(1);
+        }
         public makeDownloadUrl(path:string): string {
             assert(path.length>0 && path.substring(0, 1) === '/');
             return this.base_url+Config.PAGE_DOWNLOAD+path;
         }
         public getCautionImageUrl() {
-            return this.base_url+'/css/caution.png';
+            return this.base_url+'css/caution.png';
         }
 
         // Server info
@@ -156,7 +160,7 @@ module Exposition {
             })();
 
             // Load ajax configuration
-            $.ajax(Config.PAGE_CONFIG)
+            $.ajax(this.base_url+Config.PAGE_CONFIG)
                 .fail( error_callback )
                 .done( (json) => {
                     try {
