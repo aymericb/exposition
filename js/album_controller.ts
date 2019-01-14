@@ -111,7 +111,7 @@ module Exposition {
          * Constructor 
          * No side effect on Main View. Use load()
          */
-        constructor(config: Config, main_div: JQuery, item: Item) {
+        constructor(config: Config, main_div: JQuery, page: number, item: Item) {
 
             // Preconditions
             assert(item.isAlbum());
@@ -142,7 +142,7 @@ module Exposition {
 
             // Initialize view
             this.item = item;
-            this.view = new AlbumView(config, main_div, items);
+            this.view = new AlbumView(config, main_div, page, items);
             this.items_count = items.length;
 
             // Initialize signals
