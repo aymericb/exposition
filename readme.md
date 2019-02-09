@@ -4,7 +4,7 @@ Exposition is a modern HTML 5 photo gallery software for the Web.
 
 * **Maximize the use of the window** by dynamically adjusting the number of thumbnails and the size of pictures.
 * **Easy deployment**. Rely on common web technologies. Apache with PHP and GD.
-* **No Database**. No SQL. The filesystem is your database. An album is a directory. A photo an an image within.
+* **No Database**. No SQL. The filesystem is your database. An album is a directory. A photo is an image within.
 * **No complex administration console** to upload and manage photos. Just upload files to the right place to add new photos.
 * **Designed with modern browsers in mind**. The absence of compatibility with IE 6 is a feature, not a bug.
 
