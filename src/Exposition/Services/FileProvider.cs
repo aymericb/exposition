@@ -41,7 +41,7 @@ namespace Exposition.Services
                     // Check if extension is white-listed
                     if (!this.PhotoExtensions.Select(x => "."+x.ToLowerInvariant()).Contains(Path.GetExtension(fs_path).ToLowerInvariant()))
                     {
-                        throw new UnauthorizedAccessException();    // HTTP 403
+                        throw new ServerException(Models.Error.ItemForbidden);
                     }
 
                     return ItemType.Photo;
@@ -69,7 +69,7 @@ namespace Exposition.Services
                 var fs_path = GetFileSystemPath(path);
                 if (!Directory.Exists(fs_path))
                 {
-                    throw new DirectoryNotFoundException();       // HTTP 404
+                    throw new ServerException(Models.Error.ItemNotFound);
                 }
 
                 return Directory.EnumerateFileSystemEntries(fs_path)
@@ -93,7 +93,7 @@ namespace Exposition.Services
                 var fs_path = GetFileSystemPath(album_path);
                 if (!Directory.Exists(fs_path))
                 {
-                    throw new DirectoryNotFoundException();       // HTTP 404
+                    throw new ServerException(Models.Error.ItemNotFound);
                 }
 
                 fs_path = Path.Combine(fs_path, "album.json");
@@ -120,17 +120,17 @@ namespace Exposition.Services
         {
             // Check path is a valid sub-path of AlbumDir
             if (Path.IsPathRooted(path))
-                throw new UnauthorizedAccessException();    // HTTP 403
+                throw new ServerException(Models.Error.ItemForbidden);
             var fs_path = Path.GetFullPath(Path.Combine(this.AlbumDir, path.Replace('/', Path.DirectorySeparatorChar)));
             if (!fs_path.StartsWith(Path.GetFullPath(this.AlbumDir)))
             {
-                throw new UnauthorizedAccessException();    // HTTP 403
+                throw new ServerException(Models.Error.ItemForbidden);
             }
 
             // Check if path exists at all
             if (!File.Exists(fs_path) && !Directory.Exists(fs_path))
             {
-                throw new FileNotFoundException();          // HTTP 404
+                throw new ServerException(Models.Error.ItemNotFound);
             }
 
             return fs_path;

@@ -55,7 +55,8 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetItemType(path));
             Assert.NotNull(exception);
-            Assert.IsType<UnauthorizedAccessException>(exception);
+            Assert.IsType<ServerException>(exception);
+            Assert.Equal(Models.Error.ItemNotFound, ((ServerException)exception).Error);
         }
 
         [Fact]
@@ -102,7 +103,7 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetAlbumChildren(path));
             Assert.NotNull(exception);
-            Assert.IsType<UnauthorizedAccessException>(exception);
+            Assert.IsType<ServerException>(exception);
         }
 
         [Fact]
@@ -110,7 +111,7 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetAlbumChildren("something.jpg"));
             Assert.NotNull(exception);
-            Assert.IsType<FileNotFoundException>(exception);
+            Assert.IsType<ServerException>(exception);
         }
 
         [Fact]
@@ -118,7 +119,7 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetAlbumChildren("cities/qqwxu7njwti-jindong-h.jpg"));
             Assert.NotNull(exception);
-            Assert.IsType<DirectoryNotFoundException>(exception);
+            Assert.IsType<ServerException>(exception);
         }
 
         [Fact]
@@ -147,7 +148,7 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetAlbumDescriptor(path));
             Assert.NotNull(exception);
-            Assert.IsType<UnauthorizedAccessException>(exception);
+            Assert.IsType<ServerException>(exception);
         }
 
         [Fact]
@@ -155,7 +156,7 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetAlbumDescriptor("something.jpg"));
             Assert.NotNull(exception);
-            Assert.IsType<FileNotFoundException>(exception);
+            Assert.IsType<ServerException>(exception);
         }
 
         [Fact]
@@ -163,7 +164,7 @@ namespace Exposition.Tests
         {
             var exception = Record.Exception(() => this.provider.GetAlbumDescriptor("cities/qqwxu7njwti-jindong-h.jpg"));
             Assert.NotNull(exception);
-            Assert.IsType<DirectoryNotFoundException>(exception);
+            Assert.IsType<ServerException>(exception);
         }
 
         [Fact]
