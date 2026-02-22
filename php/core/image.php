@@ -85,10 +85,10 @@ class Image
 		$cacheWidth = $cacheHeight = 0;
 		if ($width>$height) {
 			$cacheWidth = $size;
-			$cacheHeight = $cacheWidth / $ratio;
+			$cacheHeight = (int)($cacheWidth / $ratio);
 		} else {
 			$cacheHeight = $size;
-			$cacheWidth = $cacheHeight * $ratio;
+			$cacheWidth = (int)($cacheHeight * $ratio);
 		}
 
 		// Check if original image is smaller than requested image
@@ -112,7 +112,7 @@ class Image
 				$image = imagecreatefrompng($path);
 				break;
 			case IMAGETYPE_BMP:
-				$image = imagecreatefromwbmp($path);
+				$image = imagecreatefrombmp($path);
 				break;
 		}
 		if (! $image) 

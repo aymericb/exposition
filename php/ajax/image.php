@@ -16,13 +16,13 @@ try {
 	// Get parameters
 	$cacheOnly = isset($_GET['cache']);
 
-	$path = $_GET['path'];
-	if (!isset($path) || !$path || empty($path))
+	if (!isset($_GET['path']) || empty($_GET['path']))
 		throw new \Exception('Missing path parameter');
+	$path = $_GET['path'];
 
-	$size = $_GET['size'];
-	if (!isset($size))
+	if (!isset($_GET['size']))
 		throw new \Exception('Missing size parameter');
+	$size = $_GET['size'];
 	if ($size === '0') {
 		$size = 0;
 	} else {

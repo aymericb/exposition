@@ -30,8 +30,7 @@ class Archive
 		if (!Config::IS_DOWNLOAD_ALLOWED)
 			throw new \Exception('Downloads are not allowed. Edit Config::IS_DOWNLOAD_ALLOWED');
 		if (!Album::isAlbum($item))
-			throw new \Exceptions('Archive not supported because item is not an album: "'.$item->getPath().'
-				"');
+			throw new \Exception('Archive not supported because item is not an album: "'.$item->getPath().'"');
 		foreach ($item->getChildren() as $subitem) {
 			if (Album::isAlbum($subitem))
 				throw new \Exception('Cannot create archive because the album contains at least one sub-album: "'.$item->getPath().'"');

@@ -30,9 +30,9 @@ function createItemData($item)
 try {
 
 	// Get parameters
-	$path = $_GET['path'];
-	if (!$path || empty($path))
+	if (!isset($_GET['path']) || empty($_GET['path']))
 		throw new \Exception('Missing path parameter');
+	$path = $_GET['path'];
 
 	// Get item path
 	$item = Item::createItem($path);

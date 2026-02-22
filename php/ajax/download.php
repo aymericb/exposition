@@ -17,9 +17,9 @@ require_once('../core/archive.php');
 try {
 
 	// Get parameters
-	$path = $_GET['path'];
-	if (!isset($path) || !$path || empty($path))
+	if (!isset($_GET['path']) || empty($_GET['path']))
 		throw new \Exception('Missing path parameter');
+	$path = $_GET['path'];
 
 	// Check if download is allowed
 	if (!Config::IS_DOWNLOAD_ALLOWED)
